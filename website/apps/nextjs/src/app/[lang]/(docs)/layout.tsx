@@ -1,47 +1,25 @@
-import { Suspense } from "react";
+import React from 'react';
+import { SolanaWalletProvider } from '../../../../../../src/sdk/solana-integration';
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 
-import { getCurrentUser } from "@saasfly/auth";
-
-import { NavBar } from "~/components/navbar";
-import { SiteFooter } from "~/components/site-footer";
-import type { Locale } from "~/config/i18n-config";
-import { getMarketingConfig } from "~/config/ui/marketing";
-import { getDictionary } from "~/lib/get-dictionary";
-
-interface DocsLayoutProps {
-  children: React.ReactNode;
-  params: {
-    lang: Locale;
-  };
-}
-
-export default async function DocsLayout({
+export default function DocsLayout({
   children,
-  params: { lang },
-}: DocsLayoutProps) {
-  const dict = await getDictionary(lang);
-  const user = await getCurrentUser();
-
+}: {
+  children: React.ReactNode;
+}) {
+  // Replace with your WalletConnect project ID
+  const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'YOUR_PROJECT_ID';
+  
   return (
-    <div className="flex min-h-screen flex-col">
-      <Suspense fallback="...">
-        <NavBar
-          items={
-            (await getMarketingConfig({ params: { lang: `${lang}` } })).mainNav
-          }
-          params={{ lang: `${lang}` }}
-          scroll={true}
-          user={user}
-          marketing={dict.marketing}
-          dropdown={dict.dropdown}
-        />
-      </Suspense>
-      <div className="container flex-1">{children}</div>
-      <SiteFooter
-        className="border-t"
-        params={{ lang: `${lang}` }}
-        dict={dict.common}
-      />
-    </div>
+    <SolanaWalletProvider 
+      projectId={projectId}
+      network={WalletAdapterNetwork.Mainnet}
+    >
+      <div className="flex min-h-screen flex-col">
+        <div className="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
+          {children}
+        </div>
+      </div>
+    </SolanaWalletProvider>
   );
 }

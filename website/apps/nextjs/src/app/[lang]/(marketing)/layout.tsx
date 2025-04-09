@@ -1,46 +1,25 @@
-import { Suspense } from "react";
+import React from 'react';
+import { SolanaWalletProvider } from '../../../../../../src/sdk/solana-integration';
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 
-import { getCurrentUser } from "@saasfly/auth";
-
-import { ModalProvider } from "~/components/modal-provider";
-import { NavBar } from "~/components/navbar";
-import { SiteFooter } from "~/components/site-footer";
-import type { Locale } from "~/config/i18n-config";
-import { getMarketingConfig } from "~/config/ui/marketing";
-import { getDictionary } from "~/lib/get-dictionary";
-
-export default async function MarketingLayout({
+export default function MarketingLayout({
   children,
-  params: { lang },
 }: {
   children: React.ReactNode;
-  params: {
-    lang: Locale;
-  };
 }) {
-  const dict = await getDictionary(lang);
-  const user = await getCurrentUser();
+  // Replace with your WalletConnect project ID
+  const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'YOUR_PROJECT_ID';
+  
   return (
-    <div className="flex min-h-screen flex-col">
-      <Suspense fallback="...">
-        <NavBar
-          items={
-            (await getMarketingConfig({ params: { lang: `${lang}` } })).mainNav
-          }
-          params={{ lang: `${lang}` }}
-          scroll={true}
-          user={user}
-          marketing={dict.marketing}
-          dropdown={dict.dropdown}
-        />
-      </Suspense>
-      <ModalProvider dict={dict.login} />
-      <main className="flex-1">{children}</main>
-      <SiteFooter
-        className="border-t border-border"
-        params={{ lang: `${lang}` }}
-        dict={dict.common}
-      />
-    </div>
+    <SolanaWalletProvider 
+      projectId={projectId}
+      network={WalletAdapterNetwork.Mainnet}
+    >
+      <div className="flex min-h-screen flex-col">
+        <div className="container flex-1">
+          {children}
+        </div>
+      </div>
+    </SolanaWalletProvider>
   );
 }

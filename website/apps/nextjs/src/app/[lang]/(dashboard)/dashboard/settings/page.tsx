@@ -1,30 +1,35 @@
-import { redirect } from "next/navigation";
+import React from 'react';
+import { SolanaWalletProvider } from '../../../../../../../src/sdk/solana-integration';
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 
-import { authOptions, getCurrentUser } from "@saasfly/auth";
-
-import { DashboardHeader } from "~/components/header";
-import { DashboardShell } from "~/components/shell";
-import { UserNameForm } from "~/components/user-name-form";
-
-export const metadata = {
-  title: "Settings",
-  description: "Manage account and website settings.",
-};
-
-export default async function SettingsPage() {
-  const user = await getCurrentUser();
-  if (!user) {
-    redirect(authOptions?.pages?.signIn ?? "/login");
-  }
+export default function SettingsPage() {
+  // Replace with your WalletConnect project ID
+  const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'YOUR_PROJECT_ID';
+  
   return (
-    <DashboardShell>
-      <DashboardHeader
-        heading="Settings"
-        text="Manage account and website settings."
-      />
-      <div className="grid gap-10">
-        <UserNameForm user={{ id: user.id, name: user.name ?? "" }} />
+    <SolanaWalletProvider 
+      projectId={projectId}
+      network={WalletAdapterNetwork.Mainnet}
+    >
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-lg font-medium">Wallet Settings</h3>
+          <p className="text-sm text-muted-foreground">
+            Manage your wallet connection and payment settings
+          </p>
+        </div>
+        <div className="border rounded-md p-4">
+          <div className="space-y-4">
+            <div>
+              <h4 className="text-sm font-medium">Connected Wallet</h4>
+              <p className="text-sm text-muted-foreground">
+                Your currently connected Solana wallet
+              </p>
+            </div>
+            {/* WalletConnect components will display connection status here */}
+          </div>
+        </div>
       </div>
-    </DashboardShell>
+    </SolanaWalletProvider>
   );
 }

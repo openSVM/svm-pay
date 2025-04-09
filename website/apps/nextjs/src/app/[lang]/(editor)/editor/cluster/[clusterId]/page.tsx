@@ -1,50 +1,38 @@
-import { notFound, redirect } from "next/navigation";
-import type { User } from "next-auth";
+import React from 'react';
+import { SolanaWalletProvider } from '../../../../../../../../src/sdk/solana-integration';
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 
-import { authOptions, getCurrentUser } from "@saasfly/auth";
-import { db } from "@saasfly/db";
-
-import { ClusterConfig } from "~/components/k8s/cluster-config";
-import type { Cluster } from "~/types/k8s";
-
-async function getClusterForUser(clusterId: Cluster["id"], userId: User["id"]) {
-  return await db
-    .selectFrom("K8sClusterConfig")
-    .selectAll()
-    .where("id", "=", Number(clusterId))
-    .where("authUserId", "=", userId)
-    .executeTakeFirst();
-}
-
-interface EditorClusterProps {
-  params: {
-    clusterId: number;
-    lang: string;
-  };
-}
-
-export default async function EditorClusterPage({
+export default function ClusterPage({
   params,
-}: EditorClusterProps) {
-  const user = await getCurrentUser();
-  if (!user) {
-    redirect(authOptions?.pages?.signIn ?? "/login");
-  }
-
-  // console.log("EditorClusterPage user:" + user.id + "params:", params);
-  const cluster = await getClusterForUser(params.clusterId, user.id);
-
-  if (!cluster) {
-    notFound();
-  }
+}: {
+  params: { clusterId: string };
+}) {
+  // Replace with your WalletConnect project ID
+  const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'YOUR_PROJECT_ID';
+  
   return (
-    <ClusterConfig
-      cluster={{
-        id: cluster.id,
-        name: cluster.name,
-        location: cluster.location,
-      }}
-      params={{ lang: params.lang }}
-    />
+    <SolanaWalletProvider 
+      projectId={projectId}
+      network={WalletAdapterNetwork.Mainnet}
+    >
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-lg font-medium">Cluster: {params.clusterId}</h3>
+          <p className="text-sm text-muted-foreground">
+            Manage your cluster settings and payments
+          </p>
+        </div>
+        <div className="border rounded-md p-4">
+          <div className="space-y-4">
+            <div>
+              <h4 className="text-sm font-medium">Cluster Details</h4>
+              <p className="text-sm text-muted-foreground">
+                Cluster ID: {params.clusterId}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </SolanaWalletProvider>
   );
 }
