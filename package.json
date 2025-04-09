@@ -1,0 +1,111 @@
+{
+  "name": "svm-pay",
+  "version": "1.0.0",
+  "description": "A payment solution for SVM networks (Solana, Sonic SVM, Eclipse, s00n)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src --ext .ts,.tsx",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "start:web-demo": "parcel examples/web-payment-demo.html",
+    "start:pos-demo": "parcel examples/point-of-sale-demo.html",
+    "start:subscription-demo": "parcel examples/subscription-payment-demo.html"
+  },
+  "keywords": [
+    "svm",
+    "solana",
+    "sonic",
+    "eclipse",
+    "soon",
+    "payment",
+    "crypto",
+    "blockchain"
+  ],
+  "author": "SVM-Pay Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openSVM/svm-pay.git"
+  },
+  "bugs": {
+    "url": "https://github.com/openSVM/svm-pay/issues"
+  },
+  "homepage": "https://github.com/openSVM/svm-pay#readme",
+  "dependencies": {
+    "crypto": "^1.0.1"
+  },
+  "peerDependencies": {
+    "react": "^17.0.0 || ^18.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0",
+    "vue": "^3.0.0",
+    "@angular/core": "^13.0.0 || ^14.0.0 || ^15.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "vue": {
+      "optional": true
+    },
+    "@angular/core": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^18.15.11",
+    "@types/react": "^18.0.33",
+    "@types/react-dom": "^18.0.11",
+    "@typescript-eslint/eslint-plugin": "^5.57.1",
+    "@typescript-eslint/parser": "^5.57.1",
+    "eslint": "^8.38.0",
+    "jest": "^29.5.0",
+    "parcel": "^2.8.3",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.4"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./react": {
+      "import": "./dist/sdk/react.js",
+      "require": "./dist/sdk/react.js",
+      "types": "./dist/sdk/react.d.ts"
+    },
+    "./react-integration": {
+      "import": "./dist/sdk/react-integration.js",
+      "require": "./dist/sdk/react-integration.js",
+      "types": "./dist/sdk/react-integration.d.ts"
+    },
+    "./vue": {
+      "import": "./dist/sdk/vue.js",
+      "require": "./dist/sdk/vue.js"
+    },
+    "./vue-integration": {
+      "import": "./dist/sdk/vue-integration.js",
+      "require": "./dist/sdk/vue-integration.js"
+    },
+    "./angular": {
+      "import": "./dist/sdk/angular-integration.js",
+      "require": "./dist/sdk/angular-integration.js",
+      "types": "./dist/sdk/angular-integration.d.ts"
+    },
+    "./server": {
+      "import": "./dist/sdk/server.js",
+      "require": "./dist/sdk/server.js",
+      "types": "./dist/sdk/server.d.ts"
+    }
+  }
+}

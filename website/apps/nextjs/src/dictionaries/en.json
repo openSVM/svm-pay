@@ -1,0 +1,138 @@
+{
+  "marketing": {
+    "title": "Payment infrastructure for SVM networks with",
+    "sub_title": "A complete payment solution for Solana, Sonic SVM, Eclipse, and s00n networks with one-click integration.",
+    "get_started": "Get Started",
+    "contributors": {
+      "contributors_desc": "contributors made SVM-Pay stronger",
+      "developers_first": "Help more than ",
+      "developers_second": " developers"
+    },
+    "right_side": {
+      "cross_network_title": "Cross-Network Compatibility",
+      "cross_network_desc": "Accept payments across Solana, Sonic SVM, Eclipse, and s00n networks with a single integration.",
+      "one_click_title": "One-Click Integration",
+      "one_click_desc": "Integrate SVM-Pay into your application with just a few lines of code. No complex setup required.",
+      "secure_title": "Secure by Design",
+      "secure_desc": "Built with security best practices for blockchain payments, ensuring your transactions are safe and reliable."
+    },
+    "features_grid": {
+      "cross_network_title": "Cross-Network Compatibility",
+      "cross_network_desc": "Accept payments across Solana, Sonic SVM, Eclipse, and s00n networks with a single integration.",
+      "one_click_title": "One-Click Integration",
+      "one_click_desc": "Integrate SVM-Pay into your application with just a few lines of code. No complex setup required.",
+      "no_fees_title": "No Additional Fees",
+      "no_fees_desc": "SVM-Pay charges no additional fees beyond standard network transaction fees.",
+      "secure_title": "Secure by Design",
+      "secure_desc": "Built with security best practices for blockchain payments, ensuring your transactions are safe."
+    },
+    "sponsor": {
+      "title": "Supported Networks"
+    },
+    "video": {
+      "title": "Watch a Video, then build your App in 1 hour",
+      "subtitle": "See how easy it is to integrate SVM-Pay into your application"
+    },
+    "people_comment": {
+      "title": "What People Are Saying",
+      "desc": "Don't just take our word for it. Here's what real developers are saying about SVM-Pay."
+    }
+  },
+  "header": {
+    "products": "Products",
+    "developers": "Developers",
+    "documentation": "Documentation",
+    "pricing": "Pricing",
+    "about": "About",
+    "sign_in": "Sign in",
+    "start_now": "Start now"
+  },
+  "footer": {
+    "product": "Product",
+    "features": "Features",
+    "pricing": "Pricing",
+    "documentation": "Documentation",
+    "releases": "Releases",
+    "resources": "Resources",
+    "blog": "Blog",
+    "guides": "Guides",
+    "support": "Support",
+    "status": "Status",
+    "company": "Company",
+    "about": "About",
+    "careers": "Careers",
+    "contact": "Contact",
+    "legal": "Legal",
+    "copyright": "© 2025 SVM-Pay. All rights reserved."
+  }
+}
+
+{
+  "price": {
+    "title": "Simple, transparent pricing",
+    "subtitle": "No additional fees beyond standard network transaction fees",
+    "free": {
+      "name": "Free",
+      "price": "$0",
+      "description": "Perfect for getting started with SVM-Pay",
+      "features": [
+        "Basic payment processing",
+        "Support for Solana network",
+        "Standard documentation",
+        "Community support"
+      ],
+      "cta": "Get Started"
+    },
+    "pro": {
+      "name": "Pro",
+      "price": "$0",
+      "description": "Everything you need for production applications",
+      "features": [
+        "Advanced payment processing",
+        "Support for all SVM networks",
+        "Priority documentation",
+        "Email support",
+        "Custom integration assistance"
+      ],
+      "cta": "Get Started"
+    },
+    "enterprise": {
+      "name": "Enterprise",
+      "price": "$0",
+      "description": "For large-scale applications with custom needs",
+      "features": [
+        "All Pro features",
+        "Dedicated support team",
+        "Custom development",
+        "SLA guarantees",
+        "White-label options"
+      ],
+      "cta": "Contact Us"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "items": [
+        {
+          "question": "Is SVM-Pay really free to use?",
+          "answer": "Yes, SVM-Pay charges no additional fees beyond the standard network transaction fees required by the blockchain networks themselves."
+        },
+        {
+          "question": "Which networks does SVM-Pay support?",
+          "answer": "SVM-Pay supports Solana, Sonic SVM, Eclipse, and s00n networks, with more being added regularly."
+        },
+        {
+          "question": "How easy is it to integrate SVM-Pay?",
+          "answer": "SVM-Pay is designed for one-click integration. Most developers can integrate it into their applications in under an hour with just a few lines of code."
+        },
+        {
+          "question": "Is SVM-Pay secure?",
+          "answer": "Yes, SVM-Pay is built with security best practices for blockchain payments, ensuring your transactions are safe and reliable."
+        },
+        {
+          "question": "Can I use SVM-Pay for my business?",
+          "answer": "Absolutely! SVM-Pay is designed for businesses of all sizes, from individual developers to large enterprises."
+        }
+      ]
+    }
+  }
+}
