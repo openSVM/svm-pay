@@ -35,13 +35,21 @@
   },
   "homepage": "https://github.com/openSVM/svm-pay#readme",
   "dependencies": {
+    "@reown/appkit": "^1.7.2",
+    "@solana/wallet-adapter-base": "^0.9.24",
+    "@solana/wallet-adapter-react": "^0.15.36",
+    "@solana/wallet-adapter-react-ui": "^0.9.36",
+    "@solana/web3.js": "^1.98.0",
+    "@walletconnect/solana-adapter": "^0.0.7",
+    "@walletconnect/universal-provider": "^2.19.2",
+    "bs58": "^6.0.0",
     "crypto": "^1.0.1"
   },
   "peerDependencies": {
+    "@angular/core": "^13.0.0 || ^14.0.0 || ^15.0.0",
     "react": "^17.0.0 || ^18.0.0",
     "react-dom": "^17.0.0 || ^18.0.0",
-    "vue": "^3.0.0",
-    "@angular/core": "^13.0.0 || ^14.0.0 || ^15.0.0"
+    "vue": "^3.0.0"
   },
   "peerDependenciesMeta": {
     "react": {
