@@ -1,5 +1,7 @@
 # SVM-Pay: Cross-Network Payment Solution
 
+Pay from anywhere from any solana-vm based network!
+
 ![SVM-Pay Logo](https://example.com/svm-pay-logo.png)
 
 ## Overview
