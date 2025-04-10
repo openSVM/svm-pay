@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { LAMPORTS_PER_SOL, PublicKey, Transaction } from '@solana/web3.js';
+import { LAMPORTS_PER_SOL, PublicKey, Transaction, Connection } from '@solana/web3.js';
 
 export interface SolanaPaymentProps {
   amount: number; // Amount in SOL
@@ -40,8 +40,11 @@ export const SolanaPayment: FC<SolanaPaymentProps> = ({
         }
       );
 
+      // Create a connection to use for sending the transaction
+      const connection = new Connection('https://api.mainnet-beta.solana.com');
+
       // Send the transaction
-      const signature = await sendTransaction(transaction, undefined);
+      const signature = await sendTransaction(transaction, connection);
       
       setTxSignature(signature);
       onSuccess?.(signature);

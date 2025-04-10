@@ -1,10 +1,9 @@
-import { WalletConnectionError, isVersionedTransaction } from '@solana/wallet-adapter-base';
+import { WalletConnectionError, isVersionedTransaction, WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { PublicKey, Transaction, VersionedTransaction } from '@solana/web3.js';
 import { UniversalProvider } from '@walletconnect/universal-provider';
 import { parseAccountId } from '@walletconnect/utils';
 import base58 from 'bs58';
-import { WalletConnectRPCMethods } from './constants';
-import type { WalletConnectChainID } from './constants';
+import { WalletConnectChainID, WalletConnectRPCMethods } from './constants';
 import type { UniversalProviderType, WalletConnectWalletAdapterConfig, WalletConnectWalletInit } from './types';
 
 export class ClientNotInitializedError extends Error {
@@ -25,12 +24,12 @@ export class WalletConnectWallet {
   private _UniversalProvider: UniversalProviderType | undefined;
   private _session: any | undefined;
   private _projectId: string;
-  private _network: WalletConnectChainID;
+  private _network: string;
   private _ConnectQueueResolver: ((value: unknown) => void) | undefined;
 
   constructor(config: WalletConnectWalletAdapterConfig) {
     this.initClient(config.options);
-    this._network = config.network === 'mainnet' 
+    this._network = config.network === WalletAdapterNetwork.Mainnet 
       ? WalletConnectChainID.Mainnet 
       : WalletConnectChainID.Devnet;
     

@@ -11,7 +11,7 @@ import '@solana/wallet-adapter-react-ui/styles.css';
 export interface SolanaWalletProviderProps {
   children: ReactNode;
   projectId: string;
-  network?: WalletAdapterNetwork;
+  network?: WalletAdapterNetwork.Mainnet | WalletAdapterNetwork.Devnet;
 }
 
 export const SolanaWalletProvider: FC<SolanaWalletProviderProps> = ({ 

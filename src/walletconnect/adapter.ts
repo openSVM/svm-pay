@@ -66,9 +66,7 @@ export class WalletConnectWalletAdapter extends BaseSignerWalletAdapter {
       this._connecting = true;
 
       this._wallet = new WalletConnectWallet({
-        network: this._config.network === WalletAdapterNetwork.Mainnet 
-          ? WalletConnectChainID.Mainnet 
-          : WalletConnectChainID.Devnet,
+        network: this._config.network,
         options: this._config.options
       });
 
