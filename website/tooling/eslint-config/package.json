@@ -26,10 +26,10 @@
     "eslint-plugin-react-hooks": "4.6.0"
   },
   "devDependencies": {
-    "@saasfly/prettier-config": "workspace:*",
-    "@saasfly/typescript-config": "workspace:*",
-    "eslint": "8.57.0",
-    "typescript": "5.4.5"
+    "@saasfly/prettier-config": "file:../prettier-config",
+    "@saasfly/typescript-config": "file:../typescript-config",
+    "eslint": "9.24.0",
+    "typescript": "5.8.3"
   },
   "eslintConfig": {
     "root": true,

@@ -25,9 +25,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@saasfly/db": "workspace:*",
-    "@trpc/client": "10.44.1",
-    "@trpc/server": "10.44.1",
+    "@saasfly/db": "file:../db",
+    "@trpc/client": "11.0.2",
+    "@trpc/server": "11.0.2",
     "@t3-oss/env-nextjs": "0.8.0",
     "superjson": "2.2.1",
     "dinero.js": "2.0.0-alpha.14",
@@ -36,12 +36,12 @@
     "zod-form-data": "2.0.2"
   },
   "devDependencies": {
-    "@saasfly/eslint-config": "workspace:*",
-    "@saasfly/prettier-config": "workspace:*",
-    "@saasfly/typescript-config": "workspace:*",
-    "eslint": "8.57.0",
-    "prettier": "3.2.5",
-    "typescript": "5.4.5"
+    "@saasfly/eslint-config": "file:../../tooling/eslint-config",
+    "@saasfly/prettier-config": "file:../../tooling/prettier-config",
+    "@saasfly/typescript-config": "file:../../tooling/typescript-config",
+    "eslint": "9.24.0",
+    "prettier": "3.5.3",
+    "typescript": "5.8.3"
   },
   "eslintConfig": {
     "root": true,

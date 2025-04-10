@@ -10,12 +10,12 @@
   },
   "dependencies": {
     "@ianvs/prettier-plugin-sort-imports": "4.2.1",
-    "prettier": "3.2.5",
+    "prettier": "3.5.3",
     "prettier-plugin-tailwindcss": "0.5.13"
   },
   "devDependencies": {
-    "@saasfly/typescript-config": "workspace:*",
-    "typescript": "5.4.5"
+    "@saasfly/typescript-config": "file:../typescript-config",
+    "typescript": "5.8.3"
   },
   "prettier": "@saasfly/prettier-config"
 }

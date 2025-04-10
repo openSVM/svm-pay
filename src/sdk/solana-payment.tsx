@@ -1,3 +1,5 @@
+"use client";
+
 import React, { FC, useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
