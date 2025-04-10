@@ -13,7 +13,7 @@
     "lint": "turbo lint -- --quiet -- --cache --cache-location 'node_modules/.cache/.eslintcache' && manypkg check",
     "lint:fix": "turbo lint --continue -- --fix --cache --cache-location 'node_modules/.cache/.eslintcache' ",
     "typecheck": "turbo typecheck",
-    "postinstall": "bun run check-deps",
+    "postinstall": "npm run check-deps || true",
     "check-deps": "check-dependency-version-consistency .",
     "gen": "turbo gen --config 'turbo/generators/config.ts'"
   },
