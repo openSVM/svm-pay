@@ -13,6 +13,11 @@ const config = {
     "@saasfly/db",
     "@saasfly/common",
     "@saasfly/ui",
+    "@solana/wallet-adapter-react",
+    "@solana/wallet-adapter-react-ui",
+    "@solana/wallet-adapter-base",
+    "@walletconnect/solana-adapter",
+    "@walletconnect/universal-provider",
   ],
   pageExtensions: ["ts", "tsx", "mdx"],
   experimental: {
