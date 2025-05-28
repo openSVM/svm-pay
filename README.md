@@ -26,6 +26,7 @@ SVM-Pay is a payment solution for SVM networks (Solana, Sonic SVM, Eclipse, s00n
 - [Architecture](docs/architecture.md)
 - [Security Recommendations](docs/security-recommendations.md)
 - [Examples](examples/)
+- [NPM Package Integration](NPM-INTEGRATION.md)
 
 ## Installation
 
@@ -56,6 +57,12 @@ const url = svmPay.createTransferUrl(
 
 console.log(url);
 // Output: solana:YOUR_WALLET_ADDRESS?amount=1.0&label=Your%20Store&message=Payment%20for%20Order%20%23123&reference=order-123
+
+// NPM Package Integration
+// Check wallet balance (requires svm-pay npm package)
+svmPay.checkWalletBalance()
+  .then(balance => console.log('Wallet balance:', balance))
+  .catch(error => console.error('Balance check failed:', error));
 ```
 
 ## Framework Integration

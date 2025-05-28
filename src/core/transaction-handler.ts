@@ -80,14 +80,16 @@ export class TransactionRequestHandler {
   async submitTransaction(paymentId: string, transaction: string, signature: string): Promise<PaymentRecord> {
     // In a real implementation, we would look up the payment record by ID
     // For this example, we'll create a dummy record
+    const dummyRequest: TransactionRequest = {
+      type: 'transaction' as any,
+      network: SVMNetwork.SOLANA,
+      recipient: 'dummy',
+      link: 'https://example.com/transaction'
+    };
+    
     const record: PaymentRecord = {
       id: paymentId,
-      request: {
-        type: 'transaction' as any,
-        network: SVMNetwork.SOLANA,
-        recipient: 'dummy',
-        link: 'https://example.com/transaction'
-      },
+      request: dummyRequest,
       status: PaymentStatus.PENDING,
       createdAt: Date.now(),
       updatedAt: Date.now()
@@ -130,14 +132,16 @@ export class TransactionRequestHandler {
   async checkStatus(paymentId: string): Promise<PaymentRecord> {
     // In a real implementation, we would look up the payment record by ID
     // For this example, we'll create a dummy record
+    const dummyRequest: TransactionRequest = {
+      type: 'transaction' as any,
+      network: SVMNetwork.SOLANA,
+      recipient: 'dummy',
+      link: 'https://example.com/transaction'
+    };
+    
     const record: PaymentRecord = {
       id: paymentId,
-      request: {
-        type: 'transaction' as any,
-        network: SVMNetwork.SOLANA,
-        recipient: 'dummy',
-        link: 'https://example.com/transaction'
-      },
+      request: dummyRequest,
       status: PaymentStatus.PENDING,
       signature: 'dummy-signature',
       createdAt: Date.now(),
