@@ -1,1 +1,0 @@
-{"version":3,"file":"constants.d.ts","sourceRoot":"","sources":["../../src/walletconnect/constants.ts"],"names":[],"mappings":"AAAA,eAAO,MAAM,oBAAoB;;;CAGvB,CAAC;AAEX,MAAM,MAAM,wBAAwB,GAAG,OAAO,oBAAoB,CAAC,MAAM,OAAO,oBAAoB,CAAC,CAAC;AAEtG,oBAAY,uBAAuB;IACjC,eAAe,2BAA2B;IAC1C,mBAAmB,+BAA+B;IAClD,WAAW,uBAAuB;IAClC,sBAAsB,kCAAkC;CACzD"}
