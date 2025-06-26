@@ -14,5 +14,20 @@ export * from './sdk/server';
 // Export wallet integration
 export * from './walletconnect/index';
 
-// Export npm package integration
-export * from './integration/index';
+// Export CLI utilities for programmatic access
+export { 
+  loadConfig, 
+  saveConfig, 
+  validateConfig, 
+  isTestMode,
+  type SVMPayConfig as CLIConfig 
+} from './cli/utils/config';
+export * from './cli/utils/solana';
+export * from './cli/utils/openrouter';
+export { 
+  loadPaymentHistory, 
+  savePaymentHistory, 
+  addPaymentRecord, 
+  formatPaymentHistory,
+  type PaymentRecord as CLIPaymentRecord 
+} from './cli/utils/history';

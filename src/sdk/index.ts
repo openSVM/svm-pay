@@ -22,7 +22,10 @@ import { SonicNetworkAdapter } from '../network/sonic';
 import { EclipseNetworkAdapter } from '../network/eclipse';
 import { SoonNetworkAdapter } from '../network/soon';
 import { detectNetwork } from '../network/detector';
-import { SVMPayNPMIntegration } from '../integration/npm-package';
+import { loadConfig } from '../cli/utils/config';
+import { getWalletBalance } from '../cli/utils/solana';
+import { checkApiUsage } from '../cli/utils/openrouter';
+import { loadPaymentHistory } from '../cli/utils/history';
 
 /**
  * SVM-Pay SDK configuration options
@@ -45,8 +48,6 @@ export class SVMPay {
   private config: SVMPayConfig;
   private transferHandler: TransferRequestHandler;
   private transactionHandler: TransactionRequestHandler;
-  /** Flag indicating whether npm package integration is available */
-  private npmIntegrationAvailable: boolean = false;
   
   /**
    * Create a new SVMPay SDK instance
@@ -67,25 +68,7 @@ export class SVMPay {
     this.transferHandler = new TransferRequestHandler(NetworkAdapterFactory.getAllAdapters());
     this.transactionHandler = new TransactionRequestHandler(NetworkAdapterFactory.getAllAdapters());
     
-    // Check if npm integration is available
-    this.checkNpmIntegration();
-    
     this.log('SVMPay SDK initialized');
-  }
-  
-  /**
-   * Check if npm package integration is available
-   */
-  private async checkNpmIntegration(): Promise<void> {
-    try {
-      // Try to dynamically import the npm package
-      await import('svm-pay');
-      this.npmIntegrationAvailable = true;
-      this.log('svm-pay npm package integration available');
-    } catch (error) {
-      this.npmIntegrationAvailable = false;
-      this.log('svm-pay npm package not available, using local implementation');
-    }
   }
   
   /**
@@ -191,23 +174,6 @@ export class SVMPay {
   async processPayment(request: PaymentRequest): Promise<any> {
     this.log(`Processing payment request of type: ${request.type}`);
     
-    // Try to use npm package if available and request is compatible
-    if (this.npmIntegrationAvailable && request.type === RequestType.TRANSFER && request.network === SVMNetwork.SOLANA) {
-      try {
-        const transferRequest = request as TransferRequest;
-        const options = {
-          recipient: request.recipient,
-          amount: transferRequest.amount ? parseFloat(transferRequest.amount) : undefined
-        };
-        
-        this.log('Using svm-pay npm package for payment processing');
-        return await SVMPayNPMIntegration.processPayment(options);
-      } catch (error) {
-        this.log(`Failed to use npm package, falling back to local implementation: ${error}`);
-        // Continue with local implementation on failure
-      }
-    }
-    
     // Use local implementation
     if (request.type === RequestType.TRANSFER) {
       return this.transferHandler.processRequest(request as TransferRequest);
@@ -247,79 +213,95 @@ export class SVMPay {
   }
   
   /**
-   * Check wallet balance (uses npm package if available)
+   * Check wallet balance (uses local CLI functionality)
    * 
    * @returns Wallet balance information
    */
   async checkWalletBalance(): Promise<any> {
-    if (this.npmIntegrationAvailable) {
-      try {
-        this.log('Using svm-pay npm package for balance check');
-        return await SVMPayNPMIntegration.checkBalance();
-      } catch (error) {
-        this.log(`Failed to check balance with npm package: ${error}`);
-        throw error;
+    try {
+      this.log('Using local CLI functionality for balance check');
+      const config = loadConfig();
+      
+      if (!config.privateKey) {
+        throw new Error('Private key not configured. Run "svm-pay setup -k <private-key>" first.');
       }
-    } else {
-      throw new Error('svm-pay npm package not available for balance checking');
+      
+      const balance = await getWalletBalance(config.privateKey);
+      return {
+        balance,
+        address: config.privateKey // Note: This should be converted to public key
+      };
+    } catch (error) {
+      this.log(`Failed to check balance: ${error}`);
+      throw error;
     }
   }
   
   /**
-   * Check API usage (uses npm package if available)
+   * Check API usage (uses local CLI functionality)
    * 
    * @returns API usage information
    */
   async checkApiUsage(): Promise<any> {
-    if (this.npmIntegrationAvailable) {
-      try {
-        this.log('Using svm-pay npm package for API usage check');
-        return await SVMPayNPMIntegration.checkUsage();
-      } catch (error) {
-        this.log(`Failed to check API usage with npm package: ${error}`);
-        throw error;
+    try {
+      this.log('Using local CLI functionality for API usage check');
+      const config = loadConfig();
+      
+      if (!config.apiKey) {
+        throw new Error('API key not configured. Run "svm-pay setup -a <api-key>" first.');
       }
-    } else {
-      throw new Error('svm-pay npm package not available for API usage checking');
+      
+      return await checkApiUsage(config.apiKey);
+    } catch (error) {
+      this.log(`Failed to check API usage: ${error}`);
+      throw error;
     }
   }
   
   /**
-   * Get payment history (uses npm package if available)
+   * Get payment history (uses local CLI functionality)
    * 
    * @returns Payment history
    */
   async getPaymentHistory(): Promise<any> {
-    if (this.npmIntegrationAvailable) {
-      try {
-        this.log('Using svm-pay npm package for payment history');
-        return await SVMPayNPMIntegration.getPaymentHistory();
-      } catch (error) {
-        this.log(`Failed to get payment history with npm package: ${error}`);
-        throw error;
-      }
-    } else {
-      throw new Error('svm-pay npm package not available for payment history');
+    try {
+      this.log('Using local CLI functionality for payment history');
+      return loadPaymentHistory();
+    } catch (error) {
+      this.log(`Failed to get payment history: ${error}`);
+      throw error;
     }
   }
   
   /**
-   * Setup wallet configuration (uses npm package if available)
+   * Setup wallet configuration (uses local CLI functionality)
    * 
    * @param options Setup options
    * @returns Setup result
    */
-  async setupWallet(options: { walletPath?: string }): Promise<any> {
-    if (this.npmIntegrationAvailable) {
-      try {
-        this.log('Using svm-pay npm package for wallet setup');
-        return await SVMPayNPMIntegration.setupConfig(options);
-      } catch (error) {
-        this.log(`Failed to setup wallet with npm package: ${error}`);
-        throw error;
-      }
-    } else {
-      throw new Error('svm-pay npm package not available for wallet setup');
+  async setupWallet(options: { 
+    privateKey?: string;
+    apiKey?: string;
+    threshold?: number;
+    recipient?: string;
+  }): Promise<any> {
+    try {
+      this.log('Using local CLI functionality for wallet setup');
+      const { loadConfig, saveConfig } = await import('../cli/utils/config');
+      
+      const config = loadConfig();
+      
+      if (options.privateKey) config.privateKey = options.privateKey;
+      if (options.apiKey) config.apiKey = options.apiKey;
+      if (options.threshold) config.threshold = options.threshold;
+      if (options.recipient) config.recipientAddress = options.recipient;
+      
+      saveConfig(config);
+      
+      return { success: true, config };
+    } catch (error) {
+      this.log(`Failed to setup wallet: ${error}`);
+      throw error;
     }
   }
 }
