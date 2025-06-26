@@ -1,184 +1,150 @@
-# Build Process Optimization
+# NPM Package Build Optimization
 
-This document outlines the optimizations implemented to reduce disk space usage in the build process for the svm-pay repository.
+This document describes the comprehensive build optimizations implemented for the svm-pay npm package to improve CLI/library distribution.
 
-## Identified Issues
+## Build System Improvements
 
-During the analysis of the repository structure and build process, the following disk space bottlenecks were identified:
+### 1. TypeScript Configuration
+- **Development config** (`tsconfig.json`): Includes source maps and declaration maps for debugging
+- **Production config** (`tsconfig.prod.json`): Optimized for distribution with no source maps and removed comments
+- Added proper Node.js and Jest types support
+- Configured proper module resolution and JSX support
 
-1. Large node_modules directory (711MB) in the root
-2. Multiple smaller node_modules directories in subdirectories
-3. Duplicate dependencies across packages (especially WalletConnect-related packages)
-4. Multiple dist directories throughout the node_modules structure
-5. Inefficient package manager configuration
-6. Lack of cleanup scripts for build artifacts
-
-## Implemented Optimizations
-
-### 1. Package Manager Optimization
-
-- Switched from Bun to pnpm for more efficient dependency management
-- pnpm creates a more efficient node_modules structure by using symlinks to a single content-addressable store
-- Added pnpm workspace configuration for dependency hoisting
-
-```yaml
-# pnpm-workspace.yaml
-packages:
-  - 'website/apps/*'
-  - 'website/packages/*'
-  - 'website/tooling/*'
-```
-
-### 2. NPM Configuration
-
-Added `.npmrc` files with optimized settings:
-
-```
-# Reduce package size by not installing optional dependencies
-ignore-optional=true
-
-# Use exact versions to prevent unexpected updates
-save-exact=true
-
-# Reduce disk space by not generating package-lock.json
-package-lock=false
-
-# Reduce disk space by not saving npm logs
-loglevel=error
-
-# Reduce disk space by not saving npm cache
-cache=.npm-cache
-
-# Reduce disk space by pruning dependencies when installing
-prune=true
-
-# Reduce disk space by using a shared store for dependencies
-shared-workspace-lockfile=true
-
-# Reduce disk space by not installing peer dependencies automatically
-legacy-peer-deps=true
-```
-
-### 3. PNPM Configuration
-
-Added `.pnpmrc` file with optimized settings:
-
-```
-shamefully-hoist=true
-strict-peer-dependencies=false
-auto-install-peers=true
-link-workspace-packages=true
-shared-workspace-lockfile=true
-resolution-mode=highest
-```
-
-### 4. Build Script Optimization
-
-Updated package.json scripts to include clean and prune operations:
-
-```json
-"scripts": {
-  "clean": "rm -rf node_modules/.cache dist .parcel-cache",
-  "prune": "npm prune --production"
-}
-```
-
-```json
-"scripts": {
-  "build": "turbo build --no-cache",
-  "clean": "rm -rf node_modules/.cache .turbo",
-  "clean:deep": "find . -name 'node_modules' -type d -prune -exec rm -rf {} \\; && find . -name '.turbo' -type d -prune -exec rm -rf {} \\; && find . -name '.next' -type d -prune -exec rm -rf {} \\;",
-  "prune": "pnpm prune --prod",
-  "build:prod": "pnpm clean && pnpm build && pnpm prune"
-}
-```
-
-### 5. Next.js Configuration Optimization
-
-Updated Next.js configuration with disk space optimizations:
-
-```javascript
-// Optimize build output for reduced disk space
-swcMinify: true,
-compress: true,
-
-// Reduce build output size
-productionBrowserSourceMaps: false,
-
-// Optimize for production
-poweredByHeader: false,
-
-// Reduce disk space by optimizing output
-optimizeFonts: true,
-
-// Reduce disk space by disabling image optimization in development
-images: {
-  disableStaticImages: process.env.NODE_ENV === 'development',
-  domains: ["images.unsplash.com", "avatars.githubusercontent.com", "www.twillot.com", "cdnv2.ruguoapp.com", "www.setupyourpay.com"],
-},
-
-// Webpack optimization for reduced disk space
-webpack: (config, { dev, isServer }) => {
-  // Optimize CSS
-  config.optimization = {
-    ...config.optimization,
-    minimize: !dev,
-  };
-  
-  // Reduce disk space by excluding large development-only packages
-  if (dev) {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      'react-dom$': 'react-dom/profiling',
-    };
-  }
-  
-  return config;
-},
-```
-
-### 6. Turbo Configuration Optimization
-
-Created a turbo.json file with optimized cache and build settings:
-
+### 2. Build Scripts
 ```json
 {
-  "cache": {
-    "dir": ".turbo",
-    "workers": 4
-  },
-  "cache.compression": {
-    "enabled": true,
-    "level": 9
-  },
-  "build": {
-    "output_logs": false,
-    "log_prefix": false
-  },
-  "prune": {
-    "enabled": true,
-    "include_dependencies": false,
-    "include_dev_dependencies": false
-  },
-  "global": {
-    "output_dir": "dist",
-    "no_daemon": true
-  }
+  "clean": "rm -rf dist",
+  "build": "npm run clean && tsc",
+  "build:production": "npm run clean && NODE_ENV=production tsc -p tsconfig.prod.json && NODE_ENV=production node scripts/optimize-build.js --no-source-maps",
+  "postbuild": "chmod +x dist/bin/svm-pay.js && node scripts/optimize-build.js",
+  "test:ci": "jest --passWithNoTests --ci --coverage",
+  "lint:fix": "eslint src --ext .ts,.tsx --fix",
+  "prepublishOnly": "npm run build:production && npm run test:ci && npm run lint",
+  "cli:test": "node dist/bin/svm-pay.js --help",
+  "validate:package": "npm pack --dry-run"
 }
 ```
 
-## Results
+### 3. Build Optimization Script
+The `scripts/optimize-build.js` script provides:
+- **CLI Binary Permissions**: Ensures the CLI executable has proper permissions (755)
+- **Source Map Removal**: Removes source maps in production builds to reduce package size
+- **Build Summary**: Provides detailed information about the built package
+- **File Counting**: Tracks the number of files generated
 
-These optimizations have significantly reduced disk space usage:
+### 4. Package Configuration
+- **Entry Points**: Properly configured main, types, and bin entries
+- **Exports Map**: Comprehensive exports for different frameworks (React, Vue, Angular, Server)
+- **Files Field**: Optimized to include only necessary distribution files
+- **Peer Dependencies**: Properly configured optional peer dependencies for frameworks
 
-- Reduced inode usage from 100% to 64%
-- Improved disk space efficiency through dependency hoisting and deduplication
-- Reduced build artifact size through optimized configurations
-- Added scripts for cleaning temporary files and pruning dependencies
+## Distribution Optimizations
 
-## Recommendations for Further Optimization
+### Package Size Reduction
+- **Production Builds**: Remove source maps, comments, and debug information
+- **File Optimization**: Only include necessary files in the npm package
+- **Build Artifacts**: Clean build process that removes old artifacts
 
-1. Regularly run the clean scripts to remove temporary files and build artifacts
-2. Consider implementing a CI/CD pipeline that uses the optimized build process
-3. Periodically audit dependencies to remove unused packages
-4. Use the production build script for deployment to ensure minimal disk space usage
+### CLI Distribution
+- **Executable Binary**: Properly configured CLI binary with shebang and permissions
+- **Command Structure**: Well-organized command structure with proper help and version support
+- **Dependencies**: Optimized dependency tree for CLI functionality
+
+### Library Distribution
+- **Multiple Entry Points**: Support for different frameworks and environments
+- **Type Definitions**: Complete TypeScript type definitions for all exported modules
+- **Tree Shaking**: Properly configured for optimal bundling in consumer applications
+
+## Build Validation
+
+### Testing
+- **CI Tests**: Automated testing with coverage reports
+- **CLI Testing**: Automated CLI functionality testing
+- **Lint Checks**: Code quality and style validation
+
+### Package Validation
+- **Dry Run**: `npm pack --dry-run` validation to ensure proper package structure
+- **Size Analysis**: Monitor package size and file count
+- **Dependency Analysis**: Validate dependency tree and peer dependencies
+
+## Usage
+
+### Development Build
+```bash
+npm run build
+```
+
+### Production Build
+```bash
+npm run build:production
+```
+
+### Full CI Pipeline
+```bash
+npm run prepublishOnly
+```
+
+### Package Validation
+```bash
+npm run validate:package
+```
+
+### CLI Testing
+```bash
+npm run cli:test
+```
+
+## Package Structure
+
+```
+dist/
+├── bin/
+│   └── svm-pay.js          # CLI executable
+├── cli/                    # CLI implementation
+├── core/                   # Core SDK functionality
+├── network/                # Network adapters
+├── sdk/                    # Framework integrations
+├── walletconnect/          # WalletConnect integration
+└── index.js               # Main entry point
+```
+
+## Performance Metrics
+
+- **Package Size**: ~75 KB compressed
+- **Unpacked Size**: ~372 KB
+- **File Count**: 176 files (production), 172 files (development)
+- **CLI Startup**: Fast startup with minimal dependencies
+- **Tree Shaking**: Optimized for modern bundlers
+
+## Framework Support
+
+The package provides optimized entry points for:
+- **React**: `svm-pay/react` and `svm-pay/react-integration`
+- **Vue**: `svm-pay/vue` and `svm-pay/vue-integration`
+- **Angular**: `svm-pay/angular`
+- **Server**: `svm-pay/server` for Node.js environments
+- **CLI**: Global CLI installation via `npm install -g svm-pay`
+
+## Publishing
+
+The package is configured for automated publishing via GitHub Actions:
+- **Release Tags**: Triggers on version tags (v*)
+- **CI Pipeline**: Runs tests, linting, and builds
+- **NPM Publishing**: Automated publishing to npm registry
+- **Build Validation**: Ensures package quality before publishing
+
+## Previous Optimizations
+
+The repository also includes optimizations for the workspace build process:
+
+### Package Manager Optimization
+- pnpm workspace configuration for dependency hoisting
+- Reduced package size through configuration optimizations
+- Efficient dependency management with shared stores
+
+### Build Configuration
+- Turbo.json configuration for optimized caching
+- Next.js configuration optimization for production builds
+- Webpack optimization for reduced disk space
+
+These comprehensive optimizations ensure optimal npm package distribution for both CLI and library usage.

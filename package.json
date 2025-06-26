@@ -8,14 +8,21 @@
     "svm-pay": "dist/bin/svm-pay.js"
   },
   "scripts": {
-    "build": "tsc",
+    "clean": "rm -rf dist",
+    "build": "npm run clean && tsc",
+    "build:production": "npm run clean && NODE_ENV=production tsc -p tsconfig.prod.json && NODE_ENV=production node scripts/optimize-build.js --no-source-maps",
+    "postbuild": "chmod +x dist/bin/svm-pay.js && node scripts/optimize-build.js",
     "test": "jest",
+    "test:ci": "jest --passWithNoTests --ci --coverage",
     "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "prepare": "npm run build",
-    "prepublishOnly": "npm test -- --passWithNoTests && npm run lint",
+    "prepublishOnly": "npm run build:production && npm run test:ci && npm run lint",
     "start:web-demo": "parcel examples/web-payment-demo.html",
     "start:pos-demo": "parcel examples/point-of-sale-demo.html",
-    "start:subscription-demo": "parcel examples/subscription-payment-demo.html"
+    "start:subscription-demo": "parcel examples/subscription-payment-demo.html",
+    "cli:test": "node dist/bin/svm-pay.js --help",
+    "validate:package": "npm pack --dry-run"
   },
   "keywords": [
     "svm",
@@ -85,7 +92,10 @@
   },
   "files": [
     "dist/**/*",
-    "bin/**/*"
+    "scripts/optimize-build.js",
+    "README.md",
+    "LICENSE",
+    "package.json"
   ],
   "exports": {
     ".": {

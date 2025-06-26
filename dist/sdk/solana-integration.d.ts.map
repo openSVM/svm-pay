@@ -1,0 +1,1 @@
+{"version":3,"file":"solana-integration.d.ts","sourceRoot":"","sources":["../../src/sdk/solana-integration.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,oBAAoB,EAAE,MAAM,mBAAmB,CAAC;AACzD,OAAO,EAAE,aAAa,EAAE,MAAM,kBAAkB,CAAC;AAEjD,OAAO,EACL,oBAAoB,EACpB,aAAa,EACd,CAAC"}
