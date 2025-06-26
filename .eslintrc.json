@@ -7,19 +7,28 @@
     "eslint:recommended"
   ],
   "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
   "parserOptions": {
     "ecmaVersion": 12,
     "sourceType": "module"
   },
   "rules": {
+    "@typescript-eslint/no-unused-vars": ["error", { 
+      "argsIgnorePattern": "^_",
+      "varsIgnorePattern": "^_" 
+    }],
+    "no-console": ["warn", { 
+      "allow": ["warn", "error", "info"] 
+    }],
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-non-null-assertion": "warn",
     "no-unused-vars": "off",
-    "no-console": "off",
-    "no-undef": "off",
-    "no-redeclare": "off"
+    "no-undef": "off"
   },
   "ignorePatterns": [
     "dist/",
     "node_modules/",
-    "website/"
+    "website/",
+    "scripts/"
   ]
 }

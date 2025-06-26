@@ -127,7 +127,7 @@ class SVMPayServer {
      * @param request Payment request to verify against
      * @returns Whether the transaction is valid
      */
-    verifyTransaction(transaction, request) {
+    verifyTransaction(_transaction, _request) {
         // In a real implementation, this would verify that the transaction
         // matches the payment request
         this.log(`Verifying transaction against request`);

@@ -5,7 +5,7 @@
  * Transaction requests are interactive requests for complex transactions.
  */
 
-import { NetworkAdapter, PaymentRecord, PaymentStatus, SVMNetwork, TransactionRequest } from './types';
+import { NetworkAdapter, PaymentRecord, PaymentStatus, SVMNetwork, TransactionRequest, RequestType, TransferRequest } from './types';
 import { generateReference } from './reference';
 
 /**
@@ -50,7 +50,7 @@ export class TransactionRequestHandler {
     
     try {
       // Fetch the transaction from the provided link
-      const transaction = await adapter.fetchTransaction(request);
+      const _transaction = await adapter.fetchTransaction(request);
       
       // Return the payment record
       return {
@@ -81,7 +81,7 @@ export class TransactionRequestHandler {
     // In a real implementation, we would look up the payment record by ID
     // For this example, we'll create a dummy record
     const dummyRequest: TransactionRequest = {
-      type: 'transaction' as any,
+      type: RequestType.TRANSACTION,
       network: SVMNetwork.SOLANA,
       recipient: 'dummy',
       link: 'https://example.com/transaction'
@@ -127,13 +127,14 @@ export class TransactionRequestHandler {
    * Check the status of a payment
    * 
    * @param paymentId The ID of the payment to check
+   * @param paymentType Optional type hint for the payment (transfer, transaction, etc.)
    * @returns The updated payment record
    */
-  async checkStatus(paymentId: string): Promise<PaymentRecord> {
-    // In a real implementation, we would look up the payment record by ID
-    // For this example, we'll create a dummy record
+  async checkStatus(paymentId: string, _paymentType?: string): Promise<PaymentRecord> {
+    // In a real implementation, we would look up the payment record by ID from a database
+    // For this example, we'll create a dummy record but the structure supports dynamic types
     const dummyRequest: TransactionRequest = {
-      type: 'transaction' as any,
+      type: RequestType.TRANSACTION,
       network: SVMNetwork.SOLANA,
       recipient: 'dummy',
       link: 'https://example.com/transaction'
@@ -173,5 +174,54 @@ export class TransactionRequestHandler {
         updatedAt: Date.now()
       };
     }
+  }
+  
+  /**
+   * Check status for multiple payment types dynamically
+   * 
+   * @param paymentId The ID of the payment to check
+   * @param requestType The type of request (transfer, transaction, etc.)
+   * @returns The updated payment record
+   */
+  async checkStatusByType(paymentId: string, requestType: RequestType): Promise<PaymentRecord> {
+    // This method demonstrates how the handler can process different request types
+    switch (requestType) {
+      case RequestType.TRANSFER:
+        // Handle transfer-specific status checking
+        return this.checkTransferStatus(paymentId);
+      case RequestType.TRANSACTION:
+        // Handle transaction-specific status checking
+        return this.checkStatus(paymentId, 'transaction');
+      default:
+        throw new Error(`Unsupported request type: ${requestType}`);
+    }
+  }
+  
+  /**
+   * Check status specifically for transfer requests
+   * 
+   * @param paymentId The ID of the transfer payment to check
+   * @returns The updated payment record
+   */
+  private async checkTransferStatus(paymentId: string): Promise<PaymentRecord> {
+    // Transfer-specific status checking logic
+    const dummyRequest: TransferRequest = {
+      type: RequestType.TRANSFER,
+      network: SVMNetwork.SOLANA,
+      recipient: 'dummy',
+      amount: '1.0'
+    };
+    
+    const _record: PaymentRecord = {
+      id: paymentId,
+      request: dummyRequest,
+      status: PaymentStatus.PENDING,
+      signature: 'dummy-transfer-signature',
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+    
+    // Additional transfer-specific validation could go here
+    return this.checkStatus(paymentId, 'transfer');
   }
 }

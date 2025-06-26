@@ -46,7 +46,7 @@ exports.payCommand = new commander_1.Command('pay')
     .option('-a, --amount <amount>', 'Amount to pay in SOL')
     .option('-r, --reason <reason>', 'Reason for payment (optional)')
     .option('-t, --to <address>', 'Recipient Solana address (optional, uses default if configured)')
-    .option('-f, --force', 'Skip confirmation prompts')
+    .option('-f, --force', '⚠️  DANGEROUS: Skip confirmation prompts - use with extreme caution!')
     .action(async (options) => {
     try {
         console.log('Processing payment...\n');
@@ -115,14 +115,20 @@ exports.payCommand = new commander_1.Command('pay')
                 input: process.stdin,
                 output: process.stdout
             });
+            console.warn('\n⚠️  WARNING: You are about to send a real payment!');
+            console.warn('This action cannot be undone. Please verify all details carefully.');
             const answer = await new Promise((resolve) => {
                 rl.question('\nConfirm payment? (y/N): ', resolve);
             });
             rl.close();
             if (answer.toLowerCase() !== 'y' && answer.toLowerCase() !== 'yes') {
-                console.log('Payment cancelled.');
+                console.info('Payment cancelled.');
                 process.exit(0);
             }
+        }
+        else {
+            console.warn('\n🚨 FORCE MODE ENABLED - SKIPPING CONFIRMATION!');
+            console.warn('Payment will be sent immediately without further prompts.');
         }
         // Record payment attempt
         let paymentRecord = {

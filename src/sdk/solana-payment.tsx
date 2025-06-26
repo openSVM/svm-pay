@@ -3,7 +3,7 @@
 import React, { FC, useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { LAMPORTS_PER_SOL, PublicKey, Transaction, Connection } from '@solana/web3.js';
+import { PublicKey, Transaction, Connection } from '@solana/web3.js';
 
 export interface SolanaPaymentProps {
   amount: number; // Amount in SOL

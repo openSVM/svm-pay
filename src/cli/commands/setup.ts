@@ -3,7 +3,7 @@
  */
 
 import { Command } from 'commander';
-import { loadConfig, saveConfig, SVMPayConfig } from '../utils/config';
+import { loadConfig, saveConfig } from '../utils/config';
 import { createKeypairFromPrivateKey } from '../utils/solana';
 import { isValidApiKey } from '../utils/openrouter';
 

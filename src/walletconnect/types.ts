@@ -1,7 +1,6 @@
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { SignClientTypes } from '@walletconnect/types';
 import { PublicKey } from '@solana/web3.js';
-import { WalletConnectChainID } from './constants';
 
 export interface WalletConnectWalletAdapterConfig {
   network: WalletAdapterNetwork.Mainnet | WalletAdapterNetwork.Devnet;

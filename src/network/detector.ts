@@ -80,7 +80,7 @@ export function detectNetworkFromUrl(url: string): SVMNetwork | undefined {
  * @param address The address to detect the network from
  * @returns The detected network, or undefined if detection fails
  */
-export function detectNetworkFromAddress(address: string): SVMNetwork | undefined {
+export function detectNetworkFromAddress(_address: string): SVMNetwork | undefined {
   // In a real implementation, this would analyze the address format
   // to determine which network it belongs to
   

@@ -191,9 +191,9 @@ export const QRCodePayment: React.FC<QRCodePaymentProps> = ({
   style,
   className,
 }) => {
-  const [paymentUrl, setPaymentUrl] = useState<string>('');
+  const [_paymentUrl, setPaymentUrl] = useState<string>('');
   const [status, setStatus] = useState<PaymentStatus | null>(null);
-  const [reference, setReference] = useState<string>('');
+  const [_reference, setReference] = useState<string>('');
   
   useEffect(() => {
     // Generate a reference ID for this payment

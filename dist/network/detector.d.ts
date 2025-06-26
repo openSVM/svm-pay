@@ -37,5 +37,5 @@ export declare function detectNetworkFromUrl(url: string): SVMNetwork | undefine
  * @param address The address to detect the network from
  * @returns The detected network, or undefined if detection fails
  */
-export declare function detectNetworkFromAddress(address: string): SVMNetwork | undefined;
+export declare function detectNetworkFromAddress(_address: string): SVMNetwork | undefined;
 //# sourceMappingURL=detector.d.ts.map

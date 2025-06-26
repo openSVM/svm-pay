@@ -62,7 +62,7 @@ function detectNetworkFromUrl(url) {
  * @param address The address to detect the network from
  * @returns The detected network, or undefined if detection fails
  */
-function detectNetworkFromAddress(address) {
+function detectNetworkFromAddress(_address) {
     // In a real implementation, this would analyze the address format
     // to determine which network it belongs to
     // For this example, we'll just return undefined

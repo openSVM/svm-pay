@@ -187,7 +187,7 @@ export class SVMPayServer {
    * @param request Payment request to verify against
    * @returns Whether the transaction is valid
    */
-  verifyTransaction(transaction: any, request: PaymentRequest): boolean {
+  verifyTransaction(_transaction: any, _request: PaymentRequest): boolean {
     // In a real implementation, this would verify that the transaction
     // matches the payment request
     

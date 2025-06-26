@@ -104,9 +104,9 @@ exports.PaymentButton = PaymentButton;
  * A React component that renders a QR code for a payment.
  */
 const QRCodePayment = ({ svmPay, recipient, amount, token, network, label, description, size = 200, onComplete, style, className, }) => {
-    const [paymentUrl, setPaymentUrl] = (0, react_1.useState)('');
+    const [_paymentUrl, setPaymentUrl] = (0, react_1.useState)('');
     const [status, setStatus] = (0, react_1.useState)(null);
-    const [reference, setReference] = (0, react_1.useState)('');
+    const [_reference, setReference] = (0, react_1.useState)('');
     (0, react_1.useEffect)(() => {
         // Generate a reference ID for this payment
         const ref = svmPay.generateReference();

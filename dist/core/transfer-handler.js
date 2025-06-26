@@ -45,7 +45,7 @@ class TransferRequestHandler {
         };
         try {
             // Create a transaction for this request
-            const transaction = await adapter.createTransferTransaction(request);
+            const _transaction = await adapter.createTransferTransaction(request);
             // Return the payment record
             return {
                 ...record,

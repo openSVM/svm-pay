@@ -8,7 +8,7 @@ export interface SVMPayConfig {
     recipientAddress?: string;
 }
 /**
- * Load configuration from file
+ * Load configuration from file or environment variables
  */
 export declare function loadConfig(): SVMPayConfig;
 /**

@@ -54,15 +54,30 @@ function ensureConfigDir() {
     }
 }
 /**
- * Load configuration from file
+ * Load configuration from file or environment variables
  */
 function loadConfig() {
     try {
-        if (!fs.existsSync(CONFIG_FILE)) {
-            return {};
+        let config = {};
+        // Load from file if it exists
+        if (fs.existsSync(CONFIG_FILE)) {
+            const configData = fs.readFileSync(CONFIG_FILE, 'utf-8');
+            config = JSON.parse(configData);
         }
-        const configData = fs.readFileSync(CONFIG_FILE, 'utf-8');
-        return JSON.parse(configData);
+        // Override with environment variables if available (more secure)
+        if (process.env.SVM_PAY_PRIVATE_KEY) {
+            config.privateKey = process.env.SVM_PAY_PRIVATE_KEY;
+        }
+        if (process.env.SVM_PAY_API_KEY) {
+            config.apiKey = process.env.SVM_PAY_API_KEY;
+        }
+        if (process.env.SVM_PAY_THRESHOLD) {
+            config.threshold = parseFloat(process.env.SVM_PAY_THRESHOLD);
+        }
+        if (process.env.SVM_PAY_RECIPIENT) {
+            config.recipientAddress = process.env.SVM_PAY_RECIPIENT;
+        }
+        return config;
     }
     catch (error) {
         console.error('Error loading configuration:', error);
@@ -75,8 +90,17 @@ function loadConfig() {
 function saveConfig(config) {
     try {
         ensureConfigDir();
+        // Show security warning when saving private keys to file
+        if (config.privateKey) {
+            console.warn('\n🔐 SECURITY WARNING:');
+            console.warn('Private keys are being stored in plain text at:', CONFIG_FILE);
+            console.warn('For better security, consider using environment variables:');
+            console.warn('  export SVM_PAY_PRIVATE_KEY="your-private-key"');
+            console.warn('  export SVM_PAY_API_KEY="your-api-key"');
+            console.warn('Environment variables take precedence over config file.\n');
+        }
         fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
-        console.log('Configuration saved successfully.');
+        console.info('Configuration saved successfully.');
     }
     catch (error) {
         console.error('Error saving configuration:', error);

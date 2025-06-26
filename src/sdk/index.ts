@@ -21,7 +21,6 @@ import { SolanaNetworkAdapter } from '../network/solana';
 import { SonicNetworkAdapter } from '../network/sonic';
 import { EclipseNetworkAdapter } from '../network/eclipse';
 import { SoonNetworkAdapter } from '../network/soon';
-import { detectNetwork } from '../network/detector';
 import { loadConfig } from '../cli/utils/config';
 import { getWalletBalance } from '../cli/utils/solana';
 import { checkApiUsage } from '../cli/utils/openrouter';

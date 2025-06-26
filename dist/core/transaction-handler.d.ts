@@ -4,7 +4,7 @@
  * This file implements the handler for transaction requests in the SVM-Pay protocol.
  * Transaction requests are interactive requests for complex transactions.
  */
-import { NetworkAdapter, PaymentRecord, SVMNetwork, TransactionRequest } from './types';
+import { NetworkAdapter, PaymentRecord, SVMNetwork, TransactionRequest, RequestType } from './types';
 /**
  * Handler for transaction requests
  */
@@ -36,8 +36,24 @@ export declare class TransactionRequestHandler {
      * Check the status of a payment
      *
      * @param paymentId The ID of the payment to check
+     * @param paymentType Optional type hint for the payment (transfer, transaction, etc.)
      * @returns The updated payment record
      */
-    checkStatus(paymentId: string): Promise<PaymentRecord>;
+    checkStatus(paymentId: string, _paymentType?: string): Promise<PaymentRecord>;
+    /**
+     * Check status for multiple payment types dynamically
+     *
+     * @param paymentId The ID of the payment to check
+     * @param requestType The type of request (transfer, transaction, etc.)
+     * @returns The updated payment record
+     */
+    checkStatusByType(paymentId: string, requestType: RequestType): Promise<PaymentRecord>;
+    /**
+     * Check status specifically for transfer requests
+     *
+     * @param paymentId The ID of the transfer payment to check
+     * @returns The updated payment record
+     */
+    private checkTransferStatus;
 }
 //# sourceMappingURL=transaction-handler.d.ts.map
