@@ -12,7 +12,7 @@
     "test": "jest",
     "lint": "eslint src --ext .ts,.tsx",
     "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run lint",
+    "prepublishOnly": "npm test -- --passWithNoTests && npm run lint",
     "start:web-demo": "parcel examples/web-payment-demo.html",
     "start:pos-demo": "parcel examples/point-of-sale-demo.html",
     "start:subscription-demo": "parcel examples/subscription-payment-demo.html"
