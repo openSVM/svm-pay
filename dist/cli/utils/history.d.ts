@@ -1,5 +1,5 @@
 /**
- * Payment history utilities for SVM-Pay CLI
+ * Payment history utilities for SVM-Pay CLI with encryption support
  */
 export interface PaymentRecord {
     timestamp: string;
@@ -8,13 +8,19 @@ export interface PaymentRecord {
     reason?: string;
     transactionSignature?: string;
     status: 'pending' | 'confirmed' | 'failed';
+    network?: string;
+    metadata?: {
+        label?: string;
+        message?: string;
+        memo?: string;
+    };
 }
 /**
- * Load payment history from file
+ * Load payment history from file (with encryption support)
  */
 export declare function loadPaymentHistory(): PaymentRecord[];
 /**
- * Save payment history to file
+ * Save payment history to file (with encryption support)
  */
 export declare function savePaymentHistory(history: PaymentRecord[]): void;
 /**
@@ -25,4 +31,16 @@ export declare function addPaymentRecord(payment: Omit<PaymentRecord, 'timestamp
  * Format payment history for display
  */
 export declare function formatPaymentHistory(history: PaymentRecord[]): string;
+/**
+ * Enable/disable encryption for payment history
+ */
+export declare function setEncryptionEnabled(enabled: boolean): void;
+/**
+ * Get current encryption status
+ */
+export declare function isEncryptionEnabled(): boolean;
+/**
+ * Export payment history for backup or analysis
+ */
+export declare function exportPaymentHistory(format?: 'json' | 'csv'): string;
 //# sourceMappingURL=history.d.ts.map

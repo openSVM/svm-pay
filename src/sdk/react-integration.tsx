@@ -83,7 +83,7 @@ interface SimplePaymentButtonProps {
   recipient: string;
   
   /** Amount to transfer */
-  amount?: string;
+  amount: string;
   
   /** Token to transfer (if not native token) */
   token?: string;
@@ -126,7 +126,7 @@ interface SimpleQRCodePaymentProps {
   recipient: string;
   
   /** Amount to transfer */
-  amount?: string;
+  amount: string;
   
   /** Token to transfer (if not native token) */
   token?: string;

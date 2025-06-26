@@ -19,7 +19,7 @@ interface PaymentButtonProps {
   recipient: string;
   
   /** Amount to transfer */
-  amount?: string;
+  amount: string;
   
   /** Token to transfer (if not native token) */
   token?: string;
@@ -146,7 +146,7 @@ interface QRCodePaymentProps {
   recipient: string;
   
   /** Amount to transfer */
-  amount?: string;
+  amount: string;
   
   /** Token to transfer (if not native token) */
   token?: string;

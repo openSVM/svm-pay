@@ -46,12 +46,15 @@ class SVMPayServer {
      * Create a payment URL for a transfer request
      *
      * @param recipient Recipient address
-     * @param amount Amount to transfer (optional)
+     * @param amount Amount to transfer
      * @param options Additional options
      * @returns Payment URL string
      */
     createTransferUrl(recipient, amount, options = {}) {
         const network = options.network || this.config.defaultNetwork || types_1.SVMNetwork.SOLANA;
+        if (!amount) {
+            throw new Error('Amount is required for transfer requests');
+        }
         // Generate a reference from order ID if provided
         let references = options.references || [];
         if (options.orderId) {

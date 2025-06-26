@@ -80,14 +80,17 @@ function parseURL(url) {
         }
         else {
             // This is a transfer request
+            const amount = params.get('amount');
+            if (!amount) {
+                throw new Error('Transfer request requires an amount parameter');
+            }
             const request = {
                 type: types_1.RequestType.TRANSFER,
                 network,
                 recipient,
+                amount,
             };
             // Add optional parameters
-            if (params.has('amount'))
-                request.amount = params.get('amount');
             if (params.has('spl-token'))
                 request.splToken = params.get('spl-token');
             if (params.has('label'))

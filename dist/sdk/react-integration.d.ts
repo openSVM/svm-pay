@@ -39,7 +39,7 @@ interface SimplePaymentButtonProps {
     /** Recipient address */
     recipient: string;
     /** Amount to transfer */
-    amount?: string;
+    amount: string;
     /** Token to transfer (if not native token) */
     token?: string;
     /** Network to use */
@@ -68,7 +68,7 @@ interface SimpleQRCodePaymentProps {
     /** Recipient address */
     recipient: string;
     /** Amount to transfer */
-    amount?: string;
+    amount: string;
     /** Token to transfer (if not native token) */
     token?: string;
     /** Network to use */

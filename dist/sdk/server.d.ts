@@ -34,11 +34,11 @@ export declare class SVMPayServer {
      * Create a payment URL for a transfer request
      *
      * @param recipient Recipient address
-     * @param amount Amount to transfer (optional)
+     * @param amount Amount to transfer
      * @param options Additional options
      * @returns Payment URL string
      */
-    createTransferUrl(recipient: string, amount?: string, options?: {
+    createTransferUrl(recipient: string, amount: string, options?: {
         network?: SVMNetwork;
         splToken?: string;
         label?: string;
