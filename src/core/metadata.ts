@@ -189,7 +189,7 @@ export function createNetworkMemoInstruction(
 }
 
 /**
- * Optimize memo content for size and readability
+ * Optimize memo content for size and readability with improved heuristics
  * 
  * @param metadata The metadata to optimize
  * @returns Optimized metadata that fits within limits
@@ -200,6 +200,7 @@ export function optimizeMemoContent(metadata: {
   memo?: string;
 }): { label?: string; message?: string; memo?: string } {
   const maxLength = 566; // Solana memo limit
+  let wasOptimized = false;
   
   // Calculate current length
   const memoParts: string[] = [];
@@ -213,24 +214,83 @@ export function optimizeMemoContent(metadata: {
     return metadata; // No optimization needed
   }
   
-  // Optimize by truncating in order of priority: memo > message > label
+  console.warn(`⚠ Memo content exceeds ${maxLength} character limit (current: ${currentLength} chars)`);
+  console.warn('   Applying intelligent truncation to fit within Solana memo constraints...');
+  
+  // Prioritize message over label, and preserve custom memo content when possible
   const optimized = { ...metadata };
-  const overhead = ' | '.length * (memoParts.length - 1);
-  let availableLength = maxLength - overhead;
+  const separator = ' | ';
+  const separatorOverhead = separator.length * (memoParts.length - 1);
+  let availableLength = maxLength - separatorOverhead;
   
-  // Allocate space: label (50), message (150), memo (rest)
-  if (optimized.label && optimized.label.length > 50) {
-    optimized.label = optimized.label.substring(0, 47) + '...';
+  // Strategy: Allocate space dynamically based on content priority and length
+  // Priority: 1) Custom memo (most important), 2) Message (context), 3) Label (identification)
+  
+  // Reserve space for custom memo first (it's usually the most important)
+  let memoSpace = 0;
+  if (optimized.memo) {
+    memoSpace = Math.min(optimized.memo.length, Math.floor(availableLength * 0.6)); // 60% for memo
+    availableLength -= memoSpace;
   }
-  availableLength -= optimized.label ? `Label: ${optimized.label}`.length : 0;
   
-  if (optimized.message && optimized.message.length > 150) {
-    optimized.message = optimized.message.substring(0, 147) + '...';
+  // Allocate remaining space between label and message (favor message for context)
+  const remainingSpace = availableLength;
+  const messageSpace = Math.min(
+    optimized.message ? optimized.message.length : 0,
+    Math.floor(remainingSpace * 0.7) // 70% of remaining for message
+  );
+  const labelSpace = remainingSpace - messageSpace;
+  
+  // Apply truncation with ellipsis
+  if (optimized.label && `Label: ${optimized.label}`.length > labelSpace) {
+    const availableForLabel = Math.max(0, labelSpace - 10); // Reserve space for "Label: ..."
+    if (availableForLabel > 3) { // Only truncate if we have meaningful space
+      optimized.label = optimized.label.substring(0, availableForLabel - 3) + '...';
+      wasOptimized = true;
+    } else {
+      // If no meaningful space, remove label entirely
+      optimized.label = undefined;
+      wasOptimized = true;
+      console.warn('   ⚠ Label removed due to space constraints');
+    }
   }
-  availableLength -= optimized.message ? `Message: ${optimized.message}`.length : 0;
   
-  if (optimized.memo && optimized.memo.length > availableLength) {
-    optimized.memo = optimized.memo.substring(0, availableLength - 3) + '...';
+  if (optimized.message && `Message: ${optimized.message}`.length > messageSpace) {
+    const availableForMessage = Math.max(0, messageSpace - 12); // Reserve space for "Message: ..."
+    if (availableForMessage > 3) {
+      optimized.message = optimized.message.substring(0, availableForMessage - 3) + '...';
+      wasOptimized = true;
+    } else {
+      optimized.message = undefined;
+      wasOptimized = true;
+      console.warn('   ⚠ Message removed due to space constraints');
+    }
+  }
+  
+  if (optimized.memo && optimized.memo.length > memoSpace) {
+    if (memoSpace > 3) {
+      optimized.memo = optimized.memo.substring(0, memoSpace - 3) + '...';
+      wasOptimized = true;
+    } else {
+      optimized.memo = undefined;
+      wasOptimized = true;
+      console.warn('   ⚠ Custom memo removed due to space constraints');
+    }
+  }
+  
+  // Final verification
+  const finalParts: string[] = [];
+  if (optimized.label) finalParts.push(`Label: ${optimized.label}`);
+  if (optimized.message) finalParts.push(`Message: ${optimized.message}`);
+  if (optimized.memo) finalParts.push(optimized.memo);
+  
+  const finalLength = finalParts.join(' | ').length;
+  
+  if (wasOptimized) {
+    console.warn(`   ✓ Memo optimized: ${currentLength} → ${finalLength} characters`);
+    if (finalLength > maxLength) {
+      console.error(`   ❌ ERROR: Optimization failed, still exceeds limit (${finalLength}/${maxLength})`);
+    }
   }
   
   return optimized;

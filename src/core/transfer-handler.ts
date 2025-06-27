@@ -5,22 +5,78 @@
  * Transfer requests are non-interactive requests for simple token transfers.
  */
 
-import { NetworkAdapter, PaymentRecord, PaymentStatus, SVMNetwork, TransferRequest } from './types';
+import { NetworkAdapter, PaymentRecord, PaymentStatus, SVMNetwork, TransferRequest, RequestType } from './types';
 import { generateReference } from './reference';
+
+/**
+ * Payment store interface for persisting payment records
+ */
+interface PaymentStore {
+  save(record: PaymentRecord): Promise<void>;
+  load(id: string): Promise<PaymentRecord | null>;
+  loadByType(type: RequestType): Promise<PaymentRecord[]>;
+  update(id: string, updates: Partial<PaymentRecord>): Promise<PaymentRecord>;
+  delete(id: string): Promise<boolean>;
+}
+
+/**
+ * Simple in-memory payment store for transfer handler
+ */
+class SimpleMemoryPaymentStore implements PaymentStore {
+  private payments = new Map<string, PaymentRecord>();
+  
+  async save(record: PaymentRecord): Promise<void> {
+    this.payments.set(record.id, { ...record });
+  }
+  
+  async load(id: string): Promise<PaymentRecord | null> {
+    const record = this.payments.get(id);
+    return record ? { ...record } : null;
+  }
+  
+  async loadByType(type: RequestType): Promise<PaymentRecord[]> {
+    return Array.from(this.payments.values())
+      .filter(record => record.request.type === type)
+      .map(record => ({ ...record }));
+  }
+  
+  async update(id: string, updates: Partial<PaymentRecord>): Promise<PaymentRecord> {
+    const existing = this.payments.get(id);
+    if (!existing) {
+      throw new Error(`Payment record not found: ${id}`);
+    }
+    
+    const updated = {
+      ...existing,
+      ...updates,
+      updatedAt: Date.now()
+    };
+    
+    this.payments.set(id, updated);
+    return { ...updated };
+  }
+  
+  async delete(id: string): Promise<boolean> {
+    return this.payments.delete(id);
+  }
+}
 
 /**
  * Handler for transfer requests
  */
 export class TransferRequestHandler {
   private networkAdapters: Map<SVMNetwork, NetworkAdapter>;
+  private paymentStore: PaymentStore;
   
   /**
    * Create a new TransferRequestHandler
    * 
    * @param networkAdapters Map of network adapters for each supported network
+   * @param paymentStore Optional payment store (defaults to in-memory)
    */
-  constructor(networkAdapters: Map<SVMNetwork, NetworkAdapter>) {
+  constructor(networkAdapters: Map<SVMNetwork, NetworkAdapter>, paymentStore?: PaymentStore) {
     this.networkAdapters = networkAdapters;
+    this.paymentStore = paymentStore || new SimpleMemoryPaymentStore();
   }
   
   /**
@@ -49,23 +105,26 @@ export class TransferRequestHandler {
     };
     
     try {
+      // Save initial record
+      await this.paymentStore.save(record);
+      
       // Create a transaction for this request
       const _transaction = await adapter.createTransferTransaction(request);
       
-      // Return the payment record
-      return {
-        ...record,
-        status: PaymentStatus.PENDING,
-        updatedAt: Date.now()
-      };
+      // Update record with pending status
+      const updatedRecord = await this.paymentStore.update(id, {
+        status: PaymentStatus.PENDING
+      });
+      
+      return updatedRecord;
     } catch (error) {
-      // Return the payment record with error
-      return {
-        ...record,
+      // Update record with error
+      const errorRecord = await this.paymentStore.update(id, {
         status: PaymentStatus.FAILED,
-        error: (error as Error).message,
-        updatedAt: Date.now()
-      };
+        error: (error as Error).message
+      });
+      
+      return errorRecord;
     }
   }
   
@@ -78,19 +137,11 @@ export class TransferRequestHandler {
    * @returns The updated payment record
    */
   async submitTransaction(paymentId: string, transaction: string, signature: string): Promise<PaymentRecord> {
-    // In a real implementation, we would look up the payment record by ID
-    // For this example, we'll create a dummy record
-    const record: PaymentRecord = {
-      id: paymentId,
-      request: {
-        type: 'transfer' as any,
-        network: SVMNetwork.SOLANA,
-        recipient: 'dummy'
-      },
-      status: PaymentStatus.PENDING,
-      createdAt: Date.now(),
-      updatedAt: Date.now()
-    };
+    // Load the payment record from store
+    const record = await this.paymentStore.load(paymentId);
+    if (!record) {
+      throw new Error(`Payment record not found: ${paymentId}`);
+    }
     
     try {
       // Get the network adapter for this request
@@ -102,21 +153,21 @@ export class TransferRequestHandler {
       // Submit the transaction
       const txSignature = await adapter.submitTransaction(transaction, signature);
       
-      // Return the updated payment record
-      return {
-        ...record,
+      // Update the payment record
+      const updatedRecord = await this.paymentStore.update(paymentId, {
         status: PaymentStatus.CONFIRMED,
-        signature: txSignature,
-        updatedAt: Date.now()
-      };
+        signature: txSignature
+      });
+      
+      return updatedRecord;
     } catch (error) {
-      // Return the payment record with error
-      return {
-        ...record,
+      // Update record with error
+      const errorRecord = await this.paymentStore.update(paymentId, {
         status: PaymentStatus.FAILED,
-        error: (error as Error).message,
-        updatedAt: Date.now()
-      };
+        error: (error as Error).message
+      });
+      
+      return errorRecord;
     }
   }
   
@@ -127,20 +178,11 @@ export class TransferRequestHandler {
    * @returns The updated payment record
    */
   async checkStatus(paymentId: string): Promise<PaymentRecord> {
-    // In a real implementation, we would look up the payment record by ID
-    // For this example, we'll create a dummy record
-    const record: PaymentRecord = {
-      id: paymentId,
-      request: {
-        type: 'transfer' as any,
-        network: SVMNetwork.SOLANA,
-        recipient: 'dummy'
-      },
-      status: PaymentStatus.PENDING,
-      signature: 'dummy-signature',
-      createdAt: Date.now(),
-      updatedAt: Date.now()
-    };
+    // Load the payment record from store
+    const record = await this.paymentStore.load(paymentId);
+    if (!record) {
+      throw new Error(`Payment record not found: ${paymentId}`);
+    }
     
     try {
       // Get the network adapter for this request
@@ -149,23 +191,26 @@ export class TransferRequestHandler {
         throw new Error(`No adapter available for network: ${record.request.network}`);
       }
       
-      // Check the transaction status
-      const status = await adapter.checkTransactionStatus(record.signature!);
+      // Only check if we have a signature
+      if (!record.signature) {
+        return record; // No signature to check yet
+      }
       
-      // Return the updated payment record
-      return {
-        ...record,
-        status,
-        updatedAt: Date.now()
-      };
+      // Check the transaction status
+      const status = await adapter.checkTransactionStatus(record.signature);
+      
+      // Update the payment record
+      const updatedRecord = await this.paymentStore.update(paymentId, { status });
+      
+      return updatedRecord;
     } catch (error) {
-      // Return the payment record with error
-      return {
-        ...record,
+      // Update record with error
+      const errorRecord = await this.paymentStore.update(paymentId, {
         status: PaymentStatus.FAILED,
-        error: (error as Error).message,
-        updatedAt: Date.now()
-      };
+        error: (error as Error).message
+      });
+      
+      return errorRecord;
     }
   }
 }

@@ -19,12 +19,50 @@ interface PaymentStore {
 }
 
 /**
+ * Simple async mutex implementation for concurrency safety
+ */
+class AsyncMutex {
+  private locked = false;
+  private waitQueue: Array<() => void> = [];
+  
+  async acquire(): Promise<void> {
+    return new Promise<void>((resolve) => {
+      if (!this.locked) {
+        this.locked = true;
+        resolve();
+      } else {
+        this.waitQueue.push(resolve);
+      }
+    });
+  }
+  
+  release(): void {
+    if (this.waitQueue.length > 0) {
+      const next = this.waitQueue.shift();
+      if (next) next();
+    } else {
+      this.locked = false;
+    }
+  }
+  
+  async withLock<T>(fn: () => Promise<T>): Promise<T> {
+    await this.acquire();
+    try {
+      return await fn();
+    } finally {
+      this.release();
+    }
+  }
+}
+
+/**
  * In-memory payment store implementation
  * 
  * ⚠️  CONCURRENCY & SCALING LIMITATIONS:
- * This in-memory store is NOT suitable for production use beyond demos due to:
+ * This in-memory store includes basic concurrency safety via async mutex but is still
+ * NOT suitable for production use beyond demos due to:
  * 
- * 1. NO CONCURRENCY SAFETY: Multiple concurrent operations can cause data corruption
+ * 1. LIMITED CONCURRENCY: Basic mutex prevents corruption but reduces throughput
  * 2. NO PERSISTENCE: Data is lost when the process restarts
  * 3. NO SCALING: Limited by single-process memory constraints
  * 4. NO DISTRIBUTION: Cannot share data across multiple instances
@@ -37,43 +75,31 @@ interface PaymentStore {
  */
 class MemoryPaymentStore implements PaymentStore {
   private payments = new Map<string, PaymentRecord>();
-  
-  // Track concurrent operations to warn about potential issues
-  private activeOperations = 0;
+  private mutex = new AsyncMutex();
   
   async save(record: PaymentRecord): Promise<void> {
-    this.activeOperations++;
-    if (this.activeOperations > 1) {
-      console.warn('⚠️  CONCURRENCY WARNING: Multiple concurrent operations detected in MemoryPaymentStore');
-      console.warn('   This can lead to data corruption. Consider upgrading to a database-backed store.');
-    }
-    
-    try {
+    await this.mutex.withLock(async () => {
       this.payments.set(record.id, { ...record });
-    } finally {
-      this.activeOperations--;
-    }
+    });
   }
   
   async load(id: string): Promise<PaymentRecord | null> {
-    const record = this.payments.get(id);
-    return record ? { ...record } : null;
+    return this.mutex.withLock(async () => {
+      const record = this.payments.get(id);
+      return record ? { ...record } : null;
+    });
   }
   
   async loadByType(type: RequestType): Promise<PaymentRecord[]> {
-    return Array.from(this.payments.values())
-      .filter(record => record.request.type === type)
-      .map(record => ({ ...record }));
+    return this.mutex.withLock(async () => {
+      return Array.from(this.payments.values())
+        .filter(record => record.request.type === type)
+        .map(record => ({ ...record }));
+    });
   }
   
   async update(id: string, updates: Partial<PaymentRecord>): Promise<PaymentRecord> {
-    this.activeOperations++;
-    if (this.activeOperations > 1) {
-      console.warn('⚠️  CONCURRENCY WARNING: Multiple concurrent operations detected in MemoryPaymentStore');
-      console.warn('   This can lead to race conditions. Consider upgrading to a database with transactions.');
-    }
-    
-    try {
+    return this.mutex.withLock(async () => {
       const existing = this.payments.get(id);
       if (!existing) {
         throw new Error(`Payment record not found: ${id}`);
@@ -87,13 +113,13 @@ class MemoryPaymentStore implements PaymentStore {
       
       this.payments.set(id, updated);
       return { ...updated };
-    } finally {
-      this.activeOperations--;
-    }
+    });
   }
   
   async delete(id: string): Promise<boolean> {
-    return this.payments.delete(id);
+    return this.mutex.withLock(async () => {
+      return this.payments.delete(id);
+    });
   }
 }
 
@@ -101,8 +127,11 @@ class MemoryPaymentStore implements PaymentStore {
  * Payment ID parser for extracting type and network information
  */
 class PaymentIdParser {
+  // Regex pattern for valid payment ID format
+  private static readonly ID_PATTERN = /^([a-zA-Z]+)_([a-zA-Z0-9]+)_(\d+)_([a-zA-Z0-9]+)$/;
+  
   /**
-   * Parse payment ID to extract metadata
+   * Parse payment ID to extract metadata with robust validation
    */
   static parse(paymentId: string): {
     id: string;
@@ -110,31 +139,79 @@ class PaymentIdParser {
     network?: SVMNetwork;
     timestamp?: number;
   } {
-    // Expected format: {type}_{network}_{timestamp}_{random}
-    const parts = paymentId.split('_');
+    if (!paymentId || typeof paymentId !== 'string') {
+      throw new Error('Invalid payment ID: must be a non-empty string');
+    }
     
-    if (parts.length >= 4) {
-      const [typeStr, networkStr, timestampStr] = parts;
+    // Test against expected format: {type}_{network}_{timestamp}_{random}
+    const match = this.ID_PATTERN.exec(paymentId);
+    
+    if (match) {
+      const [, typeStr, networkStr, timestampStr] = match;
+      
+      // Validate type
+      const type = typeStr.toUpperCase() as RequestType;
+      if (!Object.values(RequestType).includes(type)) {
+        console.warn(`Warning: Unknown request type '${typeStr}' in payment ID ${paymentId}`);
+      }
+      
+      // Validate network
+      const network = networkStr.toUpperCase() as SVMNetwork;
+      if (!Object.values(SVMNetwork).includes(network)) {
+        console.warn(`Warning: Unknown network '${networkStr}' in payment ID ${paymentId}`);
+      }
+      
+      // Validate timestamp
+      const timestamp = parseInt(timestampStr, 10);
+      if (isNaN(timestamp) || timestamp <= 0) {
+        throw new Error(`Invalid timestamp in payment ID: ${paymentId}`);
+      }
       
       return {
         id: paymentId,
-        type: typeStr.toUpperCase() as RequestType,
-        network: networkStr.toUpperCase() as SVMNetwork,
-        timestamp: parseInt(timestampStr, 10)
+        type,
+        network,
+        timestamp
       };
     }
+    
+    // Log warning for malformed IDs but don't throw to maintain backward compatibility
+    console.warn(`Warning: Payment ID '${paymentId}' does not match expected format. Using as simple ID.`);
+    console.warn('Expected format: {type}_{network}_{timestamp}_{random}');
     
     // Fallback for simple IDs
     return { id: paymentId };
   }
   
   /**
-   * Generate a structured payment ID
+   * Generate a structured payment ID with validation
    */
   static generate(type: RequestType, network: SVMNetwork): string {
+    if (!type || !network) {
+      throw new Error('Type and network are required to generate payment ID');
+    }
+    
+    if (!Object.values(RequestType).includes(type)) {
+      throw new Error(`Invalid request type: ${type}`);
+    }
+    
+    if (!Object.values(SVMNetwork).includes(network)) {
+      throw new Error(`Invalid network: ${network}`);
+    }
+    
     const timestamp = Date.now();
     const random = Math.random().toString(36).substring(2, 8);
     return `${type.toLowerCase()}_${network.toLowerCase()}_${timestamp}_${random}`;
+  }
+  
+  /**
+   * Validate payment ID format without parsing
+   */
+  static isValid(paymentId: string): boolean {
+    if (!paymentId || typeof paymentId !== 'string') {
+      return false;
+    }
+    return this.ID_PATTERN.test(paymentId);
   }
 }
 

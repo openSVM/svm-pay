@@ -22,7 +22,7 @@ import { SonicNetworkAdapter } from '../network/sonic';
 import { EclipseNetworkAdapter } from '../network/eclipse';
 import { SoonNetworkAdapter } from '../network/soon';
 import { loadConfig } from '../cli/utils/config';
-import { getWalletBalance } from '../cli/utils/solana';
+import { getWalletBalance, createKeypairFromPrivateKey } from '../cli/utils/solana';
 import { checkApiUsage } from '../cli/utils/openrouter';
 import { loadPaymentHistory } from '../cli/utils/history';
 
@@ -229,10 +229,14 @@ export class SVMPay {
         throw new Error('Private key not configured. Run "svm-pay setup -k <private-key>" first.');
       }
       
+      // SECURITY FIX: Derive public address from private key instead of exposing private key
+      const keypair = createKeypairFromPrivateKey(config.privateKey);
+      const publicAddress = keypair.publicKey.toString();
+      
       const balance = await getWalletBalance(config.privateKey);
       return {
         balance,
-        address: config.privateKey // Note: This should be converted to public key
+        address: publicAddress // Now returns the public address, not the private key
       };
     } catch (error) {
       this.log(`Failed to check balance: ${error}`);

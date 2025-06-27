@@ -3,6 +3,7 @@
  */
 
 import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
+import { createMemoInstruction } from '@solana/spl-memo';
 import bs58 from 'bs58';
 import { isTestMode } from './config';
 
@@ -98,9 +99,15 @@ export async function sendPayment(
     
     // Add memo if provided
     if (memo) {
-      // Note: This would require importing @solana/spl-memo
-      // For now, we'll skip the memo functionality
-      console.log(`Note: Memo "${memo}" would be added to transaction`);
+      // Truncate memo to 566 character limit for Solana
+      const truncatedMemo = memo.length > 566 ? memo.substring(0, 563) + '...' : memo;
+      const memoInstruction = createMemoInstruction(truncatedMemo, [fromKeypair.publicKey]);
+      transaction.add(memoInstruction);
+      console.log(`✓ Added memo to transaction: "${truncatedMemo}"`);
+      
+      if (memo.length > 566) {
+        console.warn(`⚠ Memo was truncated from ${memo.length} to 566 characters due to Solana limit`);
+      }
     }
     
     // Get recent blockhash
