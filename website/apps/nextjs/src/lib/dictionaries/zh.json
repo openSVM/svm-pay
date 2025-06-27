@@ -3,6 +3,7 @@
     "title": "SVM 网络支付基础设施",
     "sub_title": "为 Solana、Sonic SVM、Eclipse 和 s00n 网络提供一键集成的完整支付解决方案。",
     "get_started": "立即开始",
+    "login": "登录",
     "contributors": {
       "contributors_desc": "贡献者使 SVM-Pay 更强大",
       "developers_first": "帮助超过 ",
@@ -45,6 +46,7 @@
     "pricing": "定价",
     "about": "关于",
     "sign_in": "登录",
+    "login": "登录",
     "start_now": "立即开始"
   },
   "footer": {
@@ -64,6 +66,13 @@
     "contact": "联系",
     "legal": "法律",
     "copyright": "© 2025 SVM-Pay. 保留所有权利。"
+  },
+  "login": {
+    "welcome_back": "欢迎回来",
+    "signin_title": "连接您的钱包以登录您的账户",
+    "signin_others": "使用 Solana 连接",
+    "back": "返回",
+    "singup_title": "没有账户？注册"
   },
   "price": {
     "title": "简单透明的定价",

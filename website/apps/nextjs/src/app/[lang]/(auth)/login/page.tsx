@@ -35,7 +35,7 @@ export default async function LoginPage({
       >
         <>
           <Icons.ChevronLeft className="mr-2 h-4 w-4" />
-          {dict.login.back}
+          {dict?.login?.back || "Back"}
         </>
       </Link>
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
@@ -48,19 +48,19 @@ export default async function LoginPage({
             alt=""
           />
           <h1 className="text-2xl font-semibold tracking-tight">
-            {dict.login.welcome_back}
+            {dict?.login?.welcome_back || "Welcome back"}
           </h1>
           <p className="text-sm text-muted-foreground">
-            {dict.login.signin_title}
+            {dict?.login?.signin_title || "Connect your wallet to sign in"}
           </p>
         </div>
-        <UserAuthForm lang={lang} dict={dict.login} />
+        <UserAuthForm lang={lang} dict={dict?.login || {}} />
         {/* <p className="px-8 text-center text-sm text-muted-foreground">
           <Link
             href={`/${lang}/register`}
             className="hover:text-brand underline underline-offset-4"
           >
-            {dict.login.singup_title}
+            {dict?.login?.singup_title || "Don't have an account? Sign up"}
           </Link>
         </p> */}
       </div>
