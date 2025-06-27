@@ -48,11 +48,11 @@ let Inject: any;
 let Optional: any;
 
 // Dynamic RxJS imports
-let Observable: any;
+let _Observable: any;
 let BehaviorSubject: any;
 let from: any;
 let of: any;
-let EMPTY: any;
+let _EMPTY: any;
 let catchError: any;
 let map: any;
 let shareReplay: any;
@@ -72,11 +72,11 @@ if (hasAngularSupport()) {
     Optional = angularCore.Optional;
 
     const rxjs = require('rxjs');
-    Observable = rxjs.Observable;
+    _Observable = rxjs.Observable;
     BehaviorSubject = rxjs.BehaviorSubject;
     from = rxjs.from;
     of = rxjs.of;
-    EMPTY = rxjs.EMPTY;
+    _EMPTY = rxjs.EMPTY;
 
     const operators = require('rxjs/operators');
     catchError = operators.catchError;
@@ -289,7 +289,7 @@ export class SVMPayService {
     return new SVMPay(this.config);
   }
 
-  private async executePayment(recipient: string, amount: string, options?: any): Promise<any> {
+  private async executePayment(_recipient: string, _amount: string, _options?: any): Promise<any> {
     // Placeholder for payment execution logic
     // In a real implementation, this would handle the payment flow
     throw new Error('Payment execution not implemented in Angular integration');
