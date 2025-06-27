@@ -1,0 +1,30 @@
+[build]
+  base = "website/apps/nextjs"
+  command = "cd ../../ && bun install && cd website && bun run build --filter=@saasfly/nextjs"
+  publish = ".next"
+
+[build.environment]
+  NEXTAUTH_SECRET = "netlify-build-secret-12345"
+  NEXTAUTH_URL = "https://svm-pay.netlify.app"
+  NEXT_PUBLIC_APP_URL = "https://svm-pay.netlify.app"
+  GITHUB_CLIENT_ID = "1"
+  GITHUB_CLIENT_SECRET = "1"
+  RESEND_API_KEY = "1"
+  RESEND_FROM = "1"
+  STRIPE_API_KEY = "1"
+  STRIPE_WEBHOOK_SECRET = "1"
+  NEXT_PUBLIC_STRIPE_STD_PRODUCT_ID = "prod_"
+  NEXT_PUBLIC_STRIPE_STD_MONTHLY_PRICE_ID = "price_"
+  NEXT_PUBLIC_STRIPE_PRO_PRODUCT_ID = "prod_"
+  NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID = "price_"
+  NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID = "price_"
+  NEXT_PUBLIC_STRIPE_BUSINESS_PRODUCT_ID = "prod_"
+  NEXT_PUBLIC_STRIPE_BUSINESS_MONTHLY_PRICE_ID = "price_"
+  NEXT_PUBLIC_STRIPE_BUSINESS_YEARLY_PRICE_ID = "price_"
+  NEXT_PUBLIC_POSTHOG_KEY = " "
+  NEXT_PUBLIC_POSTHOG_HOST = "https://app.posthog.com"
+  ADMIN_EMAIL = "admin@saasfly.io,root@saasfly.io"
+  IS_DEBUG = "false"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
