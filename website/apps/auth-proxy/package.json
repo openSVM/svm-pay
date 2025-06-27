@@ -17,11 +17,11 @@
     "@saasfly/tailwind-config": "file:../../tooling/tailwind-config",
     "@saasfly/typescript-config": "file:../../tooling/typescript-config",
     "@types/node": "20.12.12",
-    "eslint": "8.57.0",
+    "eslint": "9.24.0",
     "h3": "1.11.1",
     "nitropack": "2.9.6",
-    "prettier": "3.2.5",
-    "typescript": "5.4.5"
+    "prettier": "3.5.3",
+    "typescript": "5.8.3"
   },
   "eslintConfig": {
     "root": true,
