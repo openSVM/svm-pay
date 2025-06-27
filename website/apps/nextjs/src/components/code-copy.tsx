@@ -19,16 +19,16 @@ export function CodeCopy() {
 
   return (
     <div className="inline-flex items-center gap-3">
-      <span className="font-mono text-gray-700 dark:text-gray-300">{command}</span>
+      <span className="font-mono text-slate-600">{command}</span>
       <button
         onClick={copyToClipboard}
-        className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+        className="p-1.5 rounded hover:bg-slate-100 transition-colors duration-200"
         aria-label="Copy to clipboard"
       >
         {copied ? (
           <Icons.Check className="w-4 h-4 text-green-600" />
         ) : (
-          <Icons.Copy className="w-4 h-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" />
+          <Icons.Copy className="w-4 h-4 text-slate-500 hover:text-slate-700" />
         )}
       </button>
     </div>

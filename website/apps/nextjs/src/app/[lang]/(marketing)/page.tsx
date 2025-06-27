@@ -77,12 +77,9 @@ export default async function IndexPage({
             </div>
             
             {/* Premium install command */}
-            <div className="inline-flex items-center gap-4 bg-white/60 border border-slate-200 rounded-2xl px-8 py-5 text-base font-mono text-slate-700 backdrop-blur-md shadow-xl shadow-slate-900/5">
-              <span className="text-slate-500">$</span>
+            <div className="inline-flex items-center gap-4 bg-white/60 border border-slate-200 rounded-2xl px-8 py-5 text-base backdrop-blur-md shadow-xl shadow-slate-900/5">
+              <span className="text-slate-500 font-mono">$</span>
               <CodeCopy />
-              <button className="ml-4 p-2 hover:bg-slate-100 rounded-lg transition-colors">
-                <Icons.Copy className="h-4 w-4 text-slate-500" />
-              </button>
             </div>
           </div>
         </div>
