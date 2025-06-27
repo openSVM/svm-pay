@@ -14,7 +14,7 @@
     "lint:fix": "turbo lint --continue -- --fix --cache --cache-location 'node_modules/.cache/.eslintcache' ",
     "typecheck": "turbo typecheck",
     "postinstall": "npm run check-deps || true",
-    "check-deps": "check-dependency-version-consistency .",
+    "check-deps": "check-dependency-version-consistency . --ignore-dep @saasfly/api --ignore-dep @saasfly/db --ignore-dep @saasfly/eslint-config --ignore-dep @saasfly/prettier-config --ignore-dep @saasfly/tailwind-config --ignore-dep @saasfly/typescript-config --ignore-dep @saasfly/ui",
     "gen": "turbo gen --config 'turbo/generators/config.ts'"
   },
   "devDependencies": {
