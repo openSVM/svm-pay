@@ -239,9 +239,33 @@ export class SVMPay {
         address: publicAddress // Now returns the public address, not the private key
       };
     } catch (error) {
-      this.log(`Failed to check balance: ${error}`);
-      throw error;
+      // SECURITY: Sanitize error messages to prevent private key leakage
+      const sanitizedError = this.sanitizeError(error as Error);
+      this.log(`Failed to check balance: ${sanitizedError.message}`);
+      throw sanitizedError;
     }
+  }
+
+  /**
+   * Sanitize error messages to prevent sensitive data leakage
+   * 
+   * @param error The error to sanitize
+   * @returns Sanitized error
+   */
+  private sanitizeError(error: Error): Error {
+    let message = error.message;
+    
+    // Remove any potential private key patterns from error messages
+    // This is a basic sanitization - in production, you'd want more sophisticated detection
+    message = message.replace(/[A-Za-z0-9+/]{87}={0,2}/g, '[REDACTED_PRIVATE_KEY]'); // Base58 private keys
+    message = message.replace(/\[[0-9,\s]+\]/g, '[REDACTED_ARRAY_KEY]'); // Array format keys
+    message = message.replace(/[A-Za-z0-9-]{20,}/g, '[REDACTED_SENSITIVE_DATA]'); // Other potentially sensitive strings
+    
+    const sanitizedError = new Error(message);
+    sanitizedError.name = error.name;
+    sanitizedError.stack = error.stack;
+    
+    return sanitizedError;
   }
   
   /**
