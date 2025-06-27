@@ -3,6 +3,7 @@
     "title": "Payment infrastructure for SVM networks with",
     "sub_title": "A complete payment solution for Solana, Sonic SVM, Eclipse, and s00n networks with one-click integration.",
     "get_started": "Get Started",
+    "login": "Login",
     "contributors": {
       "contributors_desc": "contributors made SVM-Pay stronger",
       "developers_first": "Help more than ",
@@ -45,6 +46,7 @@
     "pricing": "Pricing",
     "about": "About",
     "sign_in": "Sign in",
+    "login": "Login",
     "start_now": "Start now"
   },
   "footer": {
@@ -64,6 +66,13 @@
     "contact": "Contact",
     "legal": "Legal",
     "copyright": "© 2025 SVM-Pay. All rights reserved."
+  },
+  "login": {
+    "welcome_back": "Welcome back",
+    "signin_title": "Connect your wallet to sign in to your account",
+    "signin_others": "Connect with Solana",
+    "back": "Back",
+    "singup_title": "Don't have an account? Sign up"
   },
   "price": {
     "title": "Simple, transparent pricing",

@@ -18,12 +18,21 @@ export const SolanaPayment: FC<SolanaPaymentProps> = ({
   onSuccess,
   onError
 }) => {
-  const { publicKey, sendTransaction } = useWallet();
+  // Use try-catch to handle missing wallet context gracefully
+  let walletState = { publicKey: null, sendTransaction: null };
+  try {
+    const { publicKey, sendTransaction } = useWallet();
+    walletState = { publicKey, sendTransaction };
+  } catch (error) {
+    console.warn("Wallet context not available:", error);
+  }
+
+  const { publicKey, sendTransaction } = walletState;
   const [isProcessing, setIsProcessing] = useState(false);
   const [txSignature, setTxSignature] = useState<string | null>(null);
 
   const handlePayment = async () => {
-    if (!publicKey) return;
+    if (!publicKey || !sendTransaction) return;
 
     try {
       setIsProcessing(true);

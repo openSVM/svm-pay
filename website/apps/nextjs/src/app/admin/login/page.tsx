@@ -10,7 +10,16 @@ import { buttonVariants } from "@saasfly/ui/button";
 import * as Icons from "@saasfly/ui/icons";
 
 export default function LoginPage() {
-  const { publicKey, connecting } = useWallet();
+  // Use try-catch to handle missing wallet context gracefully
+  let walletState = { publicKey: null, connecting: false };
+  try {
+    const { publicKey, connecting } = useWallet();
+    walletState = { publicKey, connecting };
+  } catch (error) {
+    console.warn("Wallet context not available:", error);
+  }
+
+  const { publicKey, connecting } = walletState;
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   return (
