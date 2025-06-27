@@ -31,7 +31,7 @@ describe('CLI Commands', () => {
     
     // Clean up temp directory
     try {
-      await fs.rmdir(tempConfigDir, { recursive: true });
+      await fs.rm(tempConfigDir, { recursive: true });
     } catch (error) {
       // Ignore cleanup errors
     }
