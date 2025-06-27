@@ -1,7 +1,7 @@
 [build]
-  base = "website/apps/nextjs"
-  command = "cd ../../ && bun install && cd website && bun run build --filter=@saasfly/nextjs"
-  publish = ".next"
+  base = "website"
+  command = "bun install && bun run build --filter=@saasfly/nextjs"
+  publish = "apps/nextjs/.next"
 
 [build.environment]
   NEXTAUTH_SECRET = "netlify-build-secret-12345"
