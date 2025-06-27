@@ -57,6 +57,7 @@
     "zustand": "4.5.0"
   },
   "devDependencies": {
+    "@next-devtools/core": "0.2.0",
     "@saasfly/eslint-config": "file:../../tooling/eslint-config",
     "@saasfly/prettier-config": "file:../../tooling/prettier-config",
     "@saasfly/tailwind-config": "file:../../tooling/tailwind-config",
@@ -67,22 +68,21 @@
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
     "autoprefixer": "10.4.17",
+    "contentlayer2": "^0.4.6",
     "dotenv-cli": "7.3.0",
     "eslint": "9.24.0",
-    "prettier": "3.5.3",
-    "tailwindcss": "3.4.1",
-    "typescript": "5.8.3",
-    "contentlayer2": "0.4.6",
+    "mdast-util-toc": "7.0.0",
     "next-contentlayer2": "0.4.6",
+    "prettier": "3.5.3",
     "rehype": "13.0.1",
     "rehype-autolink-headings": "7.1.0",
     "rehype-pretty-code": "0.12.3",
     "rehype-slug": "6.0.0",
     "remark": "15.0.1",
     "remark-gfm": "4.0.0",
-    "unist-util-visit": "5.0.0",
-    "mdast-util-toc": "7.0.0",
-    "@next-devtools/core": "0.2.0"
+    "tailwindcss": "3.4.1",
+    "typescript": "5.8.3",
+    "unist-util-visit": "5.0.0"
   },
   "eslintConfig": {
     "root": true,

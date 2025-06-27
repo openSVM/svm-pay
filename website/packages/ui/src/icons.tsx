@@ -13,10 +13,13 @@ export const ChevronRight = Lucide.ChevronRight;
 export const Cloud = Lucide.Cloud;
 export const Cluster = Lucide.CloudCog;
 export const Close = Lucide.X;
+export const Code = Lucide.Code;
 export const Copy = Lucide.Copy;
 export const CopyDone = Lucide.ClipboardCheck;
 export const Dashboard = Lucide.Activity;
 export const Ellipsis = Lucide.MoreVertical;
+export const FileText = Lucide.FileText;
+export const Github = Lucide.Github;
 export const Help = Lucide.HelpCircle;
 export const Heart = Lucide.Heart;
 export const Key = Lucide.Key;
@@ -31,6 +34,7 @@ export const Post = Lucide.FileText;
 export const Rocket = Lucide.Rocket;
 export const Search = Lucide.Search;
 export const Settings = Lucide.Settings;
+export const Shield = Lucide.Shield;
 export const ShieldCheck = Lucide.ShieldCheck;
 export const Spinner = Lucide.Loader2;
 export const Sun = Lucide.SunMedium;
@@ -39,6 +43,7 @@ export const Trash = Lucide.Trash;
 export const Twitter = Lucide.Twitter;
 export const User = Lucide.User;
 export const Warning = Lucide.AlertTriangle;
+export const Zap = Lucide.Zap;
 
 export const System: Icon = (props) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
