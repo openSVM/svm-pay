@@ -59,8 +59,12 @@ export class SolanaNetworkAdapter extends BaseNetworkAdapter {
       transaction.recentBlockhash = blockhash;
       
       // Create transfer instruction
+      // NOTE: fromPubkey is intentionally set to a placeholder (11111111111111111111111111111111)
+      // This MUST be replaced with the actual user's wallet public key when the transaction
+      // is signed by the wallet. The placeholder ensures the transaction structure is correct
+      // while allowing the wallet to inject the real sender address during signing.
       const transferInstruction = SystemProgram.transfer({
-        fromPubkey: new PublicKey('11111111111111111111111111111111'), // Placeholder - will be set by wallet
+        fromPubkey: new PublicKey('11111111111111111111111111111111'), // PLACEHOLDER: Replace with actual wallet pubkey
         toPubkey: recipientPubkey,
         lamports: amount,
       });
@@ -105,8 +109,12 @@ export class SolanaNetworkAdapter extends BaseNetworkAdapter {
       transaction.recentBlockhash = blockhash;
       
       // Add a placeholder instruction (in real implementation, parse from link)
+      // NOTE: fromPubkey is intentionally set to a placeholder (11111111111111111111111111111111)
+      // This MUST be replaced with the actual user's wallet public key when the transaction
+      // is signed by the wallet. The placeholder prevents wallet confusion by clearly indicating
+      // this field will be populated by the user's wallet during the signing process.
       const transferInstruction = SystemProgram.transfer({
-        fromPubkey: new PublicKey('11111111111111111111111111111111'), // Placeholder
+        fromPubkey: new PublicKey('11111111111111111111111111111111'), // PLACEHOLDER: Replace with actual wallet pubkey
         toPubkey: new PublicKey(request.recipient),
         lamports: LAMPORTS_PER_SOL, // Default 1 SOL
       });

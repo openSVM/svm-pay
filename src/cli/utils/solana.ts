@@ -85,8 +85,10 @@ export async function sendPayment(
     const toPublicKey = new PublicKey(recipientAddress);
     
     // Create transfer instruction
+    // NOTE: Using actual keypair public key (not placeholder) since this is a direct CLI transaction
+    // where we have the private key and can determine the actual sender address
     const transferInstruction = SystemProgram.transfer({
-      fromPubkey: fromKeypair.publicKey,
+      fromPubkey: fromKeypair.publicKey, // ACTUAL wallet pubkey from provided private key
       toPubkey: toPublicKey,
       lamports: Math.floor(amount * LAMPORTS_PER_SOL)
     });

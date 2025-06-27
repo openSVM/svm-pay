@@ -19,6 +19,12 @@ export const payCommand = new Command('pay')
       
       const config = loadConfig();
       
+      // Security warning for private key usage
+      if (config.privateKey && !process.env.SVM_PAY_PRIVATE_KEY) {
+        console.warn('🔐 SECURITY NOTICE: Using private key from config file');
+        console.warn('Consider using SVM_PAY_PRIVATE_KEY environment variable instead\n');
+      }
+      
       // Validate required configuration
       if (!validateConfig(config, ['privateKey'])) {
         process.exit(1);

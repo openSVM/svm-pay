@@ -21,6 +21,12 @@ export const setupCommand = new Command('setup')
       
       // Update private key if provided
       if (options.privateKey) {
+        console.warn('\n🔐 SECURITY ALERT: You are about to store a private key!');
+        console.warn('═══════════════════════════════════════════════════════════');
+        console.warn('This key will be stored in plain text on your file system.');
+        console.warn('Consider using environment variables instead for better security.');
+        console.warn('═══════════════════════════════════════════════════════════\n');
+        
         console.log('Validating private key...');
         try {
           const keypair = createKeypairFromPrivateKey(options.privateKey);

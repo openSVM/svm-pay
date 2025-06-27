@@ -68,12 +68,23 @@ export function saveConfig(config: SVMPayConfig): void {
     
     // Show security warning when saving private keys to file
     if (config.privateKey) {
-      console.warn('\n🔐 SECURITY WARNING:');
-      console.warn('Private keys are being stored in plain text at:', CONFIG_FILE);
-      console.warn('For better security, consider using environment variables:');
-      console.warn('  export SVM_PAY_PRIVATE_KEY="your-private-key"');
-      console.warn('  export SVM_PAY_API_KEY="your-api-key"');
-      console.warn('Environment variables take precedence over config file.\n');
+      console.warn('\n🔐 CRITICAL SECURITY WARNING:');
+      console.warn('═══════════════════════════════════════════════════════════════');
+      console.warn('Private keys are being stored in PLAIN TEXT at:', CONFIG_FILE);
+      console.warn('This is EXTREMELY DANGEROUS in production environments!');
+      console.warn('');
+      console.warn('RECOMMENDED SECURE ALTERNATIVES:');
+      console.warn('1. Environment variables (recommended for development):');
+      console.warn('   export SVM_PAY_PRIVATE_KEY="your-private-key"');
+      console.warn('   export SVM_PAY_API_KEY="your-api-key"');
+      console.warn('');
+      console.warn('2. Hardware wallets (recommended for production)');
+      console.warn('3. Key management services (AWS KMS, HashiCorp Vault, etc.)');
+      console.warn('4. Encrypted key stores with proper access controls');
+      console.warn('');
+      console.warn('Environment variables ALWAYS take precedence over config files.');
+      console.warn('Consider moving to secure key storage ASAP for any real usage!');
+      console.warn('═══════════════════════════════════════════════════════════════\n');
     }
     
     fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));

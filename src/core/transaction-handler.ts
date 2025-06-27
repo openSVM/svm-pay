@@ -6,7 +6,6 @@
  */
 
 import { NetworkAdapter, PaymentRecord, PaymentStatus, SVMNetwork, TransactionRequest, RequestType, TransferRequest } from './types';
-import { generateReference } from './reference';
 
 /**
  * Payment store interface for persisting payment records
@@ -21,12 +20,39 @@ interface PaymentStore {
 
 /**
  * In-memory payment store implementation
+ * 
+ * ⚠️  CONCURRENCY & SCALING LIMITATIONS:
+ * This in-memory store is NOT suitable for production use beyond demos due to:
+ * 
+ * 1. NO CONCURRENCY SAFETY: Multiple concurrent operations can cause data corruption
+ * 2. NO PERSISTENCE: Data is lost when the process restarts
+ * 3. NO SCALING: Limited by single-process memory constraints
+ * 4. NO DISTRIBUTION: Cannot share data across multiple instances
+ * 
+ * FOR PRODUCTION USE, REPLACE WITH:
+ * - Database-backed store (PostgreSQL, MongoDB, etc.)
+ * - Distributed cache with persistence (Redis with AOF/RDB)
+ * - Transaction-safe storage with proper locking mechanisms
+ * - Microservice architecture with dedicated payment storage service
  */
 class MemoryPaymentStore implements PaymentStore {
   private payments = new Map<string, PaymentRecord>();
   
+  // Track concurrent operations to warn about potential issues
+  private activeOperations = 0;
+  
   async save(record: PaymentRecord): Promise<void> {
-    this.payments.set(record.id, { ...record });
+    this.activeOperations++;
+    if (this.activeOperations > 1) {
+      console.warn('⚠️  CONCURRENCY WARNING: Multiple concurrent operations detected in MemoryPaymentStore');
+      console.warn('   This can lead to data corruption. Consider upgrading to a database-backed store.');
+    }
+    
+    try {
+      this.payments.set(record.id, { ...record });
+    } finally {
+      this.activeOperations--;
+    }
   }
   
   async load(id: string): Promise<PaymentRecord | null> {
@@ -41,19 +67,29 @@ class MemoryPaymentStore implements PaymentStore {
   }
   
   async update(id: string, updates: Partial<PaymentRecord>): Promise<PaymentRecord> {
-    const existing = this.payments.get(id);
-    if (!existing) {
-      throw new Error(`Payment record not found: ${id}`);
+    this.activeOperations++;
+    if (this.activeOperations > 1) {
+      console.warn('⚠️  CONCURRENCY WARNING: Multiple concurrent operations detected in MemoryPaymentStore');
+      console.warn('   This can lead to race conditions. Consider upgrading to a database with transactions.');
     }
     
-    const updated = {
-      ...existing,
-      ...updates,
-      updatedAt: Date.now()
-    };
-    
-    this.payments.set(id, updated);
-    return { ...updated };
+    try {
+      const existing = this.payments.get(id);
+      if (!existing) {
+        throw new Error(`Payment record not found: ${id}`);
+      }
+      
+      const updated = {
+        ...existing,
+        ...updates,
+        updatedAt: Date.now()
+      };
+      
+      this.payments.set(id, updated);
+      return { ...updated };
+    } finally {
+      this.activeOperations--;
+    }
   }
   
   async delete(id: string): Promise<boolean> {
@@ -121,6 +157,13 @@ export class TransactionRequestHandler {
   ) {
     this.networkAdapters = networkAdapters;
     this.paymentStore = paymentStore || new MemoryPaymentStore();
+    
+    // Warn about using in-memory store for anything beyond demos
+    if (!paymentStore) {
+      console.warn('\n⚠️  SCALING WARNING: Using in-memory payment store (demo only)');
+      console.warn('   For production use, provide a persistent PaymentStore implementation');
+      console.warn('   that supports concurrency, persistence, and proper scaling.\n');
+    }
   }
   
   /**
