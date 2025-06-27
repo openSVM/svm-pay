@@ -3,7 +3,7 @@
 import React, { FC, useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { PublicKey, Transaction, Connection } from '@solana/web3.js';
+import { PublicKey, Transaction, Connection, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 export interface SolanaPaymentProps {
   amount: number; // Amount in SOL
@@ -18,44 +18,42 @@ export const SolanaPayment: FC<SolanaPaymentProps> = ({
   onSuccess,
   onError
 }) => {
-  // Use try-catch to handle missing wallet context gracefully
-  let walletState = { publicKey: null, sendTransaction: null };
-  try {
-    const { publicKey, sendTransaction } = useWallet();
-    walletState = { publicKey, sendTransaction };
-  } catch (error) {
-    console.warn("Wallet context not available:", error);
-  }
-
-  const { publicKey, sendTransaction } = walletState;
+  const { publicKey, sendTransaction, connected } = useWallet();
   const [isProcessing, setIsProcessing] = useState(false);
   const [txSignature, setTxSignature] = useState<string | null>(null);
 
   const handlePayment = async () => {
-    if (!publicKey || !sendTransaction) return;
+    if (!publicKey || !sendTransaction || !connected) return;
 
     try {
       setIsProcessing(true);
       
-      // Create a simple transfer transaction
-      const transaction = new Transaction().add(
-        // Create a transfer instruction
-        // This is a simplified example - in a real app, you would use the Solana SDK to create a proper transfer instruction
-        {
-          keys: [
-            { pubkey: publicKey, isSigner: true, isWritable: true },
-            { pubkey: new PublicKey(recipientAddress), isSigner: false, isWritable: true },
-          ],
-          programId: new PublicKey('11111111111111111111111111111111'), // System program ID
-          data: Buffer.from([2, ...new Uint8Array(8).fill(0)]), // Transfer instruction with amount
-        }
-      );
-
       // Create a connection to use for sending the transaction
       const connection = new Connection('https://api.mainnet-beta.solana.com');
+      
+      // Convert SOL amount to lamports
+      const lamports = Math.floor(amount * LAMPORTS_PER_SOL);
+      
+      // Create a proper transfer instruction using SystemProgram
+      const transferInstruction = SystemProgram.transfer({
+        fromPubkey: publicKey,
+        toPubkey: new PublicKey(recipientAddress),
+        lamports: lamports,
+      });
+
+      // Create transaction and add the transfer instruction
+      const transaction = new Transaction().add(transferInstruction);
+      
+      // Get latest blockhash for the transaction
+      const { blockhash } = await connection.getLatestBlockhash();
+      transaction.recentBlockhash = blockhash;
+      transaction.feePayer = publicKey;
 
       // Send the transaction
       const signature = await sendTransaction(transaction, connection);
+      
+      // Wait for confirmation
+      await connection.confirmTransaction(signature, 'confirmed');
       
       setTxSignature(signature);
       onSuccess?.(signature);
@@ -69,7 +67,7 @@ export const SolanaPayment: FC<SolanaPaymentProps> = ({
 
   return (
     <div className="solana-payment">
-      {!publicKey ? (
+      {!connected || !publicKey ? (
         <div>
           <p>Connect your wallet to make a payment</p>
           <WalletMultiButton />
