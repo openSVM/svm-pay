@@ -1,7 +1,6 @@
 import type { WalletError, WalletName } from '@solana/wallet-adapter-base';
 import {
   BaseSignerWalletAdapter,
-  WalletAdapterNetwork,
   WalletDisconnectionError,
   WalletNotConnectedError,
   WalletNotReadyError,
@@ -11,7 +10,6 @@ import {
   WalletWindowClosedError
 } from '@solana/wallet-adapter-base';
 import type { PublicKey, Transaction, TransactionVersion, VersionedTransaction } from '@solana/web3.js';
-import { WalletConnectChainID } from './constants';
 import { WalletConnectWallet } from './core';
 import type { WalletConnectWalletAdapterConfig } from './types';
 

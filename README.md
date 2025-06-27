@@ -26,6 +26,7 @@ SVM-Pay is a payment solution for SVM networks (Solana, Sonic SVM, Eclipse, s00n
 - [Architecture](docs/architecture.md)
 - [Security Recommendations](docs/security-recommendations.md)
 - [Examples](examples/)
+- [CLI Integration](CLI-INTEGRATION.md)
 
 ## Installation
 
@@ -56,6 +57,39 @@ const url = svmPay.createTransferUrl(
 
 console.log(url);
 // Output: solana:YOUR_WALLET_ADDRESS?amount=1.0&label=Your%20Store&message=Payment%20for%20Order%20%23123&reference=order-123
+
+// CLI Integration - access CLI functionality programmatically
+// Check wallet balance (requires CLI setup)
+svmPay.checkWalletBalance()
+  .then(balance => console.log('Wallet balance:', balance))
+  .catch(error => console.error('Balance check failed:', error));
+```
+
+## CLI Tool
+
+SVM-Pay includes a built-in CLI tool for managing payments:
+
+```bash
+# Install globally
+npm install -g svm-pay
+
+# Setup configuration
+svm-pay setup -k <your-private-key> -a <your-api-key>
+
+# Check wallet balance
+svm-pay balance
+
+# Check API usage
+svm-pay usage
+
+# Make a payment
+svm-pay pay -a 0.1 -r "API usage payment"
+
+# View payment history
+svm-pay history
+```
+
+See [CLI Integration](CLI-INTEGRATION.md) for complete CLI documentation.
 ```
 
 ## Framework Integration

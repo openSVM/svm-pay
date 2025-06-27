@@ -21,7 +21,10 @@ import { SolanaNetworkAdapter } from '../network/solana';
 import { SonicNetworkAdapter } from '../network/sonic';
 import { EclipseNetworkAdapter } from '../network/eclipse';
 import { SoonNetworkAdapter } from '../network/soon';
-import { detectNetwork } from '../network/detector';
+import { loadConfig } from '../cli/utils/config';
+import { getWalletBalance, createKeypairFromPrivateKey } from '../cli/utils/solana';
+import { checkApiUsage } from '../cli/utils/openrouter';
+import { loadPaymentHistory } from '../cli/utils/history';
 
 /**
  * SVM-Pay SDK configuration options
@@ -81,13 +84,13 @@ export class SVMPay {
    * Create a payment URL for a transfer request
    * 
    * @param recipient Recipient address
-   * @param amount Amount to transfer (optional)
+   * @param amount Amount to transfer
    * @param options Additional options
    * @returns Payment URL string
    */
   createTransferUrl(
     recipient: string,
-    amount?: string,
+    amount: string,
     options: {
       network?: SVMNetwork;
       splToken?: string;
@@ -98,6 +101,10 @@ export class SVMPay {
     } = {}
   ): string {
     const network = options.network || this.config.defaultNetwork || SVMNetwork.SOLANA;
+    
+    if (!amount) {
+      throw new Error('Amount is required for transfer requests');
+    }
     
     const request: TransferRequest = {
       type: RequestType.TRANSFER,
@@ -170,6 +177,7 @@ export class SVMPay {
   async processPayment(request: PaymentRequest): Promise<any> {
     this.log(`Processing payment request of type: ${request.type}`);
     
+    // Use local implementation
     if (request.type === RequestType.TRANSFER) {
       return this.transferHandler.processRequest(request as TransferRequest);
     } else {
@@ -204,6 +212,127 @@ export class SVMPay {
       if (data) {
         console.log(data);
       }
+    }
+  }
+  
+  /**
+   * Check wallet balance (uses local CLI functionality)
+   * 
+   * @returns Wallet balance information
+   */
+  async checkWalletBalance(): Promise<any> {
+    try {
+      this.log('Using local CLI functionality for balance check');
+      const config = loadConfig();
+      
+      if (!config.privateKey) {
+        throw new Error('Private key not configured. Run "svm-pay setup -k <private-key>" first.');
+      }
+      
+      // SECURITY FIX: Derive public address from private key instead of exposing private key
+      const keypair = createKeypairFromPrivateKey(config.privateKey);
+      const publicAddress = keypair.publicKey.toString();
+      
+      const balance = await getWalletBalance(config.privateKey);
+      return {
+        balance,
+        address: publicAddress // Now returns the public address, not the private key
+      };
+    } catch (error) {
+      // SECURITY: Sanitize error messages to prevent private key leakage
+      const sanitizedError = this.sanitizeError(error as Error);
+      this.log(`Failed to check balance: ${sanitizedError.message}`);
+      throw sanitizedError;
+    }
+  }
+
+  /**
+   * Sanitize error messages to prevent sensitive data leakage
+   * 
+   * @param error The error to sanitize
+   * @returns Sanitized error
+   */
+  private sanitizeError(error: Error): Error {
+    let message = error.message;
+    
+    // Remove any potential private key patterns from error messages
+    // This is a basic sanitization - in production, you'd want more sophisticated detection
+    message = message.replace(/[A-Za-z0-9+/]{87}={0,2}/g, '[REDACTED_PRIVATE_KEY]'); // Base58 private keys
+    message = message.replace(/\[[0-9,\s]+\]/g, '[REDACTED_ARRAY_KEY]'); // Array format keys
+    message = message.replace(/[A-Za-z0-9-]{20,}/g, '[REDACTED_SENSITIVE_DATA]'); // Other potentially sensitive strings
+    
+    const sanitizedError = new Error(message);
+    sanitizedError.name = error.name;
+    sanitizedError.stack = error.stack;
+    
+    return sanitizedError;
+  }
+  
+  /**
+   * Check API usage (uses local CLI functionality)
+   * 
+   * @returns API usage information
+   */
+  async checkApiUsage(): Promise<any> {
+    try {
+      this.log('Using local CLI functionality for API usage check');
+      const config = loadConfig();
+      
+      if (!config.apiKey) {
+        throw new Error('API key not configured. Run "svm-pay setup -a <api-key>" first.');
+      }
+      
+      return await checkApiUsage(config.apiKey);
+    } catch (error) {
+      this.log(`Failed to check API usage: ${error}`);
+      throw error;
+    }
+  }
+  
+  /**
+   * Get payment history (uses local CLI functionality)
+   * 
+   * @returns Payment history
+   */
+  async getPaymentHistory(): Promise<any> {
+    try {
+      this.log('Using local CLI functionality for payment history');
+      return loadPaymentHistory();
+    } catch (error) {
+      this.log(`Failed to get payment history: ${error}`);
+      throw error;
+    }
+  }
+  
+  /**
+   * Setup wallet configuration (uses local CLI functionality)
+   * 
+   * @param options Setup options
+   * @returns Setup result
+   */
+  async setupWallet(options: { 
+    privateKey?: string;
+    apiKey?: string;
+    threshold?: number;
+    recipient?: string;
+  }): Promise<any> {
+    try {
+      this.log('Using local CLI functionality for wallet setup');
+      const { loadConfig, saveConfig } = await import('../cli/utils/config');
+      
+      const config = loadConfig();
+      
+      if (options.privateKey) config.privateKey = options.privateKey;
+      if (options.apiKey) config.apiKey = options.apiKey;
+      if (options.threshold) config.threshold = options.threshold;
+      if (options.recipient) config.recipientAddress = options.recipient;
+      
+      saveConfig(config);
+      
+      return { success: true, config };
+    } catch (error) {
+      this.log(`Failed to setup wallet: ${error}`);
+      throw error;
     }
   }
 }

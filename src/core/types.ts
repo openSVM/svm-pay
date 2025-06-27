@@ -55,7 +55,7 @@ export interface TransferRequest extends PaymentRequest {
   type: RequestType.TRANSFER;
   
   /** The amount to transfer (as a string to preserve precision) */
-  amount?: string;
+  amount: string;
   
   /** The SPL token mint address (if transferring an SPL token) */
   splToken?: string;

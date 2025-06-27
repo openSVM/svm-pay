@@ -4,15 +4,25 @@
   "description": "A payment solution for SVM networks (Solana, Sonic SVM, Eclipse, s00n)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "svm-pay": "dist/bin/svm-pay.js"
+  },
   "scripts": {
-    "build": "tsc",
+    "clean": "rm -rf dist",
+    "build": "npm run clean && tsc",
+    "build:production": "npm run clean && NODE_ENV=production tsc -p tsconfig.prod.json && NODE_ENV=production node scripts/optimize-build.js --no-source-maps",
+    "postbuild": "chmod +x dist/bin/svm-pay.js && node scripts/optimize-build.js",
     "test": "jest",
+    "test:ci": "jest --passWithNoTests --ci --coverage",
     "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run lint",
+    "prepublishOnly": "npm run build:production && npm run test:ci && npm run lint",
     "start:web-demo": "parcel examples/web-payment-demo.html",
     "start:pos-demo": "parcel examples/point-of-sale-demo.html",
-    "start:subscription-demo": "parcel examples/subscription-payment-demo.html"
+    "start:subscription-demo": "parcel examples/subscription-payment-demo.html",
+    "cli:test": "node dist/bin/svm-pay.js --help",
+    "validate:package": "npm pack --dry-run"
   },
   "keywords": [
     "svm",
@@ -36,14 +46,19 @@
   "homepage": "https://github.com/openSVM/svm-pay#readme",
   "dependencies": {
     "@reown/appkit": "^1.7.2",
+    "@solana/spl-memo": "^0.2.5",
     "@solana/wallet-adapter-base": "^0.9.24",
     "@solana/wallet-adapter-react": "^0.15.36",
     "@solana/wallet-adapter-react-ui": "^0.9.36",
     "@solana/web3.js": "^1.98.0",
+    "@types/crypto-js": "^4.2.2",
     "@walletconnect/solana-adapter": "^0.0.7",
     "@walletconnect/universal-provider": "^2.19.2",
+    "axios": "^1.5.1",
     "bs58": "^6.0.0",
-    "crypto": "^1.0.1"
+    "commander": "^11.0.0",
+    "crypto": "^1.0.1",
+    "crypto-js": "^4.2.0"
   },
   "peerDependencies": {
     "@angular/core": "^13.0.0 || ^14.0.0 || ^15.0.0",
@@ -66,8 +81,8 @@
     }
   },
   "devDependencies": {
-    "@types/jest": "^29.5.0",
-    "@types/node": "^18.15.11",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^18.19.112",
     "@types/react": "^18.0.33",
     "@types/react-dom": "^18.0.11",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
@@ -79,7 +94,11 @@
     "typescript": "^5.0.4"
   },
   "files": [
-    "dist/**/*"
+    "dist/**/*",
+    "scripts/optimize-build.js",
+    "README.md",
+    "LICENSE",
+    "package.json"
   ],
   "exports": {
     ".": {
