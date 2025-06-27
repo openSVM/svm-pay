@@ -1,5 +1,5 @@
 import React from 'react';
-import { SolanaPayment } from '../../../../../../src/sdk/solana-integration';
+// import { SolanaPayment } from '../../../../../../src/sdk/solana-integration';
 
 export default function PricingPage() {
   // Example recipient address (replace with your own)
@@ -34,10 +34,13 @@ export default function PricingPage() {
             </ul>
           </div>
           <div className="mt-8">
-            <SolanaPayment 
+            {/* <SolanaPayment 
               amount={0.1} 
               recipientAddress={recipientAddress}
-            />
+            /> */}
+            <div className="text-center text-muted-foreground">
+              Payment integration coming soon
+            </div>
           </div>
         </div>
         
@@ -64,10 +67,13 @@ export default function PricingPage() {
             </ul>
           </div>
           <div className="mt-8">
-            <SolanaPayment 
+            {/* <SolanaPayment 
               amount={0.5} 
               recipientAddress={recipientAddress}
-            />
+            /> */}
+            <div className="text-center text-muted-foreground">
+              Payment integration coming soon
+            </div>
           </div>
         </div>
       </div>

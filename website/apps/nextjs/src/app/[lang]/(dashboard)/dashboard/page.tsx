@@ -1,5 +1,5 @@
 import React from 'react';
-import { SolanaPayment } from '../../../../../../../../src/sdk/solana-integration';
+// import { SolanaPayment } from '../../../../../../../../src/sdk/solana-integration';
 
 export default function DashboardPage() {
   // Example recipient address (replace with your own)

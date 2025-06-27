@@ -1,5 +1,5 @@
 import React from 'react';
-import { SolanaWalletProvider } from '../../../../../../../../src/sdk/solana-integration';
+// import { SolanaWalletProvider } from '../../../../../../../../src/sdk/solana-integration';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 
 export default function DashboardLayout({
