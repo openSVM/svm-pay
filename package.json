@@ -1,6 +1,6 @@
 {
   "name": "svm-pay",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "A payment solution for SVM networks (Solana, Sonic SVM, Eclipse, s00n)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
