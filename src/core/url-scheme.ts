@@ -5,7 +5,16 @@
  * The scheme is based on Solana Pay but extended to support multiple SVM networks.
  */
 
-import { PaymentRequest, RequestType, SVMNetwork, TransferRequest, TransactionRequest } from './types';
+import { 
+  PaymentRequest, 
+  RequestType, 
+  SVMNetwork, 
+  TransferRequest, 
+  TransactionRequest,
+  CrossChainTransferRequest,
+  EVMNetwork,
+  SupportedNetwork
+} from './types';
 
 /**
  * URL scheme prefixes for each supported network
@@ -15,6 +24,18 @@ const NETWORK_PREFIXES = {
   [SVMNetwork.SONIC]: 'sonic',
   [SVMNetwork.ECLIPSE]: 'eclipse',
   [SVMNetwork.SOON]: 'soon'
+};
+
+/**
+ * URL scheme prefixes for EVM networks (for cross-chain payments)
+ */
+const EVM_NETWORK_PREFIXES = {
+  [EVMNetwork.ETHEREUM]: 'ethereum',
+  [EVMNetwork.BNB_CHAIN]: 'bnb-chain',
+  [EVMNetwork.POLYGON]: 'polygon',
+  [EVMNetwork.ARBITRUM]: 'arbitrum',
+  [EVMNetwork.OPTIMISM]: 'optimism',
+  [EVMNetwork.AVALANCHE]: 'avalanche'
 };
 
 /**
@@ -47,14 +68,74 @@ export function parseURL(url: string): PaymentRequest {
         throw new Error(`Unsupported protocol: ${protocol}`);
     }
     
-    // Get recipient from pathname (removing leading slash)
-    const recipient = parsedUrl.pathname.substring(1);
+    // Get recipient from hostname (for custom protocols) or pathname
+    let recipient = parsedUrl.hostname;
+    if (!recipient && parsedUrl.pathname) {
+      // For custom protocols like "solana:", the recipient is in pathname without leading slash
+      recipient = parsedUrl.pathname.startsWith('/') ? parsedUrl.pathname.substring(1) : parsedUrl.pathname;
+    }
     if (!recipient) {
       throw new Error('Missing recipient');
     }
     
     // Parse query parameters
     const params = parsedUrl.searchParams;
+    
+    // Check if this is a cross-chain transfer request
+    if (params.has('source-network') || params.has('bridge')) {
+      const amount = params.get('amount');
+      const token = params.get('token');
+      const sourceNetworkParam = params.get('source-network');
+      
+      if (!amount) {
+        throw new Error('Cross-chain transfer request requires an amount parameter');
+      }
+      
+      if (!token) {
+        throw new Error('Cross-chain transfer request requires a token parameter');
+      }
+      
+      if (!sourceNetworkParam) {
+        throw new Error('Cross-chain transfer request requires a source-network parameter');
+      }
+      
+      // Parse source network
+      let sourceNetwork: SupportedNetwork;
+      const evmNetwork = Object.entries(EVM_NETWORK_PREFIXES).find(([, prefix]) => prefix === sourceNetworkParam);
+      const svmNetwork = Object.entries(NETWORK_PREFIXES).find(([, prefix]) => prefix === sourceNetworkParam);
+      
+      if (evmNetwork) {
+        sourceNetwork = evmNetwork[0] as EVMNetwork;
+      } else if (svmNetwork) {
+        sourceNetwork = svmNetwork[0] as SVMNetwork;
+      } else {
+        throw new Error(`Unsupported source network: ${sourceNetworkParam}`);
+      }
+      
+      const request: CrossChainTransferRequest = {
+        type: RequestType.CROSS_CHAIN_TRANSFER,
+        network, // destination network
+        sourceNetwork,
+        destinationNetwork: network,
+        recipient,
+        amount,
+        token,
+      };
+      
+      // Add optional parameters
+      if (params.has('bridge')) request.bridge = params.get('bridge')!;
+      if (params.has('label')) request.label = params.get('label')!;
+      if (params.has('message')) request.message = params.get('message')!;
+      if (params.has('memo')) request.memo = params.get('memo')!;
+      
+      // Parse references
+      const references = params.getAll('reference');
+      if (references.length > 0) {
+        request.references = references;
+      }
+      
+      return request;
+    }
     
     // Check if this is a transaction request
     if (params.has('link')) {
@@ -172,6 +253,58 @@ export function createTransactionURL(request: TransactionRequest): string {
 }
 
 /**
+ * Create a payment URL from a CrossChainTransferRequest
+ * 
+ * @param request The CrossChainTransferRequest to convert to a URL
+ * @returns A payment URL string
+ */
+export function createCrossChainURL(request: CrossChainTransferRequest): string {
+  const { 
+    destinationNetwork, 
+    sourceNetwork, 
+    recipient, 
+    amount, 
+    token, 
+    bridge, 
+    label, 
+    message, 
+    memo, 
+    references 
+  } = request;
+  
+  // Create URL with destination network protocol and recipient
+  const url = new URL(`${NETWORK_PREFIXES[destinationNetwork]}:${recipient}`);
+  
+  // Add required cross-chain parameters
+  url.searchParams.append('amount', amount);
+  url.searchParams.append('token', token);
+  
+  // Add source network
+  let sourceNetworkPrefix: string;
+  if (Object.values(EVMNetwork).includes(sourceNetwork as EVMNetwork)) {
+    sourceNetworkPrefix = EVM_NETWORK_PREFIXES[sourceNetwork as EVMNetwork];
+  } else {
+    sourceNetworkPrefix = NETWORK_PREFIXES[sourceNetwork as SVMNetwork];
+  }
+  url.searchParams.append('source-network', sourceNetworkPrefix);
+  
+  // Add optional parameters
+  if (bridge) url.searchParams.append('bridge', bridge);
+  if (label) url.searchParams.append('label', label);
+  if (message) url.searchParams.append('message', message);
+  if (memo) url.searchParams.append('memo', memo);
+  
+  // Add references
+  if (references && references.length > 0) {
+    references.forEach(reference => {
+      url.searchParams.append('reference', reference);
+    });
+  }
+  
+  return url.toString();
+}
+
+/**
  * Create a payment URL from any PaymentRequest
  * 
  * @param request The PaymentRequest to convert to a URL
@@ -180,7 +313,11 @@ export function createTransactionURL(request: TransactionRequest): string {
 export function createURL(request: PaymentRequest): string {
   if (request.type === RequestType.TRANSFER) {
     return createTransferURL(request as TransferRequest);
-  } else {
+  } else if (request.type === RequestType.TRANSACTION) {
     return createTransactionURL(request as TransactionRequest);
+  } else if (request.type === RequestType.CROSS_CHAIN_TRANSFER) {
+    return createCrossChainURL(request as CrossChainTransferRequest);
+  } else {
+    throw new Error(`Unsupported request type: ${request.type}`);
   }
 }
