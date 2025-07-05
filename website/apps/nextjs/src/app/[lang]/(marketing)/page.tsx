@@ -141,7 +141,7 @@ export default async function IndexPage({
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900 mb-4">Import & Setup</h3>
                 <div className="rounded-xl bg-slate-900 p-4 mb-4">
-                  <code className="text-blue-400 font-mono text-sm">import { SVMPay } from 'svm-pay'</code>
+                  <code className="text-blue-400 font-mono text-sm">{"import { SVMPay } from 'svm-pay'"}</code>
                 </div>
                 <p className="text-slate-600 leading-relaxed">
                   TypeScript-first with full intellisense. Initialize with your preferred network configuration.
@@ -187,7 +187,7 @@ export default async function IndexPage({
                 <div className="p-6">
                   <pre className="text-sm text-slate-700 font-mono leading-relaxed overflow-x-auto">
                     <code>
-                      {`import { SVMPay } from 'svm-pay';\n\nexport function Checkout() {\n  const payment = new SVMPay();\n  \n  return (\n    <button onClick={() => {\n      payment.createTransferUrl(\n        'your-address',\n        '99.99',\n        { token: 'USDC' }\n      );\n    }}>\n      Pay with SVM\n    </button>\n  );\n}`}
+                      {"import { SVMPay } from 'svm-pay';\n\nexport function Checkout() {\n  const payment = new SVMPay();\n  \n  return (\n    <button onClick={() => {\n      payment.createTransferUrl(\n        'your-address',\n        '99.99',\n        { token: 'USDC' }\n      );\n    }}>\n      Pay with SVM\n    </button>\n  );\n}"}
                     </code>
                   </pre>
                 </div>

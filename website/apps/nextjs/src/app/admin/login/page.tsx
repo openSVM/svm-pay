@@ -2,24 +2,20 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useWallet } from '@solana/wallet-adapter-react';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { cn } from "@saasfly/ui";
 import { CardBody, CardContainer, CardItem } from "@saasfly/ui/3d-card";
 import { buttonVariants } from "@saasfly/ui/button";
 import * as Icons from "@saasfly/ui/icons";
+import { SolanaWalletProvider } from "~/lib/sdk/solana-provider";
+
+// Dynamic import for wallet components to avoid SSR issues
+const WalletConnectionContent = React.lazy(() => 
+  import("~/components/wallet-connection-content").then(module => ({
+    default: module.WalletConnectionContent
+  }))
+);
 
 export default function LoginPage() {
-  // Use try-catch to handle missing wallet context gracefully
-  let walletState = { publicKey: null, connecting: false };
-  try {
-    const { publicKey, connecting } = useWallet();
-    walletState = { publicKey, connecting };
-  } catch (error) {
-    console.warn("Wallet context not available:", error);
-  }
-
-  const { publicKey, connecting } = walletState;
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   return (
@@ -58,9 +54,15 @@ export default function LoginPage() {
             >
               Powered by WalletConnect
             </CardItem>
-            <div className="wallet-adapter-button-container">
-              <WalletMultiButton />
-            </div>
+            <SolanaWalletProvider projectId="svm-pay">
+              <React.Suspense fallback={
+                <div className="px-4 py-2 bg-blue-600 text-white rounded-lg">
+                  Loading...
+                </div>
+              }>
+                <WalletConnectionContent />
+              </React.Suspense>
+            </SolanaWalletProvider>
           </div>
         </CardBody>
       </CardContainer>
