@@ -64,20 +64,9 @@ export default async function IndexPage({
                 </div>
                 <div className="p-6">
                   <pre className="text-sm text-slate-100 font-mono leading-relaxed overflow-x-auto">
-{`import { CrossChainPaymentManager, EVMNetwork, SVMNetwork } from 'svm-pay';
-
-// Accept payments from Ethereum to Solana
-const paymentManager = new CrossChainPaymentManager();
-
-const payment = await paymentManager.executePayment({
-  sourceNetwork: EVMNetwork.ETHEREUM,
-  destinationNetwork: SVMNetwork.SOLANA,
-  recipient: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
-  amount: '100',
-  token: '0xA0b86a33E6441c4d0C85c81a1a4e18a3f3F3f77f', // USDC
-});
-
-console.log('Payment status:', payment.status);`}
+                    <code>
+                      {`import { CrossChainPaymentManager, EVMNetwork, SVMNetwork } from 'svm-pay';\n\n// Accept payments from Ethereum to Solana\nconst paymentManager = new CrossChainPaymentManager();\n\nconst payment = await paymentManager.executePayment({\n  sourceNetwork: EVMNetwork.ETHEREUM,\n  destinationNetwork: SVMNetwork.SOLANA,\n  recipient: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',\n  amount: '100',\n  token: '0xA0b86a33E6441c4d0C85c81a1a4e18a3f3F3f77f', // USDC\n});\n\nconsole.log('Payment status:', payment.status);`}
+                    </code>
                   </pre>
                 </div>
               </div>
@@ -197,20 +186,9 @@ console.log('Payment status:', payment.status);`}
                 </div>
                 <div className="p-6">
                   <pre className="text-sm text-slate-700 font-mono leading-relaxed overflow-x-auto">
-{`import { SVMPayment } from 'svm-pay/react';
-
-export function Checkout() {
-  return (
-    <SVMPayment
-      amount={99.99}
-      token="USDC"
-      recipient="your-address"
-      onSuccess={(sig) => {
-        console.log('Payment complete:', sig);
-      }}
-    />
-  );
-}`}
+                    <code>
+                      {`import { SVMPay } from 'svm-pay';\n\nexport function Checkout() {\n  const payment = new SVMPay();\n  \n  return (\n    <button onClick={() => {\n      payment.createTransferUrl(\n        'your-address',\n        '99.99',\n        { token: 'USDC' }\n      );\n    }}>\n      Pay with SVM\n    </button>\n  );\n}`}
+                    </code>
                   </pre>
                 </div>
               </div>
@@ -223,20 +201,9 @@ export function Checkout() {
                 </div>
                 <div className="p-6">
                   <pre className="text-sm text-slate-700 font-mono leading-relaxed overflow-x-auto">
-{`<template>
-  <svm-payment
-    :amount="99.99"
-    token="USDC"
-    recipient="your-address"
-    @success="onPaymentSuccess"
-  />
-</template>
-
-<script setup>
-const onPaymentSuccess = (signature) => {
-  console.log('Payment complete:', signature);
-};
-</script>`}
+                    <code>
+                      {`<template>\n  <svm-payment\n    :amount="99.99"\n    token="USDC"\n    recipient="your-address"\n    @success="onPaymentSuccess"\n  />\n</template>\n\n<script setup>\nconst onPaymentSuccess = (signature) => {\n  console.log('Payment complete:', signature);\n};\n</script>`}
+                    </code>
                   </pre>
                 </div>
               </div>
@@ -276,20 +243,9 @@ const onPaymentSuccess = (signature) => {
                 </div>
                 <div className="p-6">
                   <pre className="text-sm text-slate-100 font-mono leading-relaxed overflow-x-auto">
-{`const checkout = new Checkout();
-checkout.addToCart({ 
-  name: 'Product 1', 
-  price: 10.99 
-});
-
-const result = await checkout.checkout(
-  'your-wallet-address'
-);
-
-console.log('Payment URL:', result.url);
-// QR code generation
-// Status monitoring
-// Order fulfillment`}
+                    <code>
+                      {`const checkout = new Checkout();\ncheckout.addToCart({ \n  name: 'Product 1', \n  price: 10.99 \n});\n\nconst result = await checkout.checkout(\n  'your-wallet-address'\n);\n\nconsole.log('Payment URL:', result.url);\n// QR code generation\n// Status monitoring\n// Order fulfillment`}
+                    </code>
                   </pre>
                 </div>
               </div>
@@ -321,23 +277,9 @@ console.log('Payment URL:', result.url);
                 </div>
                 <div className="p-6">
                   <pre className="text-sm text-slate-100 font-mono leading-relaxed overflow-x-auto">
-{`const subscription = new SubscriptionService();
-
-const plans = [
-  { 
-    id: 'pro', 
-    name: 'Pro Plan', 
-    price: '19.99', 
-    interval: 'monthly' 
-  }
-];
-
-const result = await subscription
-  .createSubscription(
-    user, 
-    plans[0], 
-    'your-address'
-  );`}
+                    <code>
+                      {`const subscription = new SubscriptionService();\n\nconst plans = [\n  { \n    id: 'pro', \n    name: 'Pro Plan', \n    price: '19.99', \n    interval: 'monthly' \n  }\n];\n\nconst result = await subscription\n  .createSubscription(\n    user, \n    plans[0], \n    'your-address'\n  );`}
+                    </code>
                   </pre>
                 </div>
               </div>
@@ -369,19 +311,9 @@ const result = await subscription
                 </div>
                 <div className="p-6">
                   <pre className="text-sm text-slate-100 font-mono leading-relaxed overflow-x-auto">
-{`const manager = new CrossChainPaymentManager();
-
-const request = CrossChainRequestFactory
-  .createTransferRequest({
-    sourceNetwork: EVMNetwork.ETHEREUM,
-    destinationNetwork: SVMNetwork.SOLANA,
-    recipient: 'solana-address',
-    amount: '100',
-    token: '0xA0b...', // USDC
-  });
-
-const result = await manager
-  .executePayment(request);`}
+                    <code>
+                      {`const manager = new CrossChainPaymentManager();\n\nconst request = CrossChainRequestFactory\n  .createTransferRequest({\n    sourceNetwork: EVMNetwork.ETHEREUM,\n    destinationNetwork: SVMNetwork.SOLANA,\n    recipient: 'solana-address',\n    amount: '100',\n    token: '0xA0b...', // USDC\n  });\n\nconst result = await manager\n  .executePayment(request);`}
+                    </code>
                   </pre>
                 </div>
               </div>
