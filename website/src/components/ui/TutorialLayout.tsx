@@ -1,4 +1,3 @@
-import React, { ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Clock, BarChart3, CheckCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
