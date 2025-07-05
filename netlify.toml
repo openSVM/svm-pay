@@ -6,3 +6,9 @@
 [build.environment]
   NODE_VERSION = "18"
   NPM_VERSION = "9"
+
+# SPA redirect rules for React Router
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
