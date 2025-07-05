@@ -2,6 +2,8 @@ import { motion } from 'framer-motion'
 import { ArrowLeft, Clock, BarChart3, CheckCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { CopyButton } from './CopyButton'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 interface TutorialStep {
   title: string
@@ -51,6 +53,25 @@ export function TutorialLayout({
       case 'Expert': return 'bg-red-100 text-red-800'
       default: return 'bg-slate-100 text-slate-800'
     }
+  }
+
+  const getLanguageFromString = (language: string): string => {
+    const normalizedLang = language.toLowerCase()
+    
+    if (normalizedLang.includes('javascript') || normalizedLang.includes('js')) return 'javascript'
+    if (normalizedLang.includes('typescript') || normalizedLang.includes('ts')) return 'typescript'
+    if (normalizedLang.includes('react')) return 'jsx'
+    if (normalizedLang.includes('shell') || normalizedLang.includes('bash')) return 'bash'
+    if (normalizedLang.includes('json')) return 'json'
+    if (normalizedLang.includes('yaml')) return 'yaml'
+    if (normalizedLang.includes('sql')) return 'sql'
+    if (normalizedLang.includes('python')) return 'python'
+    if (normalizedLang.includes('rust')) return 'rust'
+    if (normalizedLang.includes('solidity')) return 'solidity'
+    if (normalizedLang.includes('css')) return 'css'
+    if (normalizedLang.includes('html')) return 'html'
+    
+    return 'javascript' // default fallback
   }
 
   return (
@@ -149,10 +170,19 @@ export function TutorialLayout({
                       </h4>
                       <CopyButton text={step.code} />
                     </div>
-                    <div className="bg-slate-900 rounded-lg p-4 overflow-x-auto">
-                      <pre className="text-sm text-slate-100">
-                        <code>{step.code}</code>
-                      </pre>
+                    <div className="rounded-lg overflow-hidden">
+                      <SyntaxHighlighter
+                        language={getLanguageFromString(step.language || 'javascript')}
+                        style={vscDarkPlus}
+                        showLineNumbers={true}
+                        customStyle={{
+                          margin: 0,
+                          fontSize: '14px',
+                          borderRadius: '8px'
+                        }}
+                      >
+                        {step.code}
+                      </SyntaxHighlighter>
                     </div>
                   </div>
                 )}

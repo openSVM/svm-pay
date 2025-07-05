@@ -26,15 +26,24 @@ import {
 // Import individual tutorial components
 import { 
   OnlineStoreIntegrationTutorial, 
-  MarketplaceEscrowTutorial 
+  MarketplaceEscrowTutorial,
+  SubscriptionBoxTutorial,
+  DigitalProductStoreTutorial,
+  FlashSaleManagementTutorial
 } from './tutorials/EcommerceTutorials'
 import { 
   InGameCurrencyTutorial, 
-  NFTMarketplaceTutorial 
+  NFTMarketplaceTutorial,
+  TournamentPrizeDistributionTutorial,
+  PlayToEarnRewardsTutorial,
+  GameAssetRentalTutorial
 } from './tutorials/GamingTutorials'
 import { 
   SaaSSubscriptionBillingTutorial, 
-  FreelancePaymentEscrowTutorial 
+  FreelancePaymentEscrowTutorial,
+  ConsultingTimeTrackingTutorial,
+  APIUsageBillingTutorial,
+  SoftwareLicenseManagementTutorial
 } from './tutorials/SaaSTutorials'
 
 // Documentation sections
@@ -85,6 +94,45 @@ const sections = [
       { name: 'Lending Protocol Integration', href: '/docs/tutorials/defi/lending-protocol', icon: Book },
       { name: 'DEX Trading Fee Distribution', href: '/docs/tutorials/defi/dex-fees', icon: Book },
       { name: 'Automated Market Maker', href: '/docs/tutorials/defi/amm', icon: Book },
+    ]
+  },
+  {
+    title: 'Creator & Social Tutorials',
+    items: [
+      { name: 'Creator Tipping System', href: '/docs/tutorials/social/creator-tipping', icon: Book },
+      { name: 'Content Creator Subscriptions', href: '/docs/tutorials/social/creator-subscriptions', icon: Book },
+      { name: 'NFT Drop Platform', href: '/docs/tutorials/social/nft-drops', icon: Book },
+      { name: 'Social Media Monetization', href: '/docs/tutorials/social/social-monetization', icon: Book },
+      { name: 'Live Streaming Donations', href: '/docs/tutorials/social/live-streaming', icon: Book },
+      { name: 'Community Reward System', href: '/docs/tutorials/social/community-rewards', icon: Book },
+    ]
+  },
+  {
+    title: 'Enterprise Tutorials',
+    items: [
+      { name: 'B2B Invoice Processing', href: '/docs/tutorials/enterprise/b2b-invoicing', icon: Book },
+      { name: 'Employee Payroll System', href: '/docs/tutorials/enterprise/payroll-system', icon: Book },
+      { name: 'Supply Chain Payments', href: '/docs/tutorials/enterprise/supply-chain', icon: Book },
+      { name: 'Treasury Management', href: '/docs/tutorials/enterprise/treasury-management', icon: Book },
+      { name: 'Vendor Payment Management', href: '/docs/tutorials/enterprise/vendor-management', icon: Book },
+    ]
+  },
+  {
+    title: 'Cross-Chain Advanced Tutorials',
+    items: [
+      { name: 'Multi-Chain Arbitrage', href: '/docs/tutorials/cross-chain/arbitrage', icon: Book },
+      { name: 'Cross-Chain Liquidity Pools', href: '/docs/tutorials/cross-chain/liquidity-pools', icon: Book },
+      { name: 'Payment Routing Optimization', href: '/docs/tutorials/cross-chain/payment-routing', icon: Book },
+      { name: 'Cross-Chain Governance', href: '/docs/tutorials/cross-chain/governance', icon: Book },
+    ]
+  },
+  {
+    title: 'Mobile & IoT Tutorials',
+    items: [
+      { name: 'Mobile Wallet Integration', href: '/docs/tutorials/mobile/wallet-integration', icon: Book },
+      { name: 'IoT Device Micropayments', href: '/docs/tutorials/mobile/iot-micropayments', icon: Book },
+      { name: 'Smart City Payments', href: '/docs/tutorials/mobile/smart-city', icon: Book },
+      { name: 'Vehicle-to-Everything Payments', href: '/docs/tutorials/mobile/v2x-payments', icon: Book },
     ]
   },
   {
@@ -224,16 +272,25 @@ export function DocsPage() {
           <Route path="/tutorials/ecommerce" element={<EcommerceTutorials />} />
           <Route path="/tutorials/ecommerce/online-store" element={<OnlineStoreIntegrationTutorial />} />
           <Route path="/tutorials/ecommerce/marketplace-escrow" element={<MarketplaceEscrowTutorial />} />
+          <Route path="/tutorials/ecommerce/subscription-box" element={<SubscriptionBoxTutorial />} />
+          <Route path="/tutorials/ecommerce/digital-products" element={<DigitalProductStoreTutorial />} />
+          <Route path="/tutorials/ecommerce/flash-sales" element={<FlashSaleManagementTutorial />} />
           
           {/* Gaming Tutorials */}
           <Route path="/tutorials/gaming" element={<GamingTutorials />} />
           <Route path="/tutorials/gaming/currency-exchange" element={<InGameCurrencyTutorial />} />
           <Route path="/tutorials/gaming/nft-marketplace" element={<NFTMarketplaceTutorial />} />
+          <Route path="/tutorials/gaming/tournament-prizes" element={<TournamentPrizeDistributionTutorial />} />
+          <Route path="/tutorials/gaming/play-to-earn" element={<PlayToEarnRewardsTutorial />} />
+          <Route path="/tutorials/gaming/asset-rental" element={<GameAssetRentalTutorial />} />
           
           {/* SaaS Tutorials */}
           <Route path="/tutorials/saas" element={<SaaSTutorials />} />
           <Route path="/tutorials/saas/subscription-billing" element={<SaaSSubscriptionBillingTutorial />} />
           <Route path="/tutorials/saas/freelance-escrow" element={<FreelancePaymentEscrowTutorial />} />
+          <Route path="/tutorials/saas/time-tracking" element={<ConsultingTimeTrackingTutorial />} />
+          <Route path="/tutorials/saas/api-billing" element={<APIUsageBillingTutorial />} />
+          <Route path="/tutorials/saas/license-management" element={<SoftwareLicenseManagementTutorial />} />
           
           {/* Other category pages */}
           <Route path="/tutorials/defi" element={<DeFiTutorials />} />
