@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import { 
   Book, 
   Code, 
@@ -280,33 +281,57 @@ export function Documentation() {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {resources.map((resource, index) => (
-              <motion.a
+              <motion.div
                 key={resource.title}
-                href={resource.link}
-                target={resource.link.startsWith('http') ? '_blank' : '_self'}
-                rel={resource.link.startsWith('http') ? 'noopener noreferrer' : undefined}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="group block"
+                className="group"
               >
-                <div className="bg-white rounded-2xl p-6 border border-slate-200 hover:border-slate-300 hover:shadow-lg group-hover:scale-105 transition-all duration-300 h-full">
-                  <div className={`w-12 h-12 ${resource.bgColor} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                    <resource.icon className={`w-6 h-6 ${resource.color}`} />
-                  </div>
-                  <h4 className="text-lg font-bold text-slate-900 mb-2">
-                    {resource.title}
-                  </h4>
-                  <p className="text-slate-600 text-sm mb-4">
-                    {resource.description}
-                  </p>
-                  <div className="flex items-center text-slate-400 group-hover:text-slate-600 transition-colors">
-                    <span className="text-sm font-medium">Learn more</span>
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              </motion.a>
+                {resource.link.startsWith('http') ? (
+                  <a
+                    href={resource.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    <div className="bg-white rounded-2xl p-6 border border-slate-200 hover:border-slate-300 hover:shadow-lg group-hover:scale-105 transition-all duration-300 h-full">
+                      <div className={`w-12 h-12 ${resource.bgColor} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                        <resource.icon className={`w-6 h-6 ${resource.color}`} />
+                      </div>
+                      <h4 className="text-lg font-bold text-slate-900 mb-2">
+                        {resource.title}
+                      </h4>
+                      <p className="text-slate-600 text-sm mb-4">
+                        {resource.description}
+                      </p>
+                      <div className="flex items-center text-slate-400 group-hover:text-slate-600 transition-colors">
+                        <span className="text-sm font-medium">Learn more</span>
+                        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </a>
+                ) : (
+                  <Link to={resource.link} className="block">
+                    <div className="bg-white rounded-2xl p-6 border border-slate-200 hover:border-slate-300 hover:shadow-lg group-hover:scale-105 transition-all duration-300 h-full">
+                      <div className={`w-12 h-12 ${resource.bgColor} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                        <resource.icon className={`w-6 h-6 ${resource.color}`} />
+                      </div>
+                      <h4 className="text-lg font-bold text-slate-900 mb-2">
+                        {resource.title}
+                      </h4>
+                      <p className="text-slate-600 text-sm mb-4">
+                        {resource.description}
+                      </p>
+                      <div className="flex items-center text-slate-400 group-hover:text-slate-600 transition-colors">
+                        <span className="text-sm font-medium">Learn more</span>
+                        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </Link>
+                )}
+              </motion.div>
             ))}
           </div>
         </motion.div>
@@ -330,10 +355,13 @@ export function Documentation() {
               <Download className="w-5 h-5 mr-3" />
               Install SDK
             </button>
-            <button className="border-2 border-slate-600 text-white hover:bg-slate-800 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 hover:scale-105 inline-flex items-center">
+            <Link 
+              to="/demo"
+              className="border-2 border-slate-600 text-white hover:bg-slate-800 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 hover:scale-105 inline-flex items-center"
+            >
               <Zap className="w-5 h-5 mr-3" />
               Try Demo
-            </button>
+            </Link>
           </div>
         </motion.div>
       </div>

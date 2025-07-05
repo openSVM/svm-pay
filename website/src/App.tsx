@@ -1,21 +1,24 @@
 import './index.css'
-import { Hero } from './components/Hero'
-import { Features } from './components/Features'
-import { TechStack } from './components/TechStack'
-import { Documentation } from './components/Documentation'
-import { Stats } from './components/Stats'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { LandingPage } from './pages/LandingPage'
+import { DocsPage } from './pages/DocsPage'
+import { DemoPage } from './pages/DemoPage'
+import { Navigation } from './components/Navigation'
 import { Footer } from './components/Footer'
 
 function App() {
   return (
-    <div className="min-h-screen bg-white">
-      <Hero />
-      <Stats />
-      <Features />
-      <TechStack />
-      <Documentation />
-      <Footer />
-    </div>
+    <Router>
+      <div className="min-h-screen bg-white">
+        <Navigation />
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/docs/*" element={<DocsPage />} />
+          <Route path="/demo" element={<DemoPage />} />
+        </Routes>
+        <Footer />
+      </div>
+    </Router>
   )
 }
 
