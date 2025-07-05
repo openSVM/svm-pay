@@ -308,6 +308,18 @@ export interface BridgeTransferResult {
   
   /** Transfer status */
   status: BridgeTransferStatus;
+  
+  /** Bridge-specific metadata */
+  metadata?: {
+    /** Wormhole sequence number */
+    wormholeSequence?: string | number;
+    /** Wormhole attestation ID */
+    attestationId?: string;
+    /** Allbridge bridge ID */
+    bridgeId?: string;
+    /** Additional bridge-specific fields */
+    [key: string]: any;
+  };
 }
 
 /**
