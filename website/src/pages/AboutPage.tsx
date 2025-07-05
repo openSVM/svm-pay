@@ -13,42 +13,42 @@ const team = [
     name: 'Mao Mao',
     role: 'Co-founder & CEO',
     bio: 'Fearless sheriff turned fintech leader, brings justice to cross-chain payments with legendary sword skills',
-    image: 'https://images.unsplash.com/photo-1493666438817-866a91353ca9?w=300&h=300&fit=crop&crop=face',
+    image: 'https://cdn.jsdelivr.net/gh/maomao-heroes/assets@main/characters/mao-mao.png',
     linkedin: 'https://linkedin.com/in/sheriff-mao-mao'
   },
   {
     name: 'Badgerclops',
     role: 'Co-founder & CTO',
     bio: 'Cybernetic badger engineer with mechanical arm, built SVM-Pay\'s core infrastructure while eating muffins',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face',
+    image: 'https://cdn.jsdelivr.net/gh/maomao-heroes/assets@main/characters/badgerclops.png',
     linkedin: 'https://linkedin.com/in/badgerclops-deputy'
   },
   {
     name: 'Adorabat',
     role: 'Head of Security',
     bio: 'Smallest team member but fiercest defender, uses sonic screams to detect payment vulnerabilities',
-    image: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300&h=300&fit=crop&crop=face',
+    image: 'https://cdn.jsdelivr.net/gh/maomao-heroes/assets@main/characters/adorabat.png',
     linkedin: 'https://linkedin.com/in/adorabat-hero'
   },
   {
     name: 'King Snugglemagne',
     role: 'Head of Business Development',
     bio: 'Charismatic ruler of Pure Heart Valley, uses royal connections to expand SVM-Pay globally',
-    image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=300&h=300&fit=crop&crop=face',
+    image: 'https://cdn.jsdelivr.net/gh/maomao-heroes/assets@main/characters/king-snugglemagne.png',
     linkedin: 'https://linkedin.com/in/king-snugglemagne'
   },
   {
     name: 'Tanya Keys',
     role: 'Head of Product',
     bio: 'Former bounty hunter turned product strategist, designs payment flows with precision targeting',
-    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=face',
+    image: 'https://cdn.jsdelivr.net/gh/maomao-heroes/assets@main/characters/tanya-keys.png',
     linkedin: 'https://linkedin.com/in/tanya-keys'
   },
   {
     name: 'Eugene',
     role: 'Blockchain Engineer',
     bio: 'Genius inventor and engineer, creates innovative bridge protocols while maintaining his experimental lab',
-    image: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?w=300&h=300&fit=crop&crop=face',
+    image: 'https://cdn.jsdelivr.net/gh/maomao-heroes/assets@main/characters/eugene.png',
     linkedin: 'https://linkedin.com/in/eugene-inventor'
   }
 ]
@@ -252,11 +252,28 @@ export function AboutPage() {
                 transition={{ duration: 0.8, delay: index * 0.1 }}
                 className="bg-white rounded-2xl p-6 shadow-sm border text-center hover:shadow-lg transition-all duration-300"
               >
-                <img
-                  src={member.image}
-                  alt={member.name}
-                  className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
-                />
+                <div className="relative">
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
+                    onError={(e) => {
+                      // Fallback to character-specific avatar if image fails to load
+                      const fallbackAvatars: Record<string, string> = {
+                        'Mao Mao': 'https://ui-avatars.com/api/?name=Mao+Mao&background=dc2626&color=fff&size=200&format=png&rounded=true',
+                        'Badgerclops': 'https://ui-avatars.com/api/?name=Badgerclops&background=0369a1&color=fff&size=200&format=png&rounded=true',
+                        'Adorabat': 'https://ui-avatars.com/api/?name=Adorabat&background=c026d3&color=fff&size=200&format=png&rounded=true',
+                        'King Snugglemagne': 'https://ui-avatars.com/api/?name=King+S&background=ca8a04&color=fff&size=200&format=png&rounded=true',
+                        'Tanya Keys': 'https://ui-avatars.com/api/?name=Tanya+Keys&background=059669&color=fff&size=200&format=png&rounded=true',
+                        'Eugene': 'https://ui-avatars.com/api/?name=Eugene&background=7c3aed&color=fff&size=200&format=png&rounded=true'
+                      };
+                      (e.target as HTMLImageElement).src = fallbackAvatars[member.name] || 'https://ui-avatars.com/api/?name=' + member.name + '&background=6366f1&color=fff&size=200&format=png&rounded=true';
+                    }}
+                  />
+                  <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
+                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                  </div>
+                </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-1">{member.name}</h3>
                 <p className="text-purple-600 font-medium mb-3">{member.role}</p>
                 <p className="text-slate-600 text-sm mb-4 leading-relaxed">{member.bio}</p>
