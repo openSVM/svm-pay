@@ -54,8 +54,22 @@ import {
 } from './tutorials/DeFiTutorials'
 import {
   CreatorTippingSystemTutorial,
-  ContentCreatorSubscriptionsTutorial
+  ContentCreatorSubscriptionsTutorial,
+  NFTDropPlatformTutorial,
+  CommunityRewardSystemTutorial
 } from './tutorials/SocialTutorials'
+import {
+  MultiChainArbitrageTutorial,
+  CrossChainLiquidityPoolTutorial,
+  PaymentRoutingOptimizationTutorial,
+  CrossChainGovernanceTutorial
+} from './tutorials/CrossChainTutorials'
+import {
+  MobileWalletIntegrationTutorial,
+  IoTMicropaymentsTutorial,
+  SmartCityPaymentsTutorial,
+  V2XPaymentsTutorial
+} from './tutorials/MobileTutorials'
 
 // Documentation sections
 const sections = [
@@ -315,6 +329,8 @@ export function DocsPage() {
           <Route path="/tutorials/social" element={<SocialTutorials />} />
           <Route path="/tutorials/social/creator-tipping" element={<CreatorTippingSystemTutorial />} />
           <Route path="/tutorials/social/creator-subscriptions" element={<ContentCreatorSubscriptionsTutorial />} />
+          <Route path="/tutorials/social/nft-drops" element={<NFTDropPlatformTutorial />} />
+          <Route path="/tutorials/social/community-rewards" element={<CommunityRewardSystemTutorial />} />
           
           {/* Other category pages */}
           <Route path="/tutorials/defi" element={<DeFiTutorials />} />
@@ -322,6 +338,18 @@ export function DocsPage() {
           <Route path="/tutorials/enterprise" element={<EnterpriseTutorials />} />
           <Route path="/tutorials/cross-chain" element={<CrossChainTutorials />} />
           <Route path="/tutorials/mobile" element={<MobileTutorials />} />
+          
+          {/* Cross-Chain Advanced Tutorial Routes */}
+          <Route path="/tutorials/cross-chain/arbitrage" element={<MultiChainArbitrageTutorial />} />
+          <Route path="/tutorials/cross-chain/liquidity-pools" element={<CrossChainLiquidityPoolTutorial />} />
+          <Route path="/tutorials/cross-chain/payment-routing" element={<PaymentRoutingOptimizationTutorial />} />
+          <Route path="/tutorials/cross-chain/governance" element={<CrossChainGovernanceTutorial />} />
+          
+          {/* Mobile & IoT Tutorial Routes */}
+          <Route path="/tutorials/mobile/wallet-integration" element={<MobileWalletIntegrationTutorial />} />
+          <Route path="/tutorials/mobile/iot-micropayments" element={<IoTMicropaymentsTutorial />} />
+          <Route path="/tutorials/mobile/smart-city" element={<SmartCityPaymentsTutorial />} />
+          <Route path="/tutorials/mobile/v2x-payments" element={<V2XPaymentsTutorial />} />
           
           <Route path="/cross-chain" element={<CrossChainDoc />} />
           <Route path="/architecture" element={<ArchitectureDoc />} />

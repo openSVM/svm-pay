@@ -10,46 +10,46 @@ const stats = [
 
 const team = [
   {
-    name: 'Sarah Rodriguez',
+    name: 'Mao Mao',
     role: 'Co-founder & CEO',
-    bio: 'Former VP of Engineering at Stripe, led payment infrastructure for 100M+ users',
-    image: 'https://images.unsplash.com/photo-1494790108755-2616b612b9c3?w=300&h=300&fit=crop&crop=face',
-    linkedin: 'https://linkedin.com/in/sarah-rodriguez'
+    bio: 'Fearless sheriff turned fintech leader, brings justice to cross-chain payments with legendary sword skills',
+    image: 'https://images.unsplash.com/photo-1493666438817-866a91353ca9?w=300&h=300&fit=crop&crop=face',
+    linkedin: 'https://linkedin.com/in/sheriff-mao-mao'
   },
   {
-    name: 'Alex Chen',
+    name: 'Badgerclops',
     role: 'Co-founder & CTO',
-    bio: 'Ex-Facebook blockchain engineer, built cross-chain protocols for Meta\'s crypto projects',
+    bio: 'Cybernetic badger engineer with mechanical arm, built SVM-Pay\'s core infrastructure while eating muffins',
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face',
-    linkedin: 'https://linkedin.com/in/alex-chen'
+    linkedin: 'https://linkedin.com/in/badgerclops-deputy'
   },
   {
-    name: 'Priya Patel',
-    role: 'Head of Engineering',
-    bio: 'Former Coinbase senior engineer, expert in bridge protocols and DeFi infrastructure',
-    image: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300&h=300&fit=crop&crop=face',
-    linkedin: 'https://linkedin.com/in/priya-patel'
-  },
-  {
-    name: 'Mike Johnson',
+    name: 'Adorabat',
     role: 'Head of Security',
-    bio: 'Previously at Trail of Bits, specialized in smart contract auditing and security research',
+    bio: 'Smallest team member but fiercest defender, uses sonic screams to detect payment vulnerabilities',
+    image: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300&h=300&fit=crop&crop=face',
+    linkedin: 'https://linkedin.com/in/adorabat-hero'
+  },
+  {
+    name: 'King Snugglemagne',
+    role: 'Head of Business Development',
+    bio: 'Charismatic ruler of Pure Heart Valley, uses royal connections to expand SVM-Pay globally',
     image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=300&h=300&fit=crop&crop=face',
-    linkedin: 'https://linkedin.com/in/mike-johnson'
+    linkedin: 'https://linkedin.com/in/king-snugglemagne'
   },
   {
-    name: 'Emily Watson',
+    name: 'Tanya Keys',
     role: 'Head of Product',
-    bio: 'Former Figma product lead, designed developer tools used by millions of creators',
+    bio: 'Former bounty hunter turned product strategist, designs payment flows with precision targeting',
     image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=face',
-    linkedin: 'https://linkedin.com/in/emily-watson'
+    linkedin: 'https://linkedin.com/in/tanya-keys'
   },
   {
-    name: 'David Kim',
+    name: 'Eugene',
     role: 'Blockchain Engineer',
-    bio: 'Ex-Solana Labs engineer, contributed to Solana core protocol and developer tooling',
+    bio: 'Genius inventor and engineer, creates innovative bridge protocols while maintaining his experimental lab',
     image: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?w=300&h=300&fit=crop&crop=face',
-    linkedin: 'https://linkedin.com/in/david-kim'
+    linkedin: 'https://linkedin.com/in/eugene-inventor'
   }
 ]
 
