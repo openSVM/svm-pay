@@ -45,6 +45,17 @@ import {
   APIUsageBillingTutorial,
   SoftwareLicenseManagementTutorial
 } from './tutorials/SaaSTutorials'
+import {
+  YieldFarmingRewardsTutorial,
+  CrossChainArbitrageBotTutorial,
+  LendingProtocolIntegrationTutorial,
+  DEXTradingFeeDistributionTutorial,
+  AutomatedMarketMakerTutorial
+} from './tutorials/DeFiTutorials'
+import {
+  CreatorTippingSystemTutorial,
+  ContentCreatorSubscriptionsTutorial
+} from './tutorials/SocialTutorials'
 
 // Documentation sections
 const sections = [
@@ -291,6 +302,19 @@ export function DocsPage() {
           <Route path="/tutorials/saas/time-tracking" element={<ConsultingTimeTrackingTutorial />} />
           <Route path="/tutorials/saas/api-billing" element={<APIUsageBillingTutorial />} />
           <Route path="/tutorials/saas/license-management" element={<SoftwareLicenseManagementTutorial />} />
+          
+          {/* DeFi Tutorials */}
+          <Route path="/tutorials/defi" element={<DeFiTutorials />} />
+          <Route path="/tutorials/defi/yield-farming" element={<YieldFarmingRewardsTutorial />} />
+          <Route path="/tutorials/defi/arbitrage-bot" element={<CrossChainArbitrageBotTutorial />} />
+          <Route path="/tutorials/defi/lending-protocol" element={<LendingProtocolIntegrationTutorial />} />
+          <Route path="/tutorials/defi/dex-fees" element={<DEXTradingFeeDistributionTutorial />} />
+          <Route path="/tutorials/defi/amm" element={<AutomatedMarketMakerTutorial />} />
+          
+          {/* Social Tutorials */}
+          <Route path="/tutorials/social" element={<SocialTutorials />} />
+          <Route path="/tutorials/social/creator-tipping" element={<CreatorTippingSystemTutorial />} />
+          <Route path="/tutorials/social/creator-subscriptions" element={<ContentCreatorSubscriptionsTutorial />} />
           
           {/* Other category pages */}
           <Route path="/tutorials/defi" element={<DeFiTutorials />} />
