@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVM-Pay Cross-Chain Payment Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #6a0dad;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        select, input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #6a0dad;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background-color: #5a0cad;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .quote-info {
+            background-color: #e7f3ff;
+            border: 1px solid #b3d7ff;
+            color: #0c5aa6;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .bridge-option {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 5px 0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .bridge-option:hover {
+            border-color: #6a0dad;
+            background-color: #f8f9fa;
+        }
+        .bridge-option.selected {
+            border-color: #6a0dad;
+            background-color: #f0e6ff;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-bridging { background-color: #fff3cd; color: #856404; }
+        .status-confirmed { background-color: #d4edda; color: #155724; }
+        .status-failed { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌉 SVM-Pay Cross-Chain Payment Demo</h1>
+        
+        <div class="form-group">
+            <label for="sourceNetwork">Source Network (Where you have tokens):</label>
+            <select id="sourceNetwork">
+                <option value="ethereum">Ethereum</option>
+                <option value="bnb-chain">BNB Chain</option>
+                <option value="polygon">Polygon</option>
+                <option value="arbitrum">Arbitrum</option>
+                <option value="optimism">Optimism</option>
+                <option value="avalanche">Avalanche</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="destinationNetwork">Destination Network:</label>
+            <select id="destinationNetwork">
+                <option value="solana" selected>Solana</option>
+                <option value="sonic">Sonic SVM</option>
+                <option value="eclipse">Eclipse</option>
+                <option value="soon">s00n</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="token">Token Address:</label>
+            <input type="text" id="token" placeholder="0xA0b86a33E6441c4d0C85c81a1a4e18a3f3F3f77f (USDC on Ethereum)" 
+                   value="0xA0b86a33E6441c4d0C85c81a1a4e18a3f3F3f77f">
+        </div>
+
+        <div class="form-group">
+            <label for="amount">Amount:</label>
+            <input type="number" id="amount" placeholder="100" value="100" step="0.01">
+        </div>
+
+        <div class="form-group">
+            <label for="recipient">Recipient Address (Solana):</label>
+            <input type="text" id="recipient" placeholder="DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263" 
+                   value="DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263">
+        </div>
+
+        <div class="form-group">
+            <label for="label">Label (optional):</label>
+            <input type="text" id="label" placeholder="Payment for NFT">
+        </div>
+
+        <div class="form-group">
+            <label for="message">Message (optional):</label>
+            <textarea id="message" rows="2" placeholder="Cross-chain payment via SVM-Pay"></textarea>
+        </div>
+
+        <button onclick="getBridgeQuotes()">🔍 Get Bridge Quotes</button>
+        <button onclick="generateURL()">🔗 Generate Payment URL</button>
+        <button onclick="executePayment()" id="executeBtn" disabled>💸 Execute Payment</button>
+
+        <div id="quotes"></div>
+        <div id="result"></div>
+        <div id="status"></div>
+    </div>
+
+    <script type="module">
+        // Mock implementation for demo purposes
+        // In a real app, you would import from '@openSVM/svm-pay'
+        
+        window.sampleQuotes = {
+            wormhole: {
+                id: 'wormhole-quote-123',
+                inputAmount: '100',
+                outputAmount: '99.2',
+                fee: '0.8',
+                estimatedTime: 300,
+                bridge: 'Wormhole'
+            },
+            allbridge: {
+                id: 'allbridge-quote-456',
+                inputAmount: '100',
+                outputAmount: '99.5',
+                fee: '0.5',
+                estimatedTime: 180,
+                bridge: 'Allbridge'
+            }
+        };
+
+        window.selectedBridge = null;
+
+        window.getBridgeQuotes = async function() {
+            const resultDiv = document.getElementById('quotes');
+            const executeBtn = document.getElementById('executeBtn');
+            
+            try {
+                resultDiv.innerHTML = '<div class="quote-info">🔄 Getting quotes from available bridges...</div>';
+                
+                // Simulate API call delay
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const quotes = window.sampleQuotes;
+                
+                let quotesHtml = '<h3>Available Bridge Options:</h3>';
+                
+                Object.entries(quotes).forEach(([bridgeId, quote]) => {
+                    const feePercentage = ((parseFloat(quote.fee) / parseFloat(quote.inputAmount)) * 100).toFixed(2);
+                    const timeMinutes = Math.round(quote.estimatedTime / 60);
+                    
+                    quotesHtml += `
+                        <div class="bridge-option" onclick="selectBridge(event, '${bridgeId}')">
+                            <strong>${quote.bridge}</strong><br>
+                            Output: ${quote.outputAmount} tokens<br>
+                            Fee: ${quote.fee} (${feePercentage}%)<br>
+                            Time: ~${timeMinutes} minutes
+                        </div>
+                    `;
+                });
+                
+                resultDiv.innerHTML = quotesHtml;
+                executeBtn.disabled = true;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">Error getting quotes: ${error.message}</div>`;
+            }
+        };
+
+        window.selectBridge = function(event, bridgeId) {
+            // Remove previous selection
+            document.querySelectorAll('.bridge-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            // Add selection to clicked bridge
+            event.target.classList.add('selected');
+            window.selectedBridge = bridgeId;
+            
+            document.getElementById('executeBtn').disabled = false;
+        };
+
+        window.generateURL = function() {
+            const sourceNetwork = document.getElementById('sourceNetwork').value;
+            const destinationNetwork = document.getElementById('destinationNetwork').value;
+            const token = document.getElementById('token').value;
+            const amount = document.getElementById('amount').value;
+            const recipient = document.getElementById('recipient').value;
+            const label = document.getElementById('label').value;
+            const message = document.getElementById('message').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (!recipient || !amount || !token) {
+                resultDiv.innerHTML = '<div class="result error">Please fill in all required fields</div>';
+                return;
+            }
+            
+            // Create cross-chain payment URL
+            const baseUrl = `${destinationNetwork}:${recipient}`;
+            const params = new URLSearchParams();
+            params.append('amount', amount);
+            params.append('token', token);
+            params.append('source-network', sourceNetwork);
+            
+            if (label) params.append('label', label);
+            if (message) params.append('message', message);
+            
+            const paymentUrl = `${baseUrl}?${params.toString()}`;
+            
+            resultDiv.innerHTML = `
+                <div class="result success">
+                    <strong>Cross-Chain Payment URL Generated:</strong><br>
+                    ${paymentUrl}<br><br>
+                    <button onclick="copyToClipboard('${paymentUrl}')">📋 Copy URL</button>
+                </div>
+            `;
+        };
+
+        window.executePayment = async function() {
+            const resultDiv = document.getElementById('result');
+            const statusDiv = document.getElementById('status');
+            
+            if (!window.selectedBridge) {
+                resultDiv.innerHTML = '<div class="result error">Please select a bridge first</div>';
+                return;
+            }
+            
+            try {
+                resultDiv.innerHTML = '<div class="result">🚀 Executing cross-chain payment...</div>';
+                
+                // Simulate payment execution
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const paymentId = `cc-payment-${Date.now()}`;
+                const bridge = window.sampleQuotes[window.selectedBridge];
+                
+                resultDiv.innerHTML = `
+                    <div class="result success">
+                        <strong>✅ Payment Initiated Successfully!</strong><br>
+                        Payment ID: ${paymentId}<br>
+                        Bridge: ${bridge.bridge}<br>
+                        Expected Output: ${bridge.outputAmount} tokens<br>
+                        Estimated Time: ${Math.round(bridge.estimatedTime / 60)} minutes<br><br>
+                        <button onclick="checkStatus('${paymentId}')">🔍 Check Status</button>
+                    </div>
+                `;
+                
+                // Start status simulation
+                window.currentPaymentId = paymentId;
+                simulatePaymentStatus();
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">Payment failed: ${error.message}</div>`;
+            }
+        };
+
+        window.checkStatus = function(paymentId) {
+            const statusDiv = document.getElementById('status');
+            const currentStatus = window.paymentStatuses[paymentId] || 'bridging';
+            
+            let statusClass = 'status-bridging';
+            let statusText = '🌉 Bridging in progress...';
+            
+            if (currentStatus === 'confirmed') {
+                statusClass = 'status-confirmed';
+                statusText = '✅ Payment confirmed on Solana!';
+            } else if (currentStatus === 'failed') {
+                statusClass = 'status-failed';
+                statusText = '❌ Payment failed';
+            }
+            
+            statusDiv.innerHTML = `
+                <div class="quote-info">
+                    <strong>Payment Status:</strong> 
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </div>
+            `;
+        };
+
+        window.simulatePaymentStatus = function() {
+            if (!window.paymentStatuses) {
+                window.paymentStatuses = {};
+            }
+            
+            const paymentId = window.currentPaymentId;
+            window.paymentStatuses[paymentId] = 'bridging';
+            
+            // Simulate status progression
+            setTimeout(() => {
+                window.paymentStatuses[paymentId] = 'confirmed';
+                if (window.currentPaymentId === paymentId) {
+                    window.checkStatus(paymentId);
+                }
+            }, 5000);
+        };
+
+        window.copyToClipboard = function(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('URL copied to clipboard!');
+            });
+        };
+    </script>
+</body>
+</html>

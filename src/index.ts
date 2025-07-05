@@ -11,6 +11,10 @@ export * from './core/types';
 export * from './sdk/index';
 export * from './sdk/server';
 
+// Export cross-chain functionality
+export * from './core/cross-chain';
+export * from './bridge';
+
 // Export wallet integration
 export * from './walletconnect/index';
 
