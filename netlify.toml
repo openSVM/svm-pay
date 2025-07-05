@@ -1,41 +1,8 @@
 [build]
   base = "website"
-  command = "bun install && bun run build --filter=@saasfly/nextjs"
-  publish = "apps/nextjs/.next"
+  command = "npm install && npm run build"
+  publish = "dist"
 
-# Environment variables should be set in Netlify dashboard, not committed to repo
-# This is for reference only - use actual secrets in Netlify environment settings
 [build.environment]
-  # Authentication secrets - SET THESE IN NETLIFY DASHBOARD
-  # NEXTAUTH_SECRET = "your-secure-nextauth-secret-here"
-  NEXTAUTH_URL = "https://svm-pay.netlify.app"
-  NEXT_PUBLIC_APP_URL = "https://svm-pay.netlify.app"
-  
-  # OAuth secrets - SET THESE IN NETLIFY DASHBOARD  
-  # GITHUB_CLIENT_ID = "your-github-client-id"
-  # GITHUB_CLIENT_SECRET = "your-github-client-secret"
-  
-  # Email service secrets - SET THESE IN NETLIFY DASHBOARD
-  # RESEND_API_KEY = "your-resend-api-key"
-  # RESEND_FROM = "your-sender-email"
-  
-  # Payment provider secrets - SET THESE IN NETLIFY DASHBOARD
-  # STRIPE_API_KEY = "your-stripe-api-key"
-  # STRIPE_WEBHOOK_SECRET = "your-stripe-webhook-secret"
-  
-  # Public configuration (safe to commit)
-  NEXT_PUBLIC_STRIPE_STD_PRODUCT_ID = "prod_placeholder"
-  NEXT_PUBLIC_STRIPE_STD_MONTHLY_PRICE_ID = "price_placeholder"
-  NEXT_PUBLIC_STRIPE_PRO_PRODUCT_ID = "prod_placeholder"
-  NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID = "price_placeholder"
-  NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID = "price_placeholder"
-  NEXT_PUBLIC_STRIPE_BUSINESS_PRODUCT_ID = "prod_placeholder"
-  NEXT_PUBLIC_STRIPE_BUSINESS_MONTHLY_PRICE_ID = "price_placeholder"
-  NEXT_PUBLIC_STRIPE_BUSINESS_YEARLY_PRICE_ID = "price_placeholder"
-  NEXT_PUBLIC_POSTHOG_KEY = ""
-  NEXT_PUBLIC_POSTHOG_HOST = "https://app.posthog.com"
-  ADMIN_EMAIL = "admin@example.com"
-  IS_DEBUG = "false"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
+  NODE_VERSION = "18"
+  NPM_VERSION = "9"

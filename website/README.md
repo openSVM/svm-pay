@@ -1,237 +1,88 @@
+# SVM-Pay Website
 
-<div align="center" width="100%">
-    <img src="./saasfly-logo.svg" width="128" alt="" />
-</div>
+The official website for SVM-Pay - Cross-Chain Payment Infrastructure.
 
-# Saasfly </br>
-<a href="https://trendshift.io/repositories/8929" target="_blank"><img src="https://trendshift.io/api/badge/repositories/8929" alt="saasfly%2Fsaasfly | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+## Overview
 
-[![GitHub Actions Workflow Status][check-workflow-badge]][check-workflow-badge-link] [![GitHub License][github-license-badge]][github-license-badge-link]  [![Discord][discord-badge]][discord-badge-link] [![Saasfly][made-by-nextify-badge]][made-by-nextify-badge-link]
-[![Chinese](https://img.shields.io/badge/-Chinese-red.svg)](README_zh.md)
-[![German](https://img.shields.io/badge/-German-yellow.svg)](README_de.md)
-[![Vietnamese](https://img.shields.io/badge/-Vietnamese-yellow.svg)](README_vi.md) </br>
-![COMMIT_ACTIVITY](https://img.shields.io/github/commit-activity/m/saasfly/saasfly?style=for-the-badge">)
-[![Visitors](https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2Fsaasfly%2Fsaasfly&labelColor=%23f47373&countColor=%23263759)](https://visitorbadge.io/status?path=https%3A%2F%2Fgithub.com%2Fsaasfly%2Fsaasfly)
+A modern, responsive website built with:
+- **React 19** - Latest React with concurrent features
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first styling
+- **Framer Motion** - Smooth animations
+- **Vite** - Fast build tool and dev server
 
-An easy-to-use and enterprise-grade Next.js boilerplate.
+## Features
 
-You don't need to buy templates anymore; Saasfly provides a complete, open-source solution for building SaaS applications quickly and easily.
+- 🚀 **Performance optimized** - Fast loading, smooth animations
+- 📱 **Fully responsive** - Works on all devices and screen sizes
+- ♿ **Accessible** - WCAG compliant design
+- 🎨 **Modern design** - Clean, professional interface
+- 📊 **SEO optimized** - Proper meta tags and structured data
 
-> **[Nextify](https://nextify.ltd)** provides a complete Enterprise SaaS solution. Contact us at [contact@nextify.ltd](mailto:contact@nextify.ltd) if you're interested in discussing your project, or if you'd simply like to have a conversation with us, please feel free to reach out.
-
-> ❤️ We provide **free technical support and deployment services to non-profit organizations**.
->
-> 🙌 All profits obtained from our open source projects will be **entirely dedicated to supporting open source initiatives and charitable causes**.
-
-## ⚡ Live Demo
-
-Try it out for yourself!
-
-Demo Server (Location: Washington - USA): <https://show.saasfly.io>
-
-See more documentation at <https://document.saasfly.io>
-
-## 🌟 Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=saasfly/saasfly&type=Timeline)](https://star-history.com/#saasfly/saasfly&Timeline)
-
-## Sponsors
-
-<table>
-  <tr >
-    <td>
-      <a href="https://www.twillot.com/">
-        <picture>
-          <img alt="Take Control of All Your Twitter Assets" src="/twillot.png">
-        </picture>
-      </a>
-    </td>
-    <td>
-      <a href="https://www.setupyourpay.com/" title="如何注册美国公司进行收款">
-        <picture>
-          <img alt="全球收款手册" src="/setupyourpay.png">
-        </picture>
-      </a>
-    </td>
-  <tr >
-    <td >
-      <a href="mailto:contact@nextify.ltd">
-        Add your logo here
-      </a>
-    </td>
-  </tr>
-</table>
-
-## 🚀 Getting Started
-
-### 🖱 One Click Template
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsaasfly%2Fsaasfly&env=NEXT_PUBLIC_APP_URL,NEXTAUTH_URL,NEXTAUTH_SECRET,STRIPE_API_KEY,STRIPE_WEBHOOK_SECRET,POSTGRES_URL,GITHUB_CLIENT_ID,GITHUB_CLIENT_SECRET,RESEND_API_KEY,RESEND_FROM&install-command=bun%20install&build-command=bun%20run%20build&root-directory=apps%2Fnextjs)
-
-### 📋 Prerequisites
-
-Before you start, make sure you have the following installed:
-
-1. [Bun](https://bun.sh/) & [Node.js](https://nodejs.org/) & [Git](https://git-scm.com/)
-
-   1. Linux
-
-    ```bash
-      curl -sL https://gist.github.com/tianzx/874662fb204d32390bc2f2e9e4d2df0a/raw -o ~/downloaded_script.sh && chmod +x ~/downloaded_script.sh && source ~/downloaded_script.sh
-    ```
-
-   2. MacOS
-
-    ```bash
-      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-      brew install git
-      brew install oven-sh/bun/bun
-      brew install nvm
-    ```
-
-2. [PostgreSQL](https://www.postgresql.org/)
-   1. You can use Vercel Postgres or a local PostgreSQL server(add POSTGRES_URL env in .env.local)
-      ```bash
-         POSTGRES_URL = ''
-      ```
-
-### Installation
-
-To get started with this boilerplate, we offer two options:
-
-1. Use the `bun create` command(🌟Strongly recommend🌟):
+## Quick Start
 
 ```bash
-bun create saasfly 
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
 ```
 
-2. Manually clone the repository:
+## Project Structure
 
-```bash
-git clone https://github.com/saasfly/saasfly.git
-cd saasfly
-bun install
+```
+src/
+├── components/           # React components
+│   ├── ui/              # Reusable UI components
+│   ├── Hero.tsx         # Landing page hero section
+│   ├── Features.tsx     # Features showcase
+│   ├── Stats.tsx        # Usage statistics
+│   ├── TechStack.tsx    # Technical infrastructure
+│   ├── Documentation.tsx # Developer resources
+│   └── Footer.tsx       # Site footer
+├── lib/                 # Utility functions
+└── index.css           # Global styles and Tailwind config
 ```
 
-### Setup
+## Development
 
-Follow these steps to set up your project:
+The website is designed to showcase SVM-Pay's cross-chain payment capabilities with:
 
-1. Set up the environment variables:
+1. **Hero Section** - Clear value proposition and quick start code
+2. **Statistics** - Real usage metrics and developer adoption
+3. **Features** - Comprehensive feature showcase
+4. **Tech Stack** - Supported networks, bridges, and tokens
+5. **Documentation** - Code examples and developer resources
+6. **Footer** - Links and contact information
 
-```bash
-cp .env.example .env.local
-// (you must have a database prepared before running this command)
-bun db:push
-```
+## Deployment
 
-2. Run the development server:
+The website is automatically deployed to Netlify when changes are pushed to the main branch.
 
-```bash
-bun run dev:web
-```
+- **Production URL**: [svm-pay.com](https://svm-pay.com)
+- **Staging URL**: [svm-pay.netlify.app](https://svm-pay.netlify.app)
 
-3. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
+## Contributing
 
-4. (Optional alpha)`bun run tailwind-config-viewer` Open [http://localhost:3333](http://localhost:3333) in your browser to see your Tailwind CSS configuration
+When making changes:
 
+1. Test locally with `npm run dev`
+2. Build and test with `npm run build && npm run preview`
+3. Ensure responsive design works on all screen sizes
+4. Verify accessibility with screen readers
+5. Check performance with Lighthouse
 
-## 🥺 Project Roadmap
+## Performance
 
-1. Admin Dashboard Page (in alpha !!!)
-    1. Only provide static page now and we plan to integrate with headless arch
-    2. You can provide your admin account and change **ADMIN_EMAIL="admin@saasfly.io,root@saasfly.io"** in .env.local and access host:port/admin/dashboard
-    3. Based on security concerns, we will not provide online demos for the time being.
-2. Consider integrating Payload CMS.
-
-## ⭐ Features
-
-### 🐭 Frameworks
-
-- **[Next.js](https://nextjs.org/)** - The React Framework for the Web (with **App Directory**)
-- **[NextAuth.js](https://next-auth.js.org/)** - Authentication for Next.js
-- **[Kysely](https://kysely.dev/)** - The type-safe SQL query builder for TypeScript
-- **[Prisma](https://www.prisma.io/)** - Next-generation ORM for Node.js and TypeScript, used as a schema management tool
-- **[React-email](https://react.email/)** - A React renderer for creating beautiful emails using React components
-
-### 🐮 Platforms
-
-- **[Vercel](https://vercel.com/)** – Deploy your Next.js app with ease
-- **[Stripe](https://stripe.com/)** – Payment processing for internet businesses
-- **[Resend](https://resend.com/)** – Email marketing platform for developers
-
-### 🐯 Enterprise Features
-
-- **[i18n](https://nextjs.org/docs/app/building-your-application/routing/internationalization)** - Support for internationalization
-- **[SEO](https://nextjs.org/docs/app/building-your-application/optimizing/metadata)** - Search engine optimization
-- **[MonoRepo](https://turbo.build/)** - Monorepo for better code management
-- **[T3 Env](https://env.t3.gg/)** - Manage your environment variables with ease
-
-### 🐰 Data Fetching
-
-- **[trpc](https://trpc.io/)** – End-to-end typesafe APIs made easy
-- **[tanstack/react-query](https://react-query.tanstack.com/)** – Hooks for fetching, caching and updating asynchronous data in React
-
-### 🐲 Global State Management
-
-- **[Zustand](https://zustand.surge.sh/)** – Small, fast and scalable state management for React
-
-### 🐒 UI
-
-- **[Tailwind CSS](https://tailwindcss.com/)** – Utility-first CSS framework for rapid UI development
-- **[Shadcn/ui](https://ui.shadcn.com/)** – Re-usable components built using Radix UI and Tailwind CSS
-- **[Framer Motion](https://framer.com/motion)** – Motion library for React to animate components with ease
-- **[Lucide](https://lucide.dev/)** – Beautifully simple, pixel-perfect icons
-- **[next/font](https://nextjs.org/docs/basic-features/font-optimization)** – Optimize custom fonts and remove external network requests for improved performance
-
-### 🐴 Code Quality
-
-- **[TypeScript](https://www.typescriptlang.org/)** – Static type checker for end-to-end type safety
-- **[Prettier](https://prettier.io/)** – Opinionated code formatter for consistent code style
-- **[ESLint](https://eslint.org/)** – Pluggable linter for Next.js and TypeScript
-- **[Husky](https://typicode.github.io/husky)** – Git hooks made easy
-
-### 🐑 Performance
-
-- **[Vercel Analytics](https://vercel.com/analytics)** – Real-time performance metrics for your Next.js app
-- **[bun.sh](https://bun.sh/)** – npm alternative for faster and more reliable package management
-
-### 🐘 Database
-
-- **[PostgreSQL](https://www.postgresql.org/)** – The world's most advanced open source database
-
-## 📦 Apps and Packages
-
-- `web`: The main Next.js application
-- `ui`: Shared UI components
-- `db`: Database schema and utilities
-- `auth`: Authentication utilities
-- `email`: Email templates and utilities
-
-## 📜 License
-
-This project is licensed under the MIT License. For more information, see the [LICENSE](./LICENSE) file.
-
-## 🙏 Credits
-
-This project was inspired by shadcn's [Taxonomy](https://github.com/shadcn-ui/taxonomy) and t3-oss's [create-t3-turbo](https://github.com/t3-oss/create-t3-turbo).
-
-## 👨‍💻 Contributors
-
-<a href="https://github.com/saasfly/saasfly/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=saasfly/saasfly" />
-</a>
-
-Made with [contrib.rocks](https://contrib.rocks).
-
-<!-- Badges and links -->
-
-[check-workflow-badge]: https://img.shields.io/github/actions/workflow/status/saasfly/saasfly/ci.yml?label=ci
-[github-license-badge]: https://img.shields.io/badge/License-MIT-green.svg
-[discord-badge]: https://img.shields.io/discord/1204690198382911488?color=7b8dcd&link=https%3A%2F%2Fsaasfly.io%2Fdiscord
-[made-by-nextify-badge]: https://img.shields.io/badge/made_by-nextify-blue?color=FF782B&link=https://nextify.ltd/
-
-[check-workflow-badge-link]: https://github.com/saasfly/saasfly/actions/workflows/check.yml
-[github-license-badge-link]: https://github.com/saasfly/saasfly/blob/main/LICENSE
-[discord-badge-link]: https://discord.gg/8SwSX43wnD
-[made-by-nextify-badge-link]: https://nextify.ltd
+The website is optimized for:
+- **Core Web Vitals** - LCP, FID, CLS scores
+- **Bundle size** - Minimal JavaScript payload
+- **Image optimization** - WebP format with fallbacks
+- **Caching** - Proper cache headers for static assets

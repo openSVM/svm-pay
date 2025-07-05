@@ -1,41 +1,40 @@
 {
-  "name": "nextjs-template",
+  "name": "svm-pay-website",
   "private": true,
+  "version": "2.0.0",
+  "description": "SVM-Pay - Cross-Chain Payment Infrastructure",
+  "type": "module",
   "scripts": {
-    "build": "turbo build ",
-    "clean": "git clean -xdf node_modules",
-    "clean:workspaces": "turbo clean",
-    "db:push": "cd ./packages/db/ && bun db:push",
-    "dev": "turbo dev --parallel",
-    "dev:web": "turbo dev --parallel --filter !stripe",
-    "format": "turbo format --continue -- --cache --cache-location='node_modules/.cache/.prettiercache' --ignore-path='../../.gitignore'",
-    "format:fix": "turbo format --continue -- --write --cache --cache-location='node_modules/.cache/.prettiercache' --ignore-path='../../.gitignore'",
-    "lint": "turbo lint -- --quiet -- --cache --cache-location 'node_modules/.cache/.eslintcache' && manypkg check",
-    "lint:fix": "turbo lint --continue -- --fix --cache --cache-location 'node_modules/.cache/.eslintcache' ",
-    "typecheck": "turbo typecheck",
-    "postinstall": "npm run check-deps || true",
-    "check-deps": "check-dependency-version-consistency . --ignore-dep @saasfly/api --ignore-dep @saasfly/db --ignore-dep @saasfly/eslint-config --ignore-dep @saasfly/prettier-config --ignore-dep @saasfly/tailwind-config --ignore-dep @saasfly/typescript-config --ignore-dep @saasfly/ui",
-    "gen": "turbo gen --config 'turbo/generators/config.ts'"
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@headlessui/react": "^2.2.4",
+    "@tailwindcss/postcss": "^4.1.11",
+    "@tailwindcss/typography": "^0.5.16",
+    "autoprefixer": "^10.4.21",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.23.0",
+    "lucide-react": "^0.525.0",
+    "postcss": "^8.5.6",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss": "^4.1.11"
   },
   "devDependencies": {
-    "@turbo/gen": "1.13.3",
-    "check-dependency-version-consistency": "4.1.0",
-    "prettier": "3.5.3",
-    "tailwind-config-viewer": "^2.0.4",
-    "turbo": "1.13.3",
-    "typescript": "5.8.3"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "prettier": "@saasfly/prettier-config",
-  "workspaces": [
-    "apps/*",
-    "packages/*",
-    "tooling/*"
-  ],
-  "packageManager": "bun@v1.1.10",
-  "dependencies": {
-    "shikiji": "^0.10.2"
+    "@eslint/js": "^9.29.0",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.5.2",
+    "eslint": "^9.29.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.2.0",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.34.1",
+    "vite": "^7.0.0"
   }
 }
