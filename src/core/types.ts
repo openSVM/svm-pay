@@ -195,6 +195,9 @@ export interface PaymentRecord {
   
   /** Bridge used for cross-chain transfer */
   bridgeUsed?: string;
+  
+  /** Bridge quote used for cross-chain transfer */
+  bridgeQuote?: BridgeQuote;
 }
 
 /**
@@ -316,4 +319,73 @@ export enum BridgeTransferStatus {
   COMPLETED = 'completed',
   FAILED = 'failed',
   REFUNDED = 'refunded'
+}
+
+/**
+ * Quote expiration notification callback
+ */
+export type QuoteExpirationCallback = (quote: BridgeQuote, timeToExpiry: number) => void;
+
+/**
+ * Quote refresh API interface
+ */
+export interface QuoteRefreshAPI {
+  /** Refresh a quote before it expires */
+  refreshQuote(quoteId: string): Promise<BridgeQuote>;
+  
+  /** Get time until quote expires (in milliseconds) */
+  getTimeToExpiry(quote: BridgeQuote): number;
+  
+  /** Check if quote is near expiry (within threshold) */
+  isNearExpiry(quote: BridgeQuote, thresholdMs?: number): boolean;
+  
+  /** Register callback for quote expiration warnings */
+  onQuoteExpiring(callback: QuoteExpirationCallback): void;
+}
+
+/**
+ * Storage adapter interface for persistent payment storage
+ */
+export interface PaymentStorageAdapter {
+  /** Get a payment record by ID */
+  get(paymentId: string): Promise<PaymentRecord | null>;
+  
+  /** Set a payment record */
+  set(paymentId: string, payment: PaymentRecord): Promise<void>;
+  
+  /** Delete a payment record */
+  delete(paymentId: string): Promise<void>;
+  
+  /** Get all payment records (optional, for admin/monitoring) */
+  getAll?(): Promise<PaymentRecord[]>;
+  
+  /** Clear all payment records (optional, for testing) */
+  clear?(): Promise<void>;
+}
+
+/**
+ * In-memory storage adapter implementation
+ */
+export class MemoryPaymentStorageAdapter implements PaymentStorageAdapter {
+  private store: Map<string, PaymentRecord> = new Map();
+  
+  async get(paymentId: string): Promise<PaymentRecord | null> {
+    return this.store.get(paymentId) || null;
+  }
+  
+  async set(paymentId: string, payment: PaymentRecord): Promise<void> {
+    this.store.set(paymentId, payment);
+  }
+  
+  async delete(paymentId: string): Promise<void> {
+    this.store.delete(paymentId);
+  }
+  
+  async getAll(): Promise<PaymentRecord[]> {
+    return Array.from(this.store.values());
+  }
+  
+  async clear(): Promise<void> {
+    this.store.clear();
+  }
 }

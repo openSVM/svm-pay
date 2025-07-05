@@ -14,6 +14,7 @@ import {
   SVMNetwork 
 } from '../core/types';
 import { BaseBridgeAdapter } from './adapter';
+import BigNumber from 'bignumber.js';
 
 /**
  * Allbridge bridge adapter implementation
@@ -42,7 +43,7 @@ export class AllbridgeBridgeAdapter extends BaseBridgeAdapter {
       },
       supportedTokens: {
         [EVMNetwork.ETHEREUM]: [
-          '0xA0b86a33E6441c4d0C85c81a1a4e18a3f3F3f77f', // USDC
+          '0xa0B86a33E6441c4D0c85C81a1a4E18A3f3f3F77F', // USDC
           '0xdAC17F958D2ee523a2206206994597C13D831ec7', // USDT
           '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'  // WETH
         ],
@@ -74,8 +75,8 @@ export class AllbridgeBridgeAdapter extends BaseBridgeAdapter {
       contracts: {
         [EVMNetwork.ETHEREUM]: '0x1A2B73207C883Ce8E51653d6A9cC8a022740cCA4',
         [EVMNetwork.BNB_CHAIN]: '0xBBbD1BbB4f9b936C3604906D7592A644071dE884',
-        [EVMNetwork.POLYGON]: '0x7775d63836987c2C17F6f0c3E6dAA4d5F3123C05',
-        [EVMNetwork.AVALANCHE]: '0x842F5a5f6dF0c4eF073C2A9b7Ee6eF634C8C8e0B7',
+        [EVMNetwork.POLYGON]: '0x7775d63836987c2C17f6F0c3E6daa4D5f3123C05',
+        [EVMNetwork.AVALANCHE]: '0x842F5a5f6dF0c4EF073C2a9B7ee6ef634c8c8e0B7',
         [SVMNetwork.SOLANA]: 'bb1bBBB5f96936C3604906D7592A644071dE884A'
       }
     });
@@ -96,10 +97,12 @@ export class AllbridgeBridgeAdapter extends BaseBridgeAdapter {
         throw new Error(`Allbridge does not support transfer from ${request.sourceNetwork} to ${request.destinationNetwork} for token ${request.token}`);
       }
       
-      // Calculate fees (Allbridge typically has lower fees than Wormhole)
+      // Calculate fees using BigNumber for precision
       const inputAmount = request.amount;
       const feeAmount = this.calculateFee(inputAmount);
-      const outputAmount = (parseFloat(inputAmount) - parseFloat(feeAmount)).toString();
+      const inputBN = new BigNumber(inputAmount);
+      const feeBN = new BigNumber(feeAmount);
+      const outputAmount = inputBN.minus(feeBN).toString();
       
       // Generate quote
       const quote: BridgeQuote = {
@@ -181,14 +184,14 @@ export class AllbridgeBridgeAdapter extends BaseBridgeAdapter {
   }
   
   /**
-   * Calculate the fee for a transfer
+   * Calculate the fee for a transfer using BigNumber for precision
    * 
    * @param amount The transfer amount
    * @returns The calculated fee
    */
   private calculateFee(amount: string): string {
-    const amountNum = parseFloat(amount);
-    const percentageFee = amountNum * (this.info.fees.percentage || 0) / 100;
+    const amountBN = new BigNumber(amount);
+    const percentageFee = amountBN.multipliedBy(this.info.fees.percentage || 0).dividedBy(100);
     
     return percentageFee.toString();
   }

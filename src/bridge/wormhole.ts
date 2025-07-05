@@ -14,6 +14,7 @@ import {
   SVMNetwork 
 } from '../core/types';
 import { BaseBridgeAdapter } from './adapter';
+import BigNumber from 'bignumber.js';
 
 /**
  * Wormhole bridge adapter implementation
@@ -44,7 +45,7 @@ export class WormholeBridgeAdapter extends BaseBridgeAdapter {
       },
       supportedTokens: {
         [EVMNetwork.ETHEREUM]: [
-          '0xA0b86a33E6441c4d0C85c81a1a4e18a3f3F3f77f', // USDC
+          '0xa0B86a33E6441c4D0c85C81a1a4E18A3f3f3F77F', // USDC
           '0xdAC17F958D2ee523a2206206994597C13D831ec7', // USDT
           '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599', // WBTC
           '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'  // WETH
@@ -73,7 +74,7 @@ export class WormholeBridgeAdapter extends BaseBridgeAdapter {
       contracts: {
         [EVMNetwork.ETHEREUM]: '0x3ee18B2214AFF97000D974cf647E7C347E8fa585',
         [EVMNetwork.BNB_CHAIN]: '0xB6F6D86a8f9879A9c87f643768d9efc38c1Da6E7',
-        [EVMNetwork.POLYGON]: '0x7A4B5a56ED0f8E6Be64B1A50b75B4F3E0Ad0a6D6',
+        [EVMNetwork.POLYGON]: '0x7a4B5a56eD0F8E6be64B1A50b75B4F3E0ad0A6D6',
         [SVMNetwork.SOLANA]: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb'
       }
     });
@@ -94,10 +95,12 @@ export class WormholeBridgeAdapter extends BaseBridgeAdapter {
         throw new Error(`Wormhole does not support transfer from ${request.sourceNetwork} to ${request.destinationNetwork} for token ${request.token}`);
       }
       
-      // Calculate fees
+      // Calculate fees using BigNumber for precision
       const inputAmount = request.amount;
       const feeAmount = this.calculateFee(inputAmount);
-      const outputAmount = (parseFloat(inputAmount) - parseFloat(feeAmount)).toString();
+      const inputBN = new BigNumber(inputAmount);
+      const feeBN = new BigNumber(feeAmount);
+      const outputAmount = inputBN.minus(feeBN).toString();
       
       // Generate quote
       const quote: BridgeQuote = {
@@ -180,16 +183,16 @@ export class WormholeBridgeAdapter extends BaseBridgeAdapter {
   }
   
   /**
-   * Calculate the fee for a transfer
+   * Calculate the fee for a transfer using BigNumber for precision
    * 
    * @param amount The transfer amount
    * @returns The calculated fee
    */
   private calculateFee(amount: string): string {
-    const amountNum = parseFloat(amount);
-    const percentageFee = amountNum * (this.info.fees.percentage || 0) / 100;
-    const fixedFee = parseFloat(this.info.fees.fixed || '0');
+    const amountBN = new BigNumber(amount);
+    const percentageFee = amountBN.multipliedBy(this.info.fees.percentage || 0).dividedBy(100);
+    const fixedFee = new BigNumber(this.info.fees.fixed || '0');
     
-    return (percentageFee + fixedFee).toString();
+    return percentageFee.plus(fixedFee).toString();
   }
 }

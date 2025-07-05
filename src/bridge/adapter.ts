@@ -15,6 +15,7 @@ import {
   SupportedNetwork,
   SVMNetwork 
 } from '../core/types';
+import { areTokensEquivalent } from './utils';
 
 /**
  * Abstract base class for bridge adapters
@@ -80,13 +81,18 @@ export abstract class BaseBridgeAdapter implements BridgeAdapter {
       return false;
     }
     
-    // Check if token is supported on source network
+    // Check if token is supported on source network using normalization/aliasing
     const sourceTokens = this.info.supportedTokens[sourceNetwork];
-    if (!sourceTokens || !sourceTokens.includes(token)) {
+    if (!sourceTokens) {
       return false;
     }
     
-    return true;
+    // Use token equivalence check instead of strict equality
+    const isTokenSupported = sourceTokens.some(supportedToken => 
+      areTokensEquivalent(token, supportedToken, sourceNetwork)
+    );
+    
+    return isTokenSupported;
   }
 }
 

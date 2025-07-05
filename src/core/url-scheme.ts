@@ -39,15 +39,25 @@ const EVM_NETWORK_PREFIXES = {
 };
 
 /**
- * Parse a payment URL into a PaymentRequest object
+ * Parse a payment URL into a PaymentRequest object with robust validation
  * 
  * @param url The payment URL to parse
  * @returns A PaymentRequest object
  */
 export function parseURL(url: string): PaymentRequest {
+  // Input validation
+  if (!url || typeof url !== 'string') {
+    throw new Error('URL must be a non-empty string');
+  }
+  
   try {
     const parsedUrl = new URL(url);
     const protocol = parsedUrl.protocol.replace(':', '');
+    
+    // Validate protocol is not empty
+    if (!protocol) {
+      throw new Error('URL must have a valid protocol');
+    }
     
     // Determine network from protocol
     let network: SVMNetwork;
@@ -68,14 +78,29 @@ export function parseURL(url: string): PaymentRequest {
         throw new Error(`Unsupported protocol: ${protocol}`);
     }
     
-    // Get recipient from hostname (for custom protocols) or pathname
-    let recipient = parsedUrl.hostname;
+    // Get recipient with robust parsing for edge cases
+    let recipient = '';
+    
+    // Handle hostname (for standard URLs)
+    if (parsedUrl.hostname) {
+      // IPv6 addresses are enclosed in brackets, remove them
+      recipient = parsedUrl.hostname.replace(/^\[|\]$/g, '');
+    }
+    
+    // Handle pathname (for custom protocols like "solana:")  
     if (!recipient && parsedUrl.pathname) {
-      // For custom protocols like "solana:", the recipient is in pathname without leading slash
       recipient = parsedUrl.pathname.startsWith('/') ? parsedUrl.pathname.substring(1) : parsedUrl.pathname;
     }
-    if (!recipient) {
-      throw new Error('Missing recipient');
+    
+    // Validate recipient
+    if (!recipient || recipient.trim().length === 0) {
+      throw new Error('Missing or empty recipient address');
+    }
+    
+    // Additional validation for recipient format
+    recipient = recipient.trim();
+    if (recipient.includes('..') || recipient.includes('//')) {
+      throw new Error('Invalid recipient address format');
     }
     
     // Parse query parameters

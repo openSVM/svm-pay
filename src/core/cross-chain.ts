@@ -15,7 +15,11 @@ import {
   PaymentStatus,
   RequestType,
   SVMNetwork,
-  SupportedNetwork
+  SupportedNetwork,
+  QuoteExpirationCallback,
+  QuoteRefreshAPI,
+  PaymentStorageAdapter,
+  MemoryPaymentStorageAdapter
 } from '../core/types';
 import { BridgeAdapterFactory } from '../bridge/adapter';
 import { getBestBridgeQuote, validateCrossChainRequest } from '../bridge/utils';
@@ -44,8 +48,18 @@ export interface CrossChainPaymentResult {
 /**
  * Cross-chain payment manager
  */
-export class CrossChainPaymentManager {
-  private paymentStore: Map<string, PaymentRecord> = new Map();
+export class CrossChainPaymentManager implements QuoteRefreshAPI {
+  private paymentStore: PaymentStorageAdapter;
+  private quoteExpirationCallbacks: QuoteExpirationCallback[] = [];
+  
+  /**
+   * Create a new CrossChainPaymentManager
+   * 
+   * @param storageAdapter Optional storage adapter (defaults to in-memory)
+   */
+  constructor(storageAdapter?: PaymentStorageAdapter) {
+    this.paymentStore = storageAdapter || new MemoryPaymentStorageAdapter();
+  }
   
   /**
    * Execute a cross-chain payment
@@ -74,10 +88,11 @@ export class CrossChainPaymentManager {
         status: PaymentStatus.CREATED,
         createdAt: Date.now(),
         updatedAt: Date.now(),
-        bridgeUsed: bridge.info.id
+        bridgeUsed: bridge.info.id,
+        bridgeQuote: quote
       };
       
-      this.paymentStore.set(paymentId, paymentRecord);
+      await this.paymentStore.set(paymentId, paymentRecord);
       
       try {
         // Update status to bridging
@@ -89,7 +104,7 @@ export class CrossChainPaymentManager {
         // Update payment record with bridge transaction
         paymentRecord.bridgeTransactionHash = bridgeTransferResult.sourceTransactionHash;
         paymentRecord.updatedAt = Date.now();
-        this.paymentStore.set(paymentId, paymentRecord);
+        await this.paymentStore.set(paymentId, paymentRecord);
         
         // Monitor bridge transfer status (don't await - let it run in background)
         this.monitorBridgeTransfer(paymentId, bridge, bridgeTransferResult.transferId).catch(error => {
@@ -110,11 +125,16 @@ export class CrossChainPaymentManager {
       }
       
     } catch (error) {
-      // Preserve original error information and stack trace
+      // Preserve original error information and stack trace with proper cause handling
       if (error instanceof Error) {
         const wrappedError = new Error(`Failed to execute cross-chain payment: ${error.message}`);
         wrappedError.stack = error.stack;
-        wrappedError.cause = error;
+        
+        // Use cause if supported (Node.js 16.9.0+), otherwise fallback gracefully
+        if ('cause' in Error.prototype) {
+          (wrappedError as any).cause = error;
+        }
+        
         throw wrappedError;
       } else {
         throw new Error(`Failed to execute cross-chain payment: ${String(error)}`);
@@ -129,7 +149,7 @@ export class CrossChainPaymentManager {
    * @returns The payment record
    */
   async getPaymentStatus(paymentId: string): Promise<PaymentRecord | null> {
-    return this.paymentStore.get(paymentId) || null;
+    return await this.paymentStore.get(paymentId);
   }
   
   /**
@@ -219,7 +239,7 @@ export class CrossChainPaymentManager {
     status: PaymentStatus,
     error?: string
   ): Promise<void> {
-    const payment = this.paymentStore.get(paymentId);
+    const payment = await this.paymentStore.get(paymentId);
     if (!payment) {
       throw new Error(`Payment ${paymentId} not found`);
     }
@@ -231,7 +251,7 @@ export class CrossChainPaymentManager {
       payment.error = error;
     }
     
-    this.paymentStore.set(paymentId, payment);
+    await this.paymentStore.set(paymentId, payment);
   }
   
   /**
@@ -241,6 +261,117 @@ export class CrossChainPaymentManager {
    */
   private generatePaymentId(): string {
     return `cc-payment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+  
+  /**
+   * Refresh a quote before it expires
+   * 
+   * @param quoteId The quote ID to refresh
+   * @returns A promise that resolves to the refreshed quote
+   */
+  async refreshQuote(quoteId: string): Promise<BridgeQuote> {
+    // Extract bridge info from quote ID
+    const bridgeId = quoteId.split('-')[0];
+    const adapter = BridgeAdapterFactory.getAdapter(bridgeId);
+    
+    if (!adapter) {
+      throw new Error(`Bridge adapter not found for quote ${quoteId}`);
+    }
+    
+    // Find payment with this quote - need to check if storage adapter supports getAll
+    const payments = await this.getAllPayments();
+    const targetPayment = payments.find(payment => payment.bridgeQuote?.id === quoteId);
+    
+    if (!targetPayment) {
+      throw new Error(`Payment not found for quote ${quoteId}`);
+    }
+    
+    // Extract cross-chain request properties
+    const ccRequest = targetPayment.request as CrossChainTransferRequest;
+    
+    // Create new request and get fresh quote
+    const request: CrossChainTransferRequest = {
+      type: RequestType.CROSS_CHAIN_TRANSFER,
+      network: ccRequest.destinationNetwork,
+      sourceNetwork: ccRequest.sourceNetwork,
+      destinationNetwork: ccRequest.destinationNetwork,
+      recipient: ccRequest.recipient,
+      amount: ccRequest.amount,
+      token: ccRequest.token || ''
+    };
+    
+    const newQuote = await adapter.quote(request);
+    
+    // Update payment record
+    targetPayment.bridgeQuote = newQuote;
+    targetPayment.updatedAt = Date.now();
+    await this.paymentStore.set(targetPayment.id, targetPayment);
+    
+    return newQuote;
+  }
+  
+  /**
+   * Get all payments (helper method)
+   */
+  private async getAllPayments(): Promise<PaymentRecord[]> {
+    if (this.paymentStore.getAll) {
+      return await this.paymentStore.getAll();
+    }
+    // If storage adapter doesn't support getAll, we can't refresh quotes
+    throw new Error('Storage adapter does not support getAllPayments - cannot refresh quotes');
+  }
+  
+  /**
+   * Get time until quote expires (in milliseconds)
+   * 
+   * @param quote The bridge quote
+   * @returns Time until expiration in milliseconds
+   */
+  getTimeToExpiry(quote: BridgeQuote): number {
+    return Math.max(0, quote.expiresAt - Date.now());
+  }
+  
+  /**
+   * Check if quote is near expiry
+   * 
+   * @param quote The bridge quote
+   * @param thresholdMs Threshold in milliseconds (default: 2 minutes)
+   * @returns True if quote is near expiry
+   */
+  isNearExpiry(quote: BridgeQuote, thresholdMs: number = 2 * 60 * 1000): boolean {
+    return this.getTimeToExpiry(quote) <= thresholdMs;
+  }
+  
+  /**
+   * Register callback for quote expiration warnings
+   * 
+   * @param callback The callback to register
+   */
+  onQuoteExpiring(callback: QuoteExpirationCallback): void {
+    this.quoteExpirationCallbacks.push(callback);
+  }
+  
+  /**
+   * Check and notify about quotes nearing expiry
+   */
+  private async checkQuoteExpiry(): Promise<void> {
+    try {
+      const payments = await this.getAllPayments();
+      for (const payment of payments) {
+        if (payment.bridgeQuote && this.isNearExpiry(payment.bridgeQuote)) {
+          const timeToExpiry = this.getTimeToExpiry(payment.bridgeQuote);
+          this.quoteExpirationCallbacks.forEach(callback => {
+            try {
+              callback(payment.bridgeQuote!, timeToExpiry);
+            } catch (error) {
+              console.warn('Quote expiration callback failed:', error);
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to check quote expiry:', error);
+    }
   }
 }
 

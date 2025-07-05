@@ -45,7 +45,7 @@ describe('Cross-Chain Payment Functionality', () => {
         destinationNetwork: SVMNetwork.SOLANA,
         recipient: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
         amount: '100',
-        token: '0xA0b86a33E6441c4d0C85c81a1a4e18a3f3F3f77f', // USDC on Ethereum
+        token: '0xa0B86a33E6441c4D0c85C81a1a4E18A3f3f3F77F', // USDC on Ethereum
         bridge: 'wormhole',
         label: 'Test Payment',
         message: 'Cross-chain test',
@@ -56,7 +56,7 @@ describe('Cross-Chain Payment Functionality', () => {
       expect(request.sourceNetwork).toBe(EVMNetwork.ETHEREUM);
       expect(request.destinationNetwork).toBe(SVMNetwork.SOLANA);
       expect(request.amount).toBe('100');
-      expect(request.token).toBe('0xA0b86a33E6441c4d0C85c81a1a4e18a3f3F3f77f');
+      expect(request.token).toBe('0xa0B86a33E6441c4D0c85C81a1a4E18A3f3f3F77F');
       expect(request.bridge).toBe('wormhole');
     });
   });
@@ -67,7 +67,7 @@ describe('Cross-Chain Payment Functionality', () => {
         const supported = wormholeAdapter.supportsTransfer(
           EVMNetwork.ETHEREUM,
           SVMNetwork.SOLANA,
-          '0xA0b86a33E6441c4d0C85c81a1a4e18a3f3F3f77f' // USDC
+          '0xa0B86a33E6441c4D0c85C81a1a4E18A3f3f3F77F' // USDC
         );
         expect(supported).toBe(true);
       });
@@ -89,7 +89,7 @@ describe('Cross-Chain Payment Functionality', () => {
           destinationNetwork: SVMNetwork.SOLANA,
           recipient: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
           amount: '100',
-          token: '0xA0b86a33E6441c4d0C85c81a1a4e18a3f3F3f77f'
+          token: '0xa0B86a33E6441c4D0c85C81a1a4E18A3f3f3F77F'
         };
 
         const quote = await wormholeAdapter.quote(request);
@@ -107,7 +107,7 @@ describe('Cross-Chain Payment Functionality', () => {
         const supported = allbridgeAdapter.supportsTransfer(
           EVMNetwork.ETHEREUM,
           SVMNetwork.SOLANA,
-          '0xA0b86a33E6441c4d0C85c81a1a4e18a3f3F3f77f' // USDC
+          '0xa0B86a33E6441c4D0c85C81a1a4E18A3f3f3F77F' // USDC
         );
         expect(supported).toBe(true);
       });
@@ -120,7 +120,7 @@ describe('Cross-Chain Payment Functionality', () => {
           destinationNetwork: SVMNetwork.SOLANA,
           recipient: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
           amount: '100',
-          token: '0xA0b86a33E6441c4d0C85c81a1a4e18a3f3F3f77f'
+          token: '0xa0B86a33E6441c4D0c85C81a1a4E18A3f3f3F77F'
         };
 
         const [wormholeQuote, allbridgeQuote] = await Promise.all([
@@ -140,7 +140,7 @@ describe('Cross-Chain Payment Functionality', () => {
       const compatibleAdapters = BridgeAdapterFactory.findCompatibleAdapters(
         EVMNetwork.ETHEREUM,
         SVMNetwork.SOLANA,
-        '0xA0b86a33E6441c4d0C85c81a1a4e18a3f3F3f77f' // USDC
+        '0xa0B86a33E6441c4D0c85C81a1a4E18A3f3f3F77F' // USDC
       );
 
       expect(compatibleAdapters).toHaveLength(2); // Wormhole and Allbridge
@@ -168,7 +168,7 @@ describe('Cross-Chain Payment Functionality', () => {
         destinationNetwork: SVMNetwork.SOLANA,
         recipient: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
         amount: '100',
-        token: '0xA0b86a33E6441c4d0C85c81a1a4e18a3f3F3f77f'
+        token: '0xa0B86a33E6441c4D0c85C81a1a4E18A3f3f3F77F'
       };
 
       expect(() => validateCrossChainRequest(request)).not.toThrow();
@@ -182,7 +182,7 @@ describe('Cross-Chain Payment Functionality', () => {
         destinationNetwork: SVMNetwork.SOLANA,
         recipient: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
         amount: '100',
-        token: '0xA0b86a33E6441c4d0C85c81a1a4e18a3f3F3f77f'
+        token: '0xa0B86a33E6441c4D0c85C81a1a4E18A3f3f3F77F'
       };
 
       expect(() => validateCrossChainRequest(request)).toThrow('Source and destination networks cannot be the same');
@@ -196,7 +196,7 @@ describe('Cross-Chain Payment Functionality', () => {
         destinationNetwork: SVMNetwork.SOLANA,
         recipient: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
         amount: '100',
-        token: '0xA0b86a33E6441c4d0C85c81a1a4e18a3f3F3f77f'
+        token: '0xa0B86a33E6441c4D0c85C81a1a4E18A3f3f3F77F'
       };
 
       const result = await getBestBridgeQuote(request);
@@ -219,7 +219,7 @@ describe('Cross-Chain Payment Functionality', () => {
         destinationNetwork: SVMNetwork.SOLANA,
         recipient: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
         amount: '100',
-        token: '0xA0b86a33E6441c4d0C85c81a1a4e18a3f3F3f77f'
+        token: '0xa0B86a33E6441c4D0c85C81a1a4E18A3f3f3F77F'
       };
 
       const result = await paymentManager.executePayment(request);
@@ -238,7 +238,7 @@ describe('Cross-Chain Payment Functionality', () => {
         destinationNetwork: SVMNetwork.SOLANA,
         recipient: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
         amount: '100',
-        token: '0xA0b86a33E6441c4d0C85c81a1a4e18a3f3F3f77f'
+        token: '0xa0B86a33E6441c4D0c85C81a1a4E18A3f3f3F77F'
       };
 
       const result = await paymentManager.executePayment(request);
@@ -248,6 +248,73 @@ describe('Cross-Chain Payment Functionality', () => {
       expect(status?.id).toBe(result.paymentId);
       expect(status?.status).toBe(PaymentStatus.BRIDGING);
       expect(status?.bridgeUsed).toBe('allbridge');
+    });
+  });
+
+  describe('Negative Test Cases', () => {
+    describe('Unsupported Token Quotes', () => {
+      it('should throw error for unsupported token in Wormhole', async () => {
+        const request: CrossChainTransferRequest = {
+          type: RequestType.CROSS_CHAIN_TRANSFER,
+          network: SVMNetwork.SOLANA,
+          sourceNetwork: EVMNetwork.ETHEREUM,
+          destinationNetwork: SVMNetwork.SOLANA,
+          recipient: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
+          amount: '100',
+          token: '0x1234567890123456789012345678901234567890' // Unsupported token
+        };
+
+        await expect(wormholeAdapter.quote(request)).rejects.toThrow(
+          'Wormhole does not support transfer from ethereum to solana for token 0x1234567890123456789012345678901234567890'
+        );
+      });
+
+      it('should throw error for unsupported token in Allbridge', async () => {
+        const request: CrossChainTransferRequest = {
+          type: RequestType.CROSS_CHAIN_TRANSFER,
+          network: SVMNetwork.SOLANA,
+          sourceNetwork: EVMNetwork.ETHEREUM,
+          destinationNetwork: SVMNetwork.SOLANA,
+          recipient: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
+          amount: '100',
+          token: '0x9876543210987654321098765432109876543210' // Unsupported token
+        };
+
+        await expect(allbridgeAdapter.quote(request)).rejects.toThrow(
+          'Allbridge does not support transfer from ethereum to solana for token 0x9876543210987654321098765432109876543210'
+        );
+      });
+
+      it('should return null from getBestBridgeQuote for unsupported token', async () => {
+        const request: CrossChainTransferRequest = {
+          type: RequestType.CROSS_CHAIN_TRANSFER,
+          network: SVMNetwork.SOLANA,
+          sourceNetwork: EVMNetwork.ETHEREUM,
+          destinationNetwork: SVMNetwork.SOLANA,
+          recipient: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
+          amount: '100',
+          token: '0x1111111111111111111111111111111111111111' // Unsupported token
+        };
+
+        const result = await getBestBridgeQuote(request);
+        expect(result).toBeNull();
+      });
+
+      it('should throw error when no compatible bridges found', async () => {
+        const request: CrossChainTransferRequest = {
+          type: RequestType.CROSS_CHAIN_TRANSFER,
+          network: SVMNetwork.SOLANA,
+          sourceNetwork: EVMNetwork.ETHEREUM,
+          destinationNetwork: SVMNetwork.SOLANA,
+          recipient: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
+          amount: '100',
+          token: '0x2222222222222222222222222222222222222222' // Unsupported token
+        };
+
+        await expect(paymentManager.executePayment(request)).rejects.toThrow(
+          'No compatible bridges found for this transfer'
+        );
+      });
     });
   });
 });

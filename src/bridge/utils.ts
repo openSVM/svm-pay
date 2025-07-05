@@ -12,6 +12,8 @@ import {
   SVMNetwork 
 } from '../core/types';
 import { BridgeAdapterFactory } from './adapter';
+import { ethers } from 'ethers';
+import BigNumber from 'bignumber.js';
 
 /**
  * Get the best bridge quote from all available bridges
@@ -71,29 +73,28 @@ export async function getBestBridgeQuote(
  * @returns A numerical score
  */
 function calculateQuoteScore(quote: BridgeQuote): number {
-  // Use Number for better precision
-  const outputAmount = Number(quote.outputAmount);
-  const inputAmount = Number(quote.inputAmount);
-  const fee = Number(quote.fee);
+  // Use BigNumber for precise calculations
+  const outputAmount = new BigNumber(quote.outputAmount);
+  const inputAmount = new BigNumber(quote.inputAmount);
+  const fee = new BigNumber(quote.fee);
   
   // Validate inputs
-  if (isNaN(outputAmount) || isNaN(inputAmount) || isNaN(fee) || inputAmount === 0) {
+  if (outputAmount.isNaN() || inputAmount.isNaN() || fee.isNaN() || inputAmount.isZero()) {
     return 0;
   }
   
-  // Calculate efficiency ratio (output/input)
-  const efficiency = outputAmount / inputAmount;
+  // Calculate efficiency ratio (output/input) 
+  const efficiency = outputAmount.dividedBy(inputAmount);
   
   // Calculate time score (faster is better, max 600 seconds)
   const timeScore = Math.max(0, (600 - quote.estimatedTime) / 600);
   
   // Calculate fee score (lower fees are better)
-  // Use a more reasonable penalty multiplier to avoid overly penalizing valid fee ratios
-  const feeRatio = fee / inputAmount;
-  const feeScore = Math.max(0, 1 - feeRatio * 10); // Reduced penalty multiplier from 100 to 10
+  const feeRatio = fee.dividedBy(inputAmount);
+  const feeScore = Math.max(0, new BigNumber(1).minus(feeRatio.multipliedBy(10)).toNumber());
   
   // Weighted score: 50% efficiency, 30% time, 20% fees
-  return (efficiency * 0.5) + (timeScore * 0.3) + (feeScore * 0.2);
+  return (efficiency.toNumber() * 0.5) + (timeScore * 0.3) + (feeScore * 0.2);
 }
 
 /**
@@ -143,6 +144,78 @@ export function initializeDefaultBridges(): void {
 }
 
 /**
+ * Common token addresses and aliases for normalization
+ */
+const TOKEN_ALIASES: Record<string, Set<string>> = {
+  // Ethereum USDC
+  '0xa0b86a33e6441c4d0c85c81a1a4e18a3f3f3f77f': new Set([
+    '0xa0B86a33E6441c4D0c85C81a1a4E18A3f3f3F77F', // Correct checksum
+    '0xa0b86a33e6441c4d0c85c81a1a4e18a3f3f3f77f'  // Lowercase
+  ]),
+  // Polygon USDC  
+  '0x2791bca1f2de4661ed88a30c99a7a9449aa84174': new Set([
+    '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174', // Mixed case
+    '0x2791bca1f2de4661ed88a30c99a7a9449aa84174'  // Lowercase
+  ]),
+  // Add more token aliases as needed
+};
+
+/**
+ * Normalize a token address for comparison
+ * 
+ * @param token The token address to normalize
+ * @param network The network the token belongs to
+ * @returns The normalized token address
+ */
+export function normalizeTokenAddress(token: string, network: string): string {
+  if (!token) return token;
+  
+  // For EVM networks, use checksum address
+  if (['ethereum', 'bnb-chain', 'polygon', 'arbitrum', 'optimism', 'avalanche'].includes(network)) {
+    try {
+      return ethers.getAddress(token.toLowerCase());
+    } catch {
+      // If checksum fails, return lowercase for comparison
+      return token.toLowerCase();
+    }
+  }
+  
+  // For SVM networks, return as-is (they are case-sensitive)
+  return token;
+}
+
+/**
+ * Check if two token addresses are equivalent (including aliases)
+ * 
+ * @param token1 First token address
+ * @param token2 Second token address  
+ * @param network The network context
+ * @returns True if tokens are equivalent
+ */
+export function areTokensEquivalent(token1: string, token2: string, network: string): boolean {
+  const normalized1 = normalizeTokenAddress(token1, network);
+  const normalized2 = normalizeTokenAddress(token2, network);
+  
+  // Direct comparison
+  if (normalized1 === normalized2) {
+    return true;
+  }
+  
+  // Check aliases
+  const aliasSet = TOKEN_ALIASES[normalized1.toLowerCase()];
+  if (aliasSet && aliasSet.has(normalized2.toLowerCase())) {
+    return true;
+  }
+  
+  const reverseAliasSet = TOKEN_ALIASES[normalized2.toLowerCase()];
+  if (reverseAliasSet && reverseAliasSet.has(normalized1.toLowerCase())) {
+    return true;
+  }
+  
+  return false;
+}
+
+/**
  * Common token addresses for validation
  */
 const COMMON_TOKEN_PATTERNS = {
@@ -152,7 +225,7 @@ const COMMON_TOKEN_PATTERNS = {
 };
 
 /**
- * Validate a token address format
+ * Validate a token address format with robust checksum validation
  * 
  * @param token The token address to validate
  * @param network The network to validate against
@@ -161,12 +234,18 @@ const COMMON_TOKEN_PATTERNS = {
 function isValidTokenAddress(token: string, network: string): boolean {
   if (!token) return false;
   
-  // Check for common EVM token address format
+  // Check for common EVM token address format with checksum validation
   if (['ethereum', 'bnb-chain', 'polygon', 'arbitrum', 'optimism', 'avalanche'].includes(network)) {
-    return COMMON_TOKEN_PATTERNS.ethereum.test(token);
+    try {
+      // Use ethers.js for proper checksum validation
+      ethers.getAddress(token);
+      return true;
+    } catch {
+      return false;
+    }
   }
   
-  // Check for SVM token address format
+  // Check for SVM token address format (base58 with proper length)
   if (['solana', 'sonic', 'eclipse', 'soon'].includes(network)) {
     return COMMON_TOKEN_PATTERNS.solana.test(token);
   }
@@ -243,20 +322,20 @@ export function formatTransferTime(seconds: number): string {
  * @returns Formatted fee string
  */
 export function formatBridgeFee(fee: string, inputAmount: string): string {
-  // Use Number for better precision in calculations
-  const feeNum = Number(fee);
-  const inputNum = Number(inputAmount);
+  // Use BigNumber for precise calculations
+  const feeBN = new BigNumber(fee);
+  const inputBN = new BigNumber(inputAmount);
   
   // Check for valid numbers
-  if (isNaN(feeNum) || isNaN(inputNum) || inputNum === 0) {
+  if (feeBN.isNaN() || inputBN.isNaN() || inputBN.isZero()) {
     return `${fee} (0.00%)`;
   }
   
-  // Calculate percentage with higher precision
-  const percentage = (feeNum / inputNum) * 100;
+  // Calculate percentage with high precision
+  const percentage = feeBN.dividedBy(inputBN).multipliedBy(100);
   
-  // Round to appropriate decimal places
-  const formattedPercentage = percentage < 0.01 ? 
+  // Format percentage appropriately
+  const formattedPercentage = percentage.isLessThan(0.01) ? 
     percentage.toFixed(4) : 
     percentage.toFixed(2);
   
