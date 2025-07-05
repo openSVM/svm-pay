@@ -1,7 +1,7 @@
 [build]
   base = "website"
   command = "npm install && npm run build"
-  publish = "website/dist"
+  publish = "dist"
 
 [build.environment]
   NODE_VERSION = "18"
