@@ -1566,6 +1566,954 @@ const gameItemTypes = {
             "Define clear item categories for better organization",
             "Consider which item types should be tradeable"
           ]
+        },
+        {
+          title: "Mint Game Items as NFTs",
+          description: "Create and mint game items as NFTs with proper metadata and attributes.",
+          code: `import { Metaplex, keypairIdentity, bundlrStorage } from '@metaplex-foundation/js'
+import { Keypair } from '@solana/web3.js'
+
+// Initialize Metaplex for NFT operations
+const metaplex = Metaplex.make(connection)
+  .use(keypairIdentity(marketplace.authority))
+  .use(bundlrStorage())
+
+async function mintGameItem(playerWallet, itemData) {
+  try {
+    // Validate item type and rarity
+    const itemType = gameItemTypes[itemData.type]
+    if (!itemType) {
+      throw new Error('Invalid item type')
+    }
+
+    if (!itemType.rarities.includes(itemData.rarity)) {
+      throw new Error('Invalid rarity for item type')
+    }
+
+    // Check supply limits
+    if (itemType.maxSupply) {
+      const currentSupply = await getCurrentSupply(itemData.type, itemData.rarity)
+      if (currentSupply >= itemType.maxSupply) {
+        throw new Error('Maximum supply reached for this item')
+      }
+    }
+
+    // Generate item attributes based on type and rarity
+    const attributes = generateItemAttributes(itemData)
+
+    // Create NFT metadata
+    const metadata = {
+      name: \`\${itemData.name} (\${itemData.rarity})\`,
+      description: itemData.description,
+      image: itemData.imageUrl,
+      external_url: \`https://game.example.com/items/\${itemData.id}\`,
+      attributes: [
+        { trait_type: "Type", value: itemData.type },
+        { trait_type: "Rarity", value: itemData.rarity },
+        { trait_type: "Level", value: attributes.level },
+        { trait_type: "Power", value: attributes.power },
+        { trait_type: "Durability", value: attributes.durability },
+        { trait_type: "Creator", value: itemData.creator || "Game System" },
+        { trait_type: "Game ID", value: process.env.GAME_ID },
+        { trait_type: "Tradeable", value: itemType.tradeable }
+      ],
+      properties: {
+        category: itemType.category,
+        files: [
+          {
+            uri: itemData.imageUrl,
+            type: "image/png"
+          }
+        ]
+      }
+    }
+
+    // Upload metadata to Arweave via Bundlr
+    const { uri: metadataUri } = await metaplex.nfts().uploadMetadata(metadata)
+
+    // Mint NFT with royalty information
+    const { nft } = await metaplex.nfts().create({
+      uri: metadataUri,
+      name: metadata.name,
+      sellerFeeBasisPoints: (itemData.creatorRoyalty || 5) * 100, // Convert to basis points
+      creators: [
+        {
+          address: new PublicKey(itemData.creator || marketplace.gameDevWallet),
+          verified: true,
+          share: 70 // 70% to item creator
+        },
+        {
+          address: marketplace.gameDevWallet,
+          verified: false,
+          share: 30 // 30% to game developer
+        }
+      ],
+      collection: {
+        address: marketplace.gameCollectionMint,
+        verified: false
+      }
+    })
+
+    // Transfer NFT to player wallet
+    await metaplex.nfts().transfer({
+      nftOrSft: nft,
+      toOwner: new PublicKey(playerWallet)
+    })
+
+    // Record item in game database
+    await recordItemMint({
+      nftMint: nft.address.toString(),
+      itemId: itemData.id,
+      owner: playerWallet,
+      type: itemData.type,
+      rarity: itemData.rarity,
+      attributes: attributes,
+      metadataUri: metadataUri,
+      mintTime: new Date()
+    })
+
+    return {
+      success: true,
+      nftMint: nft.address.toString(),
+      metadataUri: metadataUri,
+      attributes: attributes
+    }
+
+  } catch (error) {
+    console.error('NFT minting failed:', error)
+    throw new Error(\`Failed to mint item: \${error.message}\`)
+  }
+}
+
+function generateItemAttributes(itemData) {
+  const rarityMultipliers = {
+    common: 1.0,
+    uncommon: 1.2,
+    rare: 1.5,
+    epic: 2.0,
+    legendary: 3.0,
+    mythic: 5.0
+  }
+
+  const multiplier = rarityMultipliers[itemData.rarity] || 1.0
+  const baseLevel = Math.floor(Math.random() * 10) + 1
+
+  return {
+    level: Math.floor(baseLevel * multiplier),
+    power: Math.floor((Math.random() * 100 + 50) * multiplier),
+    durability: Math.floor((Math.random() * 100 + 80) * multiplier),
+    speed: Math.floor((Math.random() * 50 + 25) * multiplier),
+    defense: Math.floor((Math.random() * 75 + 40) * multiplier)
+  }
+}`,
+          language: "JavaScript",
+          notes: [
+            "Use Metaplex SDK for standardized NFT operations",
+            "Include comprehensive metadata with game-specific attributes",
+            "Implement proper royalty distribution between creators and developers",
+            "Validate item types and supply limits before minting"
+          ]
+        },
+        {
+          title: "Create Marketplace Listings",
+          description: "Allow players to list their NFTs for sale with various pricing options.",
+          code: `async function createMarketplaceListing(ownerWallet, nftMint, listingData) {
+  try {
+    // Verify NFT ownership
+    const nft = await metaplex.nfts().findByMint({ mintAddress: new PublicKey(nftMint) })
+    const ownerTokenAccount = await metaplex.tokens().findTokenWithMintByOwner({
+      mint: new PublicKey(nftMint),
+      owner: new PublicKey(ownerWallet)
+    })
+
+    if (!ownerTokenAccount || ownerTokenAccount.amount.basisPoints.toNumber() === 0) {
+      throw new Error('NFT ownership verification failed')
+    }
+
+    // Validate listing parameters
+    if (listingData.price < marketplace.listingSettings.minimumPrice) {
+      throw new Error(\`Minimum listing price is \${marketplace.listingSettings.minimumPrice} USDC\`)
+    }
+
+    if (listingData.duration > marketplace.listingSettings.maximumDuration) {
+      throw new Error('Listing duration exceeds maximum allowed')
+    }
+
+    // Check if item is tradeable
+    const itemMetadata = await getItemMetadata(nftMint)
+    if (!itemMetadata.tradeable) {
+      throw new Error('This item type is not tradeable')
+    }
+
+    // Create escrow account for the NFT
+    const escrowAccount = await marketplace.createEscrow({
+      nftMint: nftMint,
+      seller: ownerWallet,
+      price: listingData.price,
+      duration: listingData.duration,
+      listingType: listingData.type // 'direct-sale' or 'auction'
+    })
+
+    // Transfer NFT to escrow
+    await metaplex.nfts().transfer({
+      nftOrSft: nft,
+      fromOwner: new PublicKey(ownerWallet),
+      toOwner: escrowAccount.address
+    })
+
+    // Create marketplace listing
+    const listing = await marketplace.createListing({
+      id: generateListingId(),
+      nftMint: nftMint,
+      seller: ownerWallet,
+      price: listingData.price,
+      startTime: new Date(),
+      endTime: new Date(Date.now() + listingData.duration * 1000),
+      listingType: listingData.type,
+      escrowAccount: escrowAccount.address,
+      status: 'active',
+      metadata: {
+        title: listingData.title || nft.name,
+        description: listingData.description,
+        category: itemMetadata.category,
+        rarity: itemMetadata.rarity,
+        attributes: itemMetadata.attributes
+      }
+    })
+
+    // Index listing for search and filtering
+    await indexListing(listing)
+
+    // Notify followers and interested buyers
+    await notifyPotentialBuyers(listing)
+
+    // Update seller's listing count
+    await updateSellerStats(ownerWallet, 'listings_created')
+
+    return {
+      success: true,
+      listingId: listing.id,
+      escrowAccount: escrowAccount.address,
+      endTime: listing.endTime
+    }
+
+  } catch (error) {
+    console.error('Listing creation failed:', error)
+    throw new Error(\`Failed to create listing: \${error.message}\`)
+  }
+}
+
+// Handle auction-specific logic
+async function createAuctionListing(ownerWallet, nftMint, auctionData) {
+  const baseListingData = {
+    price: auctionData.startingBid,
+    duration: auctionData.duration,
+    type: 'auction',
+    title: auctionData.title,
+    description: auctionData.description
+  }
+
+  const listing = await createMarketplaceListing(ownerWallet, nftMint, baseListingData)
+
+  // Add auction-specific data
+  await marketplace.addAuctionData(listing.listingId, {
+    startingBid: auctionData.startingBid,
+    reservePrice: auctionData.reservePrice,
+    bidIncrement: auctionData.bidIncrement || (auctionData.startingBid * 0.05),
+    autoExtend: auctionData.autoExtend || true,
+    extensionTime: auctionData.extensionTime || 300, // 5 minutes
+    currentBid: auctionData.startingBid,
+    bidders: [],
+    bidsCount: 0
+  })
+
+  return listing
+}
+
+function generateListingId() {
+  return 'listing_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+}`,
+          language: "JavaScript",
+          notes: [
+            "Verify NFT ownership before allowing listings",
+            "Use escrow accounts to secure NFTs during sale period",
+            "Support both direct sales and auction formats",
+            "Index listings for efficient search and discovery"
+          ]
+        },
+        {
+          title: "Handle Purchases and Transfers",
+          description: "Process NFT purchases with automatic royalty distribution and ownership transfer.",
+          code: `async function purchaseNFT(buyerWallet, listingId) {
+  try {
+    const listing = await marketplace.getListing(listingId)
+    if (!listing || listing.status !== 'active') {
+      throw new Error('Listing not available')
+    }
+
+    if (listing.listingType === 'auction') {
+      throw new Error('Use placeBid function for auction items')
+    }
+
+    if (listing.endTime && new Date() > listing.endTime) {
+      throw new Error('Listing has expired')
+    }
+
+    // Calculate total payment including fees and royalties
+    const paymentBreakdown = calculatePaymentBreakdown(listing)
+
+    // Create purchase payment
+    const purchasePayment = SVMPay.createPayment({
+      recipient: marketplace.escrowWallet,
+      amount: paymentBreakdown.totalAmount,
+      token: 'USDC',
+      metadata: {
+        listingId: listingId,
+        buyerId: buyerWallet,
+        nftMint: listing.nftMint,
+        paymentType: 'nft-purchase',
+        breakdown: paymentBreakdown
+      }
+    })
+
+    // Execute payment
+    const paymentResult = await purchasePayment.execute()
+
+    if (paymentResult.status === 'SUCCESS') {
+      // Process the NFT transfer and payment distribution
+      await processNFTPurchase(listing, buyerWallet, paymentResult, paymentBreakdown)
+
+      return {
+        success: true,
+        transactionId: paymentResult.transactionId,
+        nftMint: listing.nftMint,
+        totalPaid: paymentBreakdown.totalAmount
+      }
+    }
+
+  } catch (error) {
+    console.error('NFT purchase failed:', error)
+    throw new Error(\`Purchase failed: \${error.message}\`)
+  }
+}
+
+async function processNFTPurchase(listing, buyerWallet, paymentResult, paymentBreakdown) {
+  try {
+    // 1. Transfer NFT from escrow to buyer
+    const nft = await metaplex.nfts().findByMint({ 
+      mintAddress: new PublicKey(listing.nftMint) 
+    })
+
+    await metaplex.nfts().transfer({
+      nftOrSft: nft,
+      fromOwner: new PublicKey(listing.escrowAccount),
+      toOwner: new PublicKey(buyerWallet)
+    })
+
+    // 2. Distribute payments to all parties
+    await distributeNFTSalePayments(listing, paymentBreakdown)
+
+    // 3. Update listing status
+    await marketplace.updateListingStatus(listing.id, 'sold')
+
+    // 4. Record transaction in database
+    await recordNFTSale({
+      listingId: listing.id,
+      nftMint: listing.nftMint,
+      seller: listing.seller,
+      buyer: buyerWallet,
+      salePrice: listing.price,
+      totalPaid: paymentBreakdown.totalAmount,
+      paymentId: paymentResult.id,
+      saleTime: new Date(),
+      breakdown: paymentBreakdown
+    })
+
+    // 5. Update player inventories
+    await updatePlayerInventory(listing.seller, 'removed', listing.nftMint)
+    await updatePlayerInventory(buyerWallet, 'added', listing.nftMint)
+
+    // 6. Send notifications
+    await sendSaleNotifications(listing, buyerWallet, paymentBreakdown.totalAmount)
+
+    // 7. Update marketplace statistics
+    await updateMarketplaceStats({
+      volumeIncrease: paymentBreakdown.totalAmount,
+      salesCount: 1,
+      activeListingsChange: -1
+    })
+
+  } catch (error) {
+    console.error('Purchase processing failed:', error)
+    // Initiate refund process
+    await initiateRefund(buyerWallet, paymentBreakdown.totalAmount, paymentResult.id)
+    throw error
+  }
+}
+
+function calculatePaymentBreakdown(listing) {
+  const basePrice = listing.price
+  const platformFee = basePrice * (marketplace.royaltySettings.platformFee / 100)
+  const gameDevRoyalty = basePrice * (marketplace.royaltySettings.gameDevRoyalty / 100)
+  
+  // Get creator royalty from NFT metadata
+  const creatorRoyalty = basePrice * (listing.creatorRoyaltyPercent / 100)
+  
+  const sellerRevenue = basePrice - platformFee - gameDevRoyalty - creatorRoyalty
+  const totalAmount = basePrice + platformFee // Buyer pays platform fee
+
+  return {
+    basePrice,
+    platformFee,
+    gameDevRoyalty,
+    creatorRoyalty,
+    sellerRevenue,
+    totalAmount,
+    breakdown: {
+      seller: sellerRevenue,
+      platform: platformFee,
+      gameDev: gameDevRoyalty,
+      creator: creatorRoyalty
+    }
+  }
+}
+
+async function distributeNFTSalePayments(listing, paymentBreakdown) {
+  const payments = []
+
+  // Payment to seller
+  if (paymentBreakdown.sellerRevenue > 0) {
+    payments.push(SVMPay.createPayment({
+      recipient: listing.seller,
+      amount: paymentBreakdown.sellerRevenue,
+      token: 'USDC',
+      metadata: { type: 'seller-revenue', listingId: listing.id }
+    }))
+  }
+
+  // Payment to game developer
+  if (paymentBreakdown.gameDevRoyalty > 0) {
+    payments.push(SVMPay.createPayment({
+      recipient: marketplace.gameDevWallet,
+      amount: paymentBreakdown.gameDevRoyalty,
+      token: 'USDC',
+      metadata: { type: 'game-dev-royalty', listingId: listing.id }
+    }))
+  }
+
+  // Payment to item creator
+  if (paymentBreakdown.creatorRoyalty > 0) {
+    payments.push(SVMPay.createPayment({
+      recipient: listing.creatorWallet,
+      amount: paymentBreakdown.creatorRoyalty,
+      token: 'USDC',
+      metadata: { type: 'creator-royalty', listingId: listing.id }
+    }))
+  }
+
+  // Platform fee stays in marketplace wallet
+
+  // Execute all payments
+  const results = await Promise.all(payments.map(payment => payment.execute()))
+  return results
+}`,
+          language: "JavaScript",
+          notes: [
+            "Implement comprehensive payment breakdown including all fees",
+            "Transfer NFTs securely from escrow to buyers",
+            "Distribute payments automatically to all stakeholders",
+            "Handle refunds if transfers fail after payment"
+          ]
+        },
+        {
+          title: "Implement Auction System",
+          description: "Build auction functionality with automatic bidding and winner determination.",
+          code: `async function placeBid(bidderWallet, listingId, bidAmount) {
+  try {
+    const listing = await marketplace.getListing(listingId)
+    const auction = await marketplace.getAuctionData(listingId)
+
+    if (!listing || listing.listingType !== 'auction') {
+      throw new Error('Item is not available for auction')
+    }
+
+    if (listing.status !== 'active') {
+      throw new Error('Auction is not active')
+    }
+
+    if (new Date() > listing.endTime) {
+      throw new Error('Auction has ended')
+    }
+
+    // Validate bid amount
+    if (bidAmount < auction.currentBid + auction.bidIncrement) {
+      throw new Error(\`Minimum bid is \${auction.currentBid + auction.bidIncrement} USDC\`)
+    }
+
+    if (auction.reservePrice && bidAmount < auction.reservePrice) {
+      throw new Error(\`Bid must be at least \${auction.reservePrice} USDC (reserve price)\`)
+    }
+
+    // Create bid escrow
+    const bidEscrow = await marketplace.createBidEscrow({
+      listingId: listingId,
+      bidder: bidderWallet,
+      amount: bidAmount
+    })
+
+    // Process bid payment to escrow
+    const bidPayment = SVMPay.createPayment({
+      recipient: bidEscrow.address,
+      amount: bidAmount,
+      token: 'USDC',
+      metadata: {
+        listingId: listingId,
+        bidder: bidderWallet,
+        bidAmount: bidAmount,
+        paymentType: 'auction-bid'
+      }
+    })
+
+    const paymentResult = await bidPayment.execute()
+
+    if (paymentResult.status === 'SUCCESS') {
+      // Refund previous highest bidder
+      if (auction.currentBidder && auction.currentBidder !== bidderWallet) {
+        await refundPreviousBidder(auction.currentBidder, auction.currentBid)
+      }
+
+      // Update auction data
+      await marketplace.updateAuctionData(listingId, {
+        currentBid: bidAmount,
+        currentBidder: bidderWallet,
+        bidsCount: auction.bidsCount + 1,
+        bidders: [...auction.bidders, {
+          wallet: bidderWallet,
+          amount: bidAmount,
+          timestamp: new Date()
+        }],
+        lastBidTime: new Date()
+      })
+
+      // Extend auction if bid placed near end time
+      if (auction.autoExtend) {
+        const timeRemaining = listing.endTime.getTime() - Date.now()
+        if (timeRemaining < auction.extensionTime * 1000) {
+          const newEndTime = new Date(Date.now() + auction.extensionTime * 1000)
+          await marketplace.updateListingEndTime(listingId, newEndTime)
+        }
+      }
+
+      // Notify other bidders and watchers
+      await notifyBidPlaced(listing, bidderWallet, bidAmount)
+
+      // Check if reserve price is met
+      if (auction.reservePrice && bidAmount >= auction.reservePrice && !auction.reserveMet) {
+        await marketplace.updateAuctionData(listingId, { reserveMet: true })
+        await notifyReserveMet(listing)
+      }
+
+      return {
+        success: true,
+        bidAmount: bidAmount,
+        newEndTime: listing.endTime,
+        isHighestBidder: true
+      }
+    }
+
+  } catch (error) {
+    console.error('Bid placement failed:', error)
+    throw new Error(\`Failed to place bid: \${error.message}\`)
+  }
+}
+
+async function finalizeAuction(listingId) {
+  try {
+    const listing = await marketplace.getListing(listingId)
+    const auction = await marketplace.getAuctionData(listingId)
+
+    if (new Date() < listing.endTime) {
+      throw new Error('Auction has not ended yet')
+    }
+
+    if (listing.status !== 'active') {
+      throw new Error('Auction has already been finalized')
+    }
+
+    // Check if reserve price was met
+    if (auction.reservePrice && !auction.reserveMet) {
+      // Reserve not met - return NFT to seller and refund highest bidder
+      await returnNFTToSeller(listing)
+      if (auction.currentBidder) {
+        await refundBidder(auction.currentBidder, auction.currentBid)
+      }
+      
+      await marketplace.updateListingStatus(listingId, 'reserve-not-met')
+      
+      return {
+        success: true,
+        result: 'reserve-not-met',
+        nftReturned: true
+      }
+    }
+
+    if (!auction.currentBidder || auction.currentBid === 0) {
+      // No bids - return NFT to seller
+      await returnNFTToSeller(listing)
+      await marketplace.updateListingStatus(listingId, 'no-bids')
+      
+      return {
+        success: true,
+        result: 'no-bids',
+        nftReturned: true
+      }
+    }
+
+    // Auction successful - process sale
+    const paymentBreakdown = calculatePaymentBreakdown({
+      ...listing,
+      price: auction.currentBid
+    })
+
+    await processNFTPurchase(listing, auction.currentBidder, {
+      id: \`auction-\${listingId}\`,
+      transactionId: \`auction-\${listingId}-\${Date.now()}\`
+    }, paymentBreakdown)
+
+    // Update listing status
+    await marketplace.updateListingStatus(listingId, 'sold')
+
+    // Notify winner and seller
+    await notifyAuctionComplete(listing, auction.currentBidder, auction.currentBid)
+
+    return {
+      success: true,
+      result: 'sold',
+      winner: auction.currentBidder,
+      finalPrice: auction.currentBid
+    }
+
+  } catch (error) {
+    console.error('Auction finalization failed:', error)
+    throw new Error(\`Failed to finalize auction: \${error.message}\`)
+  }
+}
+
+// Background job to automatically finalize expired auctions
+async function processExpiredAuctions() {
+  const expiredAuctions = await marketplace.getExpiredAuctions()
+  
+  for (const auction of expiredAuctions) {
+    try {
+      await finalizeAuction(auction.listingId)
+      console.log(\`Finalized auction \${auction.listingId}\`)
+    } catch (error) {
+      console.error(\`Failed to finalize auction \${auction.listingId}:\`, error)
+      // Queue for manual review
+      await queueForManualReview(auction.listingId)
+    }
+  }
+}
+
+// Run every 5 minutes
+setInterval(processExpiredAuctions, 5 * 60 * 1000)`,
+          language: "JavaScript",
+          notes: [
+            "Implement automatic bid validation and escrow management",
+            "Handle auction extensions when bids are placed near end time",
+            "Process reserve prices and handle unsuccessful auctions",
+            "Automate auction finalization with background jobs"
+          ]
+        },
+        {
+          title: "Build Marketplace Search and Analytics",
+          description: "Create search functionality and analytics dashboard for marketplace insights.",
+          code: `import React, { useState, useEffect } from 'react'
+import { Search, Filter, TrendingUp, DollarSign } from 'lucide-react'
+
+export function NFTMarketplaceInterface() {
+  const [listings, setListings] = useState([])
+  const [filters, setFilters] = useState({
+    category: 'all',
+    rarity: 'all',
+    priceRange: { min: 0, max: 1000 },
+    listingType: 'all',
+    sortBy: 'newest'
+  })
+  const [searchQuery, setSearchQuery] = useState('')
+  const [marketStats, setMarketStats] = useState(null)
+
+  useEffect(() => {
+    loadMarketplaceData()
+  }, [filters, searchQuery])
+
+  const loadMarketplaceData = async () => {
+    try {
+      const [listingsData, statsData] = await Promise.all([
+        searchListings(searchQuery, filters),
+        getMarketplaceStats()
+      ])
+      
+      setListings(listingsData)
+      setMarketStats(statsData)
+    } catch (error) {
+      console.error('Failed to load marketplace data:', error)
+    }
+  }
+
+  const handlePurchase = async (listingId) => {
+    try {
+      const result = await purchaseNFT(userWallet, listingId)
+      if (result.success) {
+        // Refresh listings and show success message
+        await loadMarketplaceData()
+        showSuccessMessage('NFT purchased successfully!')
+      }
+    } catch (error) {
+      showErrorMessage(error.message)
+    }
+  }
+
+  const handleBid = async (listingId, bidAmount) => {
+    try {
+      const result = await placeBid(userWallet, listingId, bidAmount)
+      if (result.success) {
+        await loadMarketplaceData()
+        showSuccessMessage(\`Bid of \${bidAmount} USDC placed successfully!\`)
+      }
+    } catch (error) {
+      showErrorMessage(error.message)
+    }
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto p-6">
+      {/* Market Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="bg-white p-6 rounded-lg border">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-500">24h Volume</p>
+              <p className="text-2xl font-bold text-gray-900">
+                \${marketStats?.volume24h?.toLocaleString() || '0'}
+              </p>
+            </div>
+            <DollarSign className="w-8 h-8 text-green-500" />
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg border">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-500">Active Listings</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {marketStats?.activeListings?.toLocaleString() || '0'}
+              </p>
+            </div>
+            <TrendingUp className="w-8 h-8 text-blue-500" />
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg border">
+          <div>
+            <p className="text-sm font-medium text-gray-500">Floor Price</p>
+            <p className="text-2xl font-bold text-gray-900">
+              \${marketStats?.floorPrice || '0'}
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg border">
+          <div>
+            <p className="text-sm font-medium text-gray-500">Total Sales</p>
+            <p className="text-2xl font-bold text-gray-900">
+              {marketStats?.totalSales?.toLocaleString() || '0'}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Search and Filters */}
+      <div className="bg-white rounded-lg border p-6 mb-8">
+        <div className="flex flex-col lg:flex-row gap-4">
+          {/* Search Bar */}
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search items by name, type, or creator..."
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          {/* Filters */}
+          <div className="flex gap-4">
+            <select
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              value={filters.category}
+              onChange={(e) => setFilters({...filters, category: e.target.value})}
+            >
+              <option value="all">All Categories</option>
+              <option value="weapon">Weapons</option>
+              <option value="armor">Armor</option>
+              <option value="cosmetic">Cosmetics</option>
+            </select>
+
+            <select
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              value={filters.rarity}
+              onChange={(e) => setFilters({...filters, rarity: e.target.value})}
+            >
+              <option value="all">All Rarities</option>
+              <option value="common">Common</option>
+              <option value="rare">Rare</option>
+              <option value="epic">Epic</option>
+              <option value="legendary">Legendary</option>
+            </select>
+
+            <select
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              value={filters.listingType}
+              onChange={(e) => setFilters({...filters, listingType: e.target.value})}
+            >
+              <option value="all">All Types</option>
+              <option value="direct-sale">Buy Now</option>
+              <option value="auction">Auctions</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* NFT Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {listings.map((listing) => (
+          <NFTCard
+            key={listing.id}
+            listing={listing}
+            onPurchase={() => handlePurchase(listing.id)}
+            onBid={(amount) => handleBid(listing.id, amount)}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function NFTCard({ listing, onPurchase, onBid }) {
+  const [bidAmount, setBidAmount] = useState('')
+  const isAuction = listing.listingType === 'auction'
+  const timeRemaining = new Date(listing.endTime) - new Date()
+  const isExpired = timeRemaining <= 0
+
+  return (
+    <div className="bg-white rounded-lg border overflow-hidden">
+      <img
+        src={listing.metadata.imageUrl}
+        alt={listing.metadata.title}
+        className="w-full h-48 object-cover"
+      />
+      
+      <div className="p-4">
+        <h3 className="font-semibold text-lg mb-2">{listing.metadata.title}</h3>
+        
+        <div className="flex justify-between items-center mb-2">
+          <span className={\`px-2 py-1 rounded text-xs font-medium \${
+            listing.metadata.rarity === 'legendary' ? 'bg-yellow-100 text-yellow-800' :
+            listing.metadata.rarity === 'epic' ? 'bg-purple-100 text-purple-800' :
+            listing.metadata.rarity === 'rare' ? 'bg-blue-100 text-blue-800' :
+            'bg-gray-100 text-gray-800'
+          }\`}>
+            {listing.metadata.rarity}
+          </span>
+          <span className="text-sm text-gray-500">{listing.metadata.category}</span>
+        </div>
+
+        {isAuction ? (
+          <div className="space-y-3">
+            <div>
+              <p className="text-sm text-gray-500">Current Bid</p>
+              <p className="text-xl font-bold">\${listing.auction.currentBid} USDC</p>
+            </div>
+            
+            {!isExpired && (
+              <div>
+                <input
+                  type="number"
+                  placeholder="Enter bid amount"
+                  className="w-full px-3 py-2 border border-gray-300 rounded mb-2"
+                  value={bidAmount}
+                  onChange={(e) => setBidAmount(e.target.value)}
+                />
+                <button
+                  onClick={() => onBid(parseFloat(bidAmount))}
+                  className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+                  disabled={!bidAmount || parseFloat(bidAmount) < listing.auction.currentBid + listing.auction.bidIncrement}
+                >
+                  Place Bid
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <div>
+              <p className="text-sm text-gray-500">Price</p>
+              <p className="text-xl font-bold">\${listing.price} USDC</p>
+            </div>
+            
+            <button
+              onClick={onPurchase}
+              className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
+            >
+              Buy Now
+            </button>
+          </div>
+        )}
+
+        {isAuction && timeRemaining > 0 && (
+          <p className="text-xs text-gray-500 mt-2">
+            Ends in: {formatTimeRemaining(timeRemaining)}
+          </p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+async function searchListings(query, filters) {
+  const searchParams = {
+    query: query,
+    category: filters.category !== 'all' ? filters.category : null,
+    rarity: filters.rarity !== 'all' ? filters.rarity : null,
+    listingType: filters.listingType !== 'all' ? filters.listingType : null,
+    minPrice: filters.priceRange.min,
+    maxPrice: filters.priceRange.max,
+    sortBy: filters.sortBy,
+    status: 'active'
+  }
+
+  const response = await fetch('/api/marketplace/search', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(searchParams)
+  })
+
+  return response.json()
+}
+
+async function getMarketplaceStats() {
+  const response = await fetch('/api/marketplace/stats')
+  return response.json()
+}`,
+          language: "React Component",
+          notes: [
+            "Implement comprehensive search with multiple filter options",
+            "Display real-time market statistics and trends",
+            "Support both direct sales and auction interfaces",
+            "Include proper bid validation and time remaining displays"
+          ]
         }
       ]}
       conclusion="You've created a comprehensive NFT marketplace for game items! Players can now trade their valuable in-game assets as NFTs with proper royalty distribution and secure transfer mechanisms."
