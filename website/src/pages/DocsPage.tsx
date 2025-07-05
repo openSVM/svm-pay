@@ -23,6 +23,20 @@ import {
   MobileTutorials 
 } from '../components/AdvancedTutorialSections'
 
+// Import individual tutorial components
+import { 
+  OnlineStoreIntegrationTutorial, 
+  MarketplaceEscrowTutorial 
+} from './tutorials/EcommerceTutorials'
+import { 
+  InGameCurrencyTutorial, 
+  NFTMarketplaceTutorial 
+} from './tutorials/GamingTutorials'
+import { 
+  SaaSSubscriptionBillingTutorial, 
+  FreelancePaymentEscrowTutorial 
+} from './tutorials/SaaSTutorials'
+
 // Documentation sections
 const sections = [
   {
@@ -34,16 +48,43 @@ const sections = [
     ]
   },
   {
-    title: 'Tutorials',
+    title: 'E-commerce Tutorials',
     items: [
-      { name: 'E-commerce Tutorials', href: '/docs/tutorials/ecommerce', icon: Book },
-      { name: 'Gaming & NFT Tutorials', href: '/docs/tutorials/gaming', icon: Book },
-      { name: 'DeFi Integration Tutorials', href: '/docs/tutorials/defi', icon: Book },
-      { name: 'SaaS & Service Tutorials', href: '/docs/tutorials/saas', icon: Book },
-      { name: 'Creator & Social Tutorials', href: '/docs/tutorials/social', icon: Book },
-      { name: 'Enterprise Tutorials', href: '/docs/tutorials/enterprise', icon: Book },
-      { name: 'Cross-Chain Tutorials', href: '/docs/tutorials/cross-chain', icon: Book },
-      { name: 'Mobile & IoT Tutorials', href: '/docs/tutorials/mobile', icon: Book },
+      { name: 'Online Store Integration', href: '/docs/tutorials/ecommerce/online-store', icon: Book },
+      { name: 'Marketplace with Escrow', href: '/docs/tutorials/ecommerce/marketplace-escrow', icon: Book },
+      { name: 'Subscription Box Service', href: '/docs/tutorials/ecommerce/subscription-box', icon: Book },
+      { name: 'Digital Product Store', href: '/docs/tutorials/ecommerce/digital-products', icon: Book },
+      { name: 'Flash Sale Management', href: '/docs/tutorials/ecommerce/flash-sales', icon: Book },
+    ]
+  },
+  {
+    title: 'Gaming & NFT Tutorials',
+    items: [
+      { name: 'In-Game Currency Exchange', href: '/docs/tutorials/gaming/currency-exchange', icon: Book },
+      { name: 'NFT Marketplace for Games', href: '/docs/tutorials/gaming/nft-marketplace', icon: Book },
+      { name: 'Tournament Prize Distribution', href: '/docs/tutorials/gaming/tournament-prizes', icon: Book },
+      { name: 'Play-to-Earn Rewards', href: '/docs/tutorials/gaming/play-to-earn', icon: Book },
+      { name: 'Game Asset Rental System', href: '/docs/tutorials/gaming/asset-rental', icon: Book },
+    ]
+  },
+  {
+    title: 'SaaS & Service Tutorials',
+    items: [
+      { name: 'SaaS Subscription Billing', href: '/docs/tutorials/saas/subscription-billing', icon: Book },
+      { name: 'Freelance Payment Escrow', href: '/docs/tutorials/saas/freelance-escrow', icon: Book },
+      { name: 'Consulting Time Tracking', href: '/docs/tutorials/saas/time-tracking', icon: Book },
+      { name: 'API Usage Billing', href: '/docs/tutorials/saas/api-billing', icon: Book },
+      { name: 'Software License Management', href: '/docs/tutorials/saas/license-management', icon: Book },
+    ]
+  },
+  {
+    title: 'DeFi & Finance Tutorials',
+    items: [
+      { name: 'Yield Farming Rewards', href: '/docs/tutorials/defi/yield-farming', icon: Book },
+      { name: 'Cross-Chain Arbitrage Bot', href: '/docs/tutorials/defi/arbitrage-bot', icon: Book },
+      { name: 'Lending Protocol Integration', href: '/docs/tutorials/defi/lending-protocol', icon: Book },
+      { name: 'DEX Trading Fee Distribution', href: '/docs/tutorials/defi/dex-fees', icon: Book },
+      { name: 'Automated Market Maker', href: '/docs/tutorials/defi/amm', icon: Book },
     ]
   },
   {
@@ -178,14 +219,29 @@ export function DocsPage() {
           <Route path="/developer-guide" element={<DeveloperGuideDoc />} />
           <Route path="/api" element={<ApiDoc />} />
           <Route path="/cli" element={<CliDoc />} />
+          
+          {/* E-commerce Tutorials */}
           <Route path="/tutorials/ecommerce" element={<EcommerceTutorials />} />
+          <Route path="/tutorials/ecommerce/online-store" element={<OnlineStoreIntegrationTutorial />} />
+          <Route path="/tutorials/ecommerce/marketplace-escrow" element={<MarketplaceEscrowTutorial />} />
+          
+          {/* Gaming Tutorials */}
           <Route path="/tutorials/gaming" element={<GamingTutorials />} />
-          <Route path="/tutorials/defi" element={<DeFiTutorials />} />
+          <Route path="/tutorials/gaming/currency-exchange" element={<InGameCurrencyTutorial />} />
+          <Route path="/tutorials/gaming/nft-marketplace" element={<NFTMarketplaceTutorial />} />
+          
+          {/* SaaS Tutorials */}
           <Route path="/tutorials/saas" element={<SaaSTutorials />} />
+          <Route path="/tutorials/saas/subscription-billing" element={<SaaSSubscriptionBillingTutorial />} />
+          <Route path="/tutorials/saas/freelance-escrow" element={<FreelancePaymentEscrowTutorial />} />
+          
+          {/* Other category pages */}
+          <Route path="/tutorials/defi" element={<DeFiTutorials />} />
           <Route path="/tutorials/social" element={<SocialTutorials />} />
           <Route path="/tutorials/enterprise" element={<EnterpriseTutorials />} />
           <Route path="/tutorials/cross-chain" element={<CrossChainTutorials />} />
           <Route path="/tutorials/mobile" element={<MobileTutorials />} />
+          
           <Route path="/cross-chain" element={<CrossChainDoc />} />
           <Route path="/architecture" element={<ArchitectureDoc />} />
           <Route path="/security" element={<SecurityDoc />} />
