@@ -27,41 +27,71 @@ export default async function IndexPage({
            }}>
       </div>
 
-      {/* Hero Section - Fullscreen */}
+      {/* Hero Section - Developer Focused */}
       <section className="relative min-h-screen flex items-center justify-center px-6 sm:px-8">
         <div className="w-full max-w-none">
           <div className="text-center max-w-6xl mx-auto px-4">
-            {/* Premium status badge */}
+            {/* Developer-focused badge */}
             <div className="inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white/80 px-6 py-3 text-sm font-medium text-slate-700 mb-12 backdrop-blur-md shadow-lg shadow-slate-900/5">
-              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-              Enterprise-grade payment infrastructure
-              <div className="text-emerald-600 text-xs bg-emerald-50 px-2 py-1 rounded-md font-semibold">LIVE</div>
+              <Icons.Code className="w-4 h-4 text-emerald-500" />
+              Developer-first payment infrastructure
+              <div className="text-emerald-600 text-xs bg-emerald-50 px-2 py-1 rounded-md font-semibold">v1.1.0</div>
             </div>
             
-            {/* Premium heading with sophisticated typography */}
-            <h1 className="text-5xl sm:text-7xl lg:text-8xl xl:text-9xl font-black tracking-[-0.04em] text-slate-900 leading-[0.9] mb-8">
-              The future of
+            {/* Developer-focused heading */}
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-[-0.04em] text-slate-900 leading-[0.9] mb-8">
+              Build cross-chain payments
               <br />
-              <span className="bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">
-                SVM payments
+              <span className="bg-gradient-to-r from-purple-600 via-blue-600 to-emerald-600 bg-clip-text text-transparent">
+                in minutes, not months
               </span>
             </h1>
             
-            {/* Premium subheading */}
+            {/* Developer-focused subheading */}
             <p className="text-xl sm:text-2xl text-slate-600 max-w-4xl mx-auto leading-relaxed mb-16 font-light">
-              Bank-grade payment infrastructure for the next generation of decentralized applications. 
-              Accept payments across all SVM networks with enterprise reliability and zero additional fees.
+              Accept payments from Ethereum, BNB Chain, Polygon → Solana, Sonic, Eclipse, s00n. 
+              One SDK, all SVM networks, zero platform fees.
             </p>
             
-            {/* Premium CTA buttons */}
+            {/* Quick start code preview */}
+            <div className="max-w-3xl mx-auto mb-12">
+              <div className="rounded-2xl bg-slate-900 overflow-hidden border border-slate-200 shadow-2xl shadow-slate-900/25">
+                <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-700 bg-slate-800">
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  <span className="ml-4 text-slate-300 font-mono text-sm">quickstart.js</span>
+                </div>
+                <div className="p-6">
+                  <pre className="text-sm text-slate-100 font-mono leading-relaxed overflow-x-auto">
+{`import { CrossChainPaymentManager, EVMNetwork, SVMNetwork } from 'svm-pay';
+
+// Accept payments from Ethereum to Solana
+const paymentManager = new CrossChainPaymentManager();
+
+const payment = await paymentManager.executePayment({
+  sourceNetwork: EVMNetwork.ETHEREUM,
+  destinationNetwork: SVMNetwork.SOLANA,
+  recipient: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
+  amount: '100',
+  token: '0xA0b86a33E6441c4d0C85c81a1a4e18a3f3F3f77f', // USDC
+});
+
+console.log('Payment status:', payment.status);`}
+                  </pre>
+                </div>
+              </div>
+            </div>
+            
+            {/* Developer-focused CTA buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-20">
-              <Link href="https://github.com/openSVM/svm-pay" target="_blank">
+              <Link href="#quickstart">
                 <Button 
                   size="lg"
                   className="h-16 px-12 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-2xl transition-all duration-300 shadow-2xl shadow-slate-900/25 hover:shadow-slate-900/40 hover:scale-105 text-lg"
                 >
-                  Start building today
-                  <Icons.ArrowRight className="ml-3 h-5 w-5" />
+                  <Icons.Rocket className="mr-3 h-5 w-5" />
+                  Get started now
                 </Button>
               </Link>
               
@@ -70,13 +100,13 @@ export default async function IndexPage({
                 target="_blank" 
                 className="inline-flex items-center gap-3 h-16 px-8 text-slate-700 hover:text-slate-900 font-medium transition-all duration-300 text-lg border border-slate-200 rounded-2xl hover:border-slate-300 hover:bg-white/50 backdrop-blur-sm"
               >
-                <Icons.FileText className="h-5 w-5" />
-                View documentation
+                <Icons.Github className="h-5 w-5" />
+                View on GitHub
                 <Icons.ArrowRight className="h-4 w-4" />
               </Link>
             </div>
             
-            {/* Premium install command */}
+            {/* Installation command */}
             <div className="inline-flex items-center gap-4 bg-white/60 border border-slate-200 rounded-2xl px-8 py-5 text-base backdrop-blur-md shadow-xl shadow-slate-900/5">
               <span className="text-slate-500 font-mono">$</span>
               <CodeCopy />
@@ -85,401 +115,536 @@ export default async function IndexPage({
         </div>
       </section>
 
-      {/* Premium Features Section - Fullscreen */}
-      <section className="relative min-h-screen flex items-center justify-center py-32 px-6 sm:px-8 bg-gradient-to-b from-white to-slate-50">
+      {/* Quick Start Section */}
+      <section id="quickstart" className="relative min-h-screen flex items-center justify-center py-32 px-6 sm:px-8 bg-gradient-to-b from-white to-slate-50">
         <div className="w-full max-w-none">
           <div className="text-center mb-24 max-w-4xl mx-auto">
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-[-0.03em] text-slate-900 mb-8">
-              Enterprise-grade architecture
+              Start building in 60 seconds
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed font-light">
-              Built from the ground up with bank-level security, institutional reliability, and developer-first experience that scales from prototype to production.
+              Three simple steps to integrate cross-chain payments. No complex setup, no lengthy onboarding, no hidden complexity.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 max-w-7xl mx-auto px-4">
-            {/* Cross-Network */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto px-4">
+            {/* Step 1: Install */}
             <div className="group">
-              <Card className="p-10 bg-white/60 border border-slate-200 rounded-3xl hover:shadow-2xl hover:shadow-slate-900/10 transition-all duration-500 hover:scale-105 backdrop-blur-sm hover:bg-white/80">
-                <div className="w-16 h-16 bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-slate-900/25 group-hover:scale-110 transition-transform duration-300">
-                  <Icons.Cloud className="h-8 w-8 text-white" />
+              <Card className="p-8 bg-white/60 border border-slate-200 rounded-3xl hover:shadow-2xl hover:shadow-slate-900/10 transition-all duration-500 hover:scale-105 backdrop-blur-sm hover:bg-white/80 h-full">
+                <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/25 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-2xl font-black text-white">1</span>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4">
-                  Universal Network Support
-                </h3>
-                <p className="text-slate-600 leading-relaxed text-lg">
-                  One integration across all SVM networks. Seamlessly accept payments on Solana, Sonic, Eclipse, and s00n with identical APIs and consistent developer experience.
+                <h3 className="text-2xl font-bold text-slate-900 mb-4">Install SDK</h3>
+                <div className="rounded-xl bg-slate-900 p-4 mb-4">
+                  <code className="text-emerald-400 font-mono text-sm">npm install svm-pay</code>
+                </div>
+                <p className="text-slate-600 leading-relaxed">
+                  Install with npm, yarn, or pnpm. Zero configuration required, works with any JavaScript framework.
                 </p>
               </Card>
             </div>
 
-            {/* Developer Experience */}
+            {/* Step 2: Import */}
             <div className="group">
-              <Card className="p-10 bg-white/60 border border-slate-200 rounded-3xl hover:shadow-2xl hover:shadow-slate-900/10 transition-all duration-500 hover:scale-105 backdrop-blur-sm hover:bg-white/80">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-blue-600/25 group-hover:scale-110 transition-transform duration-300">
-                  <Icons.Blocks className="h-8 w-8 text-white" />
+              <Card className="p-8 bg-white/60 border border-slate-200 rounded-3xl hover:shadow-2xl hover:shadow-slate-900/10 transition-all duration-500 hover:scale-105 backdrop-blur-sm hover:bg-white/80 h-full">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-blue-500/25 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-2xl font-black text-white">2</span>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4">
-                  Developer Excellence
-                </h3>
-                <p className="text-slate-600 leading-relaxed text-lg">
-                  TypeScript-first SDK with comprehensive documentation, interactive examples, and 24/7 developer support. Ship faster with our intuitive APIs.
+                <h3 className="text-2xl font-bold text-slate-900 mb-4">Import & Setup</h3>
+                <div className="rounded-xl bg-slate-900 p-4 mb-4">
+                  <code className="text-blue-400 font-mono text-sm">import { SVMPay } from 'svm-pay'</code>
+                </div>
+                <p className="text-slate-600 leading-relaxed">
+                  TypeScript-first with full intellisense. Initialize with your preferred network configuration.
                 </p>
               </Card>
             </div>
 
-            {/* Zero Fees */}
+            {/* Step 3: Accept Payments */}
             <div className="group">
-              <Card className="p-10 bg-white/60 border border-slate-200 rounded-3xl hover:shadow-2xl hover:shadow-slate-900/10 transition-all duration-500 hover:scale-105 backdrop-blur-sm hover:bg-white/80">
-                <div className="w-16 h-16 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-emerald-600/25 group-hover:scale-110 transition-transform duration-300">
-                  <Icons.Rocket className="h-8 w-8 text-white" />
+              <Card className="p-8 bg-white/60 border border-slate-200 rounded-3xl hover:shadow-2xl hover:shadow-slate-900/10 transition-all duration-500 hover:scale-105 backdrop-blur-sm hover:bg-white/80 h-full">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-purple-500/25 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-2xl font-black text-white">3</span>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4">
-                  Zero Platform Fees
-                </h3>
-                <p className="text-slate-600 leading-relaxed text-lg">
-                  Keep 100% of your revenue. No hidden charges, no percentage cuts, no surprise fees. Pay only standard network transaction costs.
-                </p>
-              </Card>
-            </div>
-
-            {/* Security */}
-            <div className="group">
-              <Card className="p-10 bg-white/60 border border-slate-200 rounded-3xl hover:shadow-2xl hover:shadow-slate-900/10 transition-all duration-500 hover:scale-105 backdrop-blur-sm hover:bg-white/80">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-purple-600/25 group-hover:scale-110 transition-transform duration-300">
-                  <Icons.ShieldCheck className="h-8 w-8 text-white" />
+                <h3 className="text-2xl font-bold text-slate-900 mb-4">Accept Payments</h3>
+                <div className="rounded-xl bg-slate-900 p-4 mb-4">
+                  <code className="text-purple-400 font-mono text-sm">svmPay.executePayment(request)</code>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4">
-                  Bank-Grade Security
-                </h3>
-                <p className="text-slate-600 leading-relaxed text-lg">
-                  SOC 2 Type II compliant infrastructure with multi-signature wallets, hardware security modules, and continuous security monitoring.
-                </p>
-              </Card>
-            </div>
-
-            {/* Open Source */}
-            <div className="group">
-              <Card className="p-10 bg-white/60 border border-slate-200 rounded-3xl hover:shadow-2xl hover:shadow-slate-900/10 transition-all duration-500 hover:scale-105 backdrop-blur-sm hover:bg-white/80">
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-600 to-orange-700 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-orange-600/25 group-hover:scale-110 transition-transform duration-300">
-                  <Icons.Heart className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4">
-                  Open Source Foundation
-                </h3>
-                <p className="text-slate-600 leading-relaxed text-lg">
-                  MIT licensed and fully auditable. Contribute to the codebase, customize for your needs, and join a community of world-class developers.
-                </p>
-              </Card>
-            </div>
-
-            {/* Support */}
-            <div className="group">
-              <Card className="p-10 bg-white/60 border border-slate-200 rounded-3xl hover:shadow-2xl hover:shadow-slate-900/10 transition-all duration-500 hover:scale-105 backdrop-blur-sm hover:bg-white/80">
-                <div className="w-16 h-16 bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-indigo-600/25 group-hover:scale-110 transition-transform duration-300">
-                  <Icons.User className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4">
-                  Enterprise Support
-                </h3>
-                <p className="text-slate-600 leading-relaxed text-lg">
-                  Dedicated support team with SLA guarantees, priority response times, and direct access to our engineering team for enterprise customers.
+                <p className="text-slate-600 leading-relaxed">
+                  Start accepting payments across all SVM networks with a single method call.
                 </p>
               </Card>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Premium Code Example Section - Fullscreen */}
-      <section className="relative min-h-screen flex items-center justify-center py-32 px-6 sm:px-8 bg-gradient-to-b from-slate-50 to-white">
-        <div className="w-full max-w-none">
-          <div className="text-center mb-24 max-w-4xl mx-auto">
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-[-0.03em] text-slate-900 mb-8">
-              Ship in minutes, not weeks
-            </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed font-light">
-              Our SDK abstracts away blockchain complexity while maintaining full control. From integration to production in a single afternoon.
-            </p>
-          </div>
+          {/* Framework Integration Examples */}
+          <div className="mt-24 max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <h3 className="text-3xl font-bold text-slate-900 mb-4">
+                Framework Integration Examples
+              </h3>
+              <p className="text-lg text-slate-600">
+                Native components for React, Vue, Angular, and vanilla JavaScript
+              </p>
+            </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-16 max-w-7xl mx-auto px-4">
-            {/* React Integration */}
-            <div className="space-y-8">
-              <div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-3">Frontend Integration</h3>
-                <p className="text-slate-600 text-lg">Drop-in React components with built-in wallet connection and transaction handling</p>
-              </div>
-              <div className="rounded-3xl bg-slate-900 overflow-hidden border border-slate-200 shadow-2xl shadow-slate-900/25">
-                <div className="flex items-center gap-3 px-8 py-6 border-b border-slate-700 bg-slate-800">
-                  <div className="w-4 h-4 rounded-full bg-red-500"></div>
-                  <div className="w-4 h-4 rounded-full bg-yellow-500"></div>
-                  <div className="w-4 h-4 rounded-full bg-green-500"></div>
-                  <span className="ml-4 text-slate-300 font-mono text-sm">Payment.tsx</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* React Example */}
+              <div className="rounded-2xl bg-white/60 border border-slate-200 overflow-hidden backdrop-blur-sm">
+                <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-200 bg-white/80">
+                  <Icons.Code className="w-5 h-5 text-blue-500" />
+                  <span className="font-semibold text-slate-900">React</span>
                 </div>
-                <div className="p-8">
-                  <pre className="text-sm text-slate-100 font-mono leading-loose overflow-x-auto">
-{`import { SvmPayment } from 'svm-pay/react';
+                <div className="p-6">
+                  <pre className="text-sm text-slate-700 font-mono leading-relaxed overflow-x-auto">
+{`import { SVMPayment } from 'svm-pay/react';
 
 export function Checkout() {
   return (
-    <SvmPayment
+    <SVMPayment
       amount={99.99}
       token="USDC"
-      network="solana"
-      recipient="your-wallet-address"
-      onSuccess={(signature) => {
-        // Payment completed successfully
-        console.log('Transaction:', signature);
-        
-        // Redirect to success page
-        router.push('/payment/success');
+      recipient="your-address"
+      onSuccess={(sig) => {
+        console.log('Payment complete:', sig);
       }}
-      onError={(error) => {
-        // Handle payment failure
-        console.error('Payment failed:', error);
-        showNotification('Payment failed');
-      }}
-      className="w-full"
     />
   );
 }`}
                   </pre>
                 </div>
               </div>
-            </div>
-            
-            {/* Server Verification */}
-            <div className="space-y-8">
-              <div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-3">Backend Verification</h3>
-                <p className="text-slate-600 text-lg">Secure server-side payment verification with automatic retry logic</p>
-              </div>
-              <div className="rounded-3xl bg-slate-900 overflow-hidden border border-slate-200 shadow-2xl shadow-slate-900/25">
-                <div className="flex items-center gap-3 px-8 py-6 border-b border-slate-700 bg-slate-800">
-                  <div className="w-4 h-4 rounded-full bg-red-500"></div>
-                  <div className="w-4 h-4 rounded-full bg-yellow-500"></div>
-                  <div className="w-4 h-4 rounded-full bg-green-500"></div>
-                  <span className="ml-4 text-slate-300 font-mono text-sm">verify.ts</span>
-                </div>
-                <div className="p-8">
-                  <pre className="text-sm text-slate-100 font-mono leading-loose overflow-x-auto">
-{`import { verifyPayment } from 'svm-pay/server';
 
-app.post('/api/verify-payment', async (req, res) => {
-  const { signature, orderId } = req.body;
-  
-  try {
-    const verification = await verifyPayment({
-      signature,
-      expectedAmount: orders[orderId].amount,
-      network: 'solana',
-      timeout: 30000, // 30 second timeout
-    });
-    
-    if (verification.isValid) {
-      // Payment confirmed on-chain
-      await fulfillOrder(orderId);
-      
-      res.json({ 
-        success: true,
-        transactionId: verification.signature,
-        blockHeight: verification.blockHeight
-      });
-    }
-  } catch (error) {
-    res.status(400).json({ 
-      success: false, 
-      error: error.message 
-    });
-  }
-});`}
+              {/* Vue Example */}
+              <div className="rounded-2xl bg-white/60 border border-slate-200 overflow-hidden backdrop-blur-sm">
+                <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-200 bg-white/80">
+                  <Icons.Code className="w-5 h-5 text-green-500" />
+                  <span className="font-semibold text-slate-900">Vue</span>
+                </div>
+                <div className="p-6">
+                  <pre className="text-sm text-slate-700 font-mono leading-relaxed overflow-x-auto">
+{`<template>
+  <svm-payment
+    :amount="99.99"
+    token="USDC"
+    recipient="your-address"
+    @success="onPaymentSuccess"
+  />
+</template>
+
+<script setup>
+const onPaymentSuccess = (signature) => {
+  console.log('Payment complete:', signature);
+};
+</script>`}
                   </pre>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Features highlight */}
-          <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="text-center p-8 rounded-2xl bg-white/60 border border-slate-200 backdrop-blur-sm">
-              <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Icons.Zap className="h-6 w-6 text-emerald-600" />
+      {/* Use Cases & Tutorials Section */}
+      <section className="relative min-h-screen flex items-center justify-center py-32 px-6 sm:px-8 bg-gradient-to-b from-slate-50 to-white">
+        <div className="w-full max-w-none">
+          <div className="text-center mb-24 max-w-4xl mx-auto">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-[-0.03em] text-slate-900 mb-8">
+              Real-world use cases
+            </h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed font-light">
+              From e-commerce to DeFi, see how developers are building the next generation of payment experiences with SVM-Pay.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 max-w-7xl mx-auto px-4 mb-24">
+            {/* E-commerce Integration */}
+            <div className="space-y-6">
+              <div>
+                <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/25">
+                  <Icons.ShoppingCart className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-3">E-commerce Integration</h3>
+                <p className="text-slate-600 text-lg mb-6">Accept crypto payments in your online store with automatic order fulfillment</p>
               </div>
-              <h4 className="font-bold text-slate-900 mb-2">Sub-second confirmations</h4>
-              <p className="text-slate-600 text-sm">Real-time payment processing with instant UI feedback</p>
+              <div className="rounded-2xl bg-slate-900 overflow-hidden border border-slate-200 shadow-xl shadow-slate-900/25">
+                <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-700 bg-slate-800">
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  <span className="ml-4 text-slate-300 font-mono text-sm">checkout.tsx</span>
+                </div>
+                <div className="p-6">
+                  <pre className="text-sm text-slate-100 font-mono leading-relaxed overflow-x-auto">
+{`const checkout = new Checkout();
+checkout.addToCart({ 
+  name: 'Product 1', 
+  price: 10.99 
+});
+
+const result = await checkout.checkout(
+  'your-wallet-address'
+);
+
+console.log('Payment URL:', result.url);
+// QR code generation
+// Status monitoring
+// Order fulfillment`}
+                  </pre>
+                </div>
+              </div>
+              <Link 
+                href="https://github.com/openSVM/svm-pay/blob/main/examples/point-of-sale-demo.tsx" 
+                target="_blank"
+                className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
+              >
+                View full example
+                <Icons.ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
-            <div className="text-center p-8 rounded-2xl bg-white/60 border border-slate-200 backdrop-blur-sm">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Icons.Shield className="h-6 w-6 text-blue-600" />
+            
+            {/* Subscription Service */}
+            <div className="space-y-6">
+              <div>
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/25">
+                  <Icons.CreditCard className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-3">Subscription Payments</h3>
+                <p className="text-slate-600 text-lg mb-6">Recurring payments for SaaS, content platforms, and subscription services</p>
               </div>
-              <h4 className="font-bold text-slate-900 mb-2">Built-in security</h4>
-              <p className="text-slate-600 text-sm">Automatic signature verification and replay protection</p>
+              <div className="rounded-2xl bg-slate-900 overflow-hidden border border-slate-200 shadow-xl shadow-slate-900/25">
+                <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-700 bg-slate-800">
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  <span className="ml-4 text-slate-300 font-mono text-sm">subscription.ts</span>
+                </div>
+                <div className="p-6">
+                  <pre className="text-sm text-slate-100 font-mono leading-relaxed overflow-x-auto">
+{`const subscription = new SubscriptionService();
+
+const plans = [
+  { 
+    id: 'pro', 
+    name: 'Pro Plan', 
+    price: '19.99', 
+    interval: 'monthly' 
+  }
+];
+
+const result = await subscription
+  .createSubscription(
+    user, 
+    plans[0], 
+    'your-address'
+  );`}
+                  </pre>
+                </div>
+              </div>
+              <Link 
+                href="https://github.com/openSVM/svm-pay/blob/main/examples/subscription-payment-demo.tsx" 
+                target="_blank"
+                className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors"
+              >
+                View full example
+                <Icons.ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
-            <div className="text-center p-8 rounded-2xl bg-white/60 border border-slate-200 backdrop-blur-sm">
-              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Icons.Code className="h-6 w-6 text-purple-600" />
+
+            {/* Cross-Chain Payments */}
+            <div className="space-y-6">
+              <div>
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-purple-500/25">
+                  <Icons.ArrowLeftRight className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-3">Cross-Chain Payments</h3>
+                <p className="text-slate-600 text-lg mb-6">Accept payments from Ethereum, Polygon, BNB Chain to Solana networks</p>
               </div>
-              <h4 className="font-bold text-slate-900 mb-2">TypeScript native</h4>
-              <p className="text-slate-600 text-sm">Full type safety with intelligent autocomplete</p>
+              <div className="rounded-2xl bg-slate-900 overflow-hidden border border-slate-200 shadow-xl shadow-slate-900/25">
+                <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-700 bg-slate-800">
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  <span className="ml-4 text-slate-300 font-mono text-sm">cross-chain.ts</span>
+                </div>
+                <div className="p-6">
+                  <pre className="text-sm text-slate-100 font-mono leading-relaxed overflow-x-auto">
+{`const manager = new CrossChainPaymentManager();
+
+const request = CrossChainRequestFactory
+  .createTransferRequest({
+    sourceNetwork: EVMNetwork.ETHEREUM,
+    destinationNetwork: SVMNetwork.SOLANA,
+    recipient: 'solana-address',
+    amount: '100',
+    token: '0xA0b...', // USDC
+  });
+
+const result = await manager
+  .executePayment(request);`}
+                  </pre>
+                </div>
+              </div>
+              <Link 
+                href="https://github.com/openSVM/svm-pay/blob/main/examples/cross-chain-payment-demo.html" 
+                target="_blank"
+                className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium transition-colors"
+              >
+                View live demo
+                <Icons.ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Developer Resources */}
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-16">
+              <h3 className="text-3xl font-bold text-slate-900 mb-4">
+                Developer Resources
+              </h3>
+              <p className="text-lg text-slate-600">
+                Everything you need to build, deploy, and scale your payment integration
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Link 
+                href="https://github.com/openSVM/svm-pay/blob/main/docs/developer-guide.md"
+                target="_blank"
+                className="group p-6 rounded-xl bg-white/60 border border-slate-200 hover:border-slate-300 hover:bg-white/80 transition-all duration-300 hover:scale-105 backdrop-blur-sm"
+              >
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
+                  <Icons.BookOpen className="h-6 w-6 text-blue-600" />
+                </div>
+                <h4 className="font-bold text-slate-900 mb-2">Developer Guide</h4>
+                <p className="text-slate-600 text-sm mb-3">Comprehensive documentation with tutorials and examples</p>
+                <div className="flex items-center text-blue-600 group-hover:text-blue-700 text-sm font-medium">
+                  Read the docs
+                  <Icons.ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </Link>
+
+              <Link 
+                href="https://github.com/openSVM/svm-pay/blob/main/docs/cross-chain-payments.md"
+                target="_blank"
+                className="group p-6 rounded-xl bg-white/60 border border-slate-200 hover:border-slate-300 hover:bg-white/80 transition-all duration-300 hover:scale-105 backdrop-blur-sm"
+              >
+                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-purple-200 transition-colors">
+                  <Icons.Link className="h-6 w-6 text-purple-600" />
+                </div>
+                <h4 className="font-bold text-slate-900 mb-2">Cross-Chain Guide</h4>
+                <p className="text-slate-600 text-sm mb-3">Learn how to integrate cross-chain payment flows</p>
+                <div className="flex items-center text-purple-600 group-hover:text-purple-700 text-sm font-medium">
+                  View guide
+                  <Icons.ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </Link>
+
+              <Link 
+                href="https://github.com/openSVM/svm-pay"
+                target="_blank"
+                className="group p-6 rounded-xl bg-white/60 border border-slate-200 hover:border-slate-300 hover:bg-white/80 transition-all duration-300 hover:scale-105 backdrop-blur-sm"
+              >
+                <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-slate-200 transition-colors">
+                  <Icons.Github className="h-6 w-6 text-slate-600" />
+                </div>
+                <h4 className="font-bold text-slate-900 mb-2">Source Code</h4>
+                <p className="text-slate-600 text-sm mb-3">Explore the codebase, contribute, and join the community</p>
+                <div className="flex items-center text-slate-600 group-hover:text-slate-700 text-sm font-medium">
+                  Browse code
+                  <Icons.ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Premium Supported Networks - Fullscreen */}
+      {/* Supported Networks & Cross-Chain Features */}
       <section className="relative min-h-screen flex items-center justify-center py-32 px-6 sm:px-8 bg-gradient-to-b from-white to-slate-50">
         <div className="w-full max-w-none">
           <div className="text-center mb-24 max-w-4xl mx-auto">
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-[-0.03em] text-slate-900 mb-8">
-              One API, infinite possibilities
+              Cross-chain by design
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed font-light">
-              Connect to the entire SVM ecosystem with a single integration. Support multiple networks without changing your codebase.
+              Accept payments from any EVM network to any SVM network. Our bridge infrastructure handles the complexity so you don't have to.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto mb-20">
-            {/* Solana */}
-            <Link href="https://solana.com/" target="_blank" className="group block">
-              <div className="p-10 rounded-3xl bg-white/60 border border-slate-200 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-500 hover:scale-105 backdrop-blur-sm">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-purple-500/25">
-                  <span className="text-3xl font-black text-white">S</span>
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4">Solana</h3>
-                <p className="text-slate-600 mb-6 leading-relaxed">The high-performance blockchain powering the future of DeFi and Web3 applications</p>
-                <div className="space-y-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Network Type:</span>
-                    <span className="font-semibold text-slate-700">Layer 1</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">TPS:</span>
-                    <span className="font-semibold text-slate-700">65,000+</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Finality:</span>
-                    <span className="font-semibold text-slate-700">~400ms</span>
-                  </div>
-                </div>
-                <div className="mt-6 flex items-center text-purple-600 group-hover:text-purple-700">
-                  <span className="font-medium">Explore network</span>
-                  <Icons.ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-            </Link>
-
-            {/* Sonic SVM */}
-            <Link href="https://sonic.xyz/" target="_blank" className="group block">
-              <div className="p-10 rounded-3xl bg-white/60 border border-slate-200 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 hover:scale-105 backdrop-blur-sm">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-blue-500/25">
-                  <span className="text-3xl">⚡</span>
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4">Sonic SVM</h3>
-                <p className="text-slate-600 mb-6 leading-relaxed">Lightning-fast SVM runtime optimized for maximum performance and scalability</p>
-                <div className="space-y-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Network Type:</span>
-                    <span className="font-semibold text-slate-700">SVM Chain</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">TPS:</span>
-                    <span className="font-semibold text-slate-700">100,000+</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Finality:</span>
-                    <span className="font-semibold text-slate-700">~200ms</span>
+          {/* Source Networks (EVM) */}
+          <div className="mb-16">
+            <div className="text-center mb-12">
+              <h3 className="text-2xl font-bold text-slate-900 mb-4">Source Networks (Pay From)</h3>
+              <p className="text-slate-600">Accept payments from major EVM networks</p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 max-w-5xl mx-auto">
+              {[
+                { name: 'Ethereum', symbol: 'ETH', color: 'from-blue-500 to-blue-600' },
+                { name: 'BNB Chain', symbol: 'BNB', color: 'from-yellow-500 to-yellow-600' },
+                { name: 'Polygon', symbol: 'MATIC', color: 'from-purple-500 to-purple-600' },
+                { name: 'Arbitrum', symbol: 'ARB', color: 'from-indigo-500 to-indigo-600' },
+                { name: 'Optimism', symbol: 'OP', color: 'from-red-500 to-red-600' },
+                { name: 'Avalanche', symbol: 'AVAX', color: 'from-rose-500 to-rose-600' },
+              ].map((network) => (
+                <div key={network.name} className="group">
+                  <div className="p-6 rounded-2xl bg-white/60 border border-slate-200 hover:shadow-xl hover:shadow-slate-900/10 transition-all duration-300 hover:scale-105 backdrop-blur-sm text-center">
+                    <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${network.color} flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                      <span className="text-xl font-black text-white">{network.symbol.charAt(0)}</span>
+                    </div>
+                    <h4 className="font-bold text-slate-900 text-sm">{network.name}</h4>
                   </div>
                 </div>
-                <div className="mt-6 flex items-center text-blue-600 group-hover:text-blue-700">
-                  <span className="font-medium">Explore network</span>
-                  <Icons.ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-            </Link>
-
-            {/* Eclipse */}
-            <Link href="https://eclipse.builders/" target="_blank" className="group block">
-              <div className="p-10 rounded-3xl bg-white/60 border border-slate-200 hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-500 hover:scale-105 backdrop-blur-sm">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-700 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-orange-500/25">
-                  <span className="text-3xl font-black text-white">E</span>
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4">Eclipse</h3>
-                <p className="text-slate-600 mb-6 leading-relaxed">SVM-compatible Layer 2 with Ethereum settlement and interoperability</p>
-                <div className="space-y-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Network Type:</span>
-                    <span className="font-semibold text-slate-700">Layer 2</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Settlement:</span>
-                    <span className="font-semibold text-slate-700">Ethereum</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Runtime:</span>
-                    <span className="font-semibold text-slate-700">SVM</span>
-                  </div>
-                </div>
-                <div className="mt-6 flex items-center text-orange-600 group-hover:text-orange-700">
-                  <span className="font-medium">Explore network</span>
-                  <Icons.ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-            </Link>
-
-            {/* s00n */}
-            <Link href="https://s00n.xyz/" target="_blank" className="group block">
-              <div className="p-10 rounded-3xl bg-white/60 border border-slate-200 hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 hover:scale-105 backdrop-blur-sm">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-emerald-500/25">
-                  <span className="text-3xl font-black text-white">s</span>
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4">s00n</h3>
-                <p className="text-slate-600 mb-6 leading-relaxed">Next-generation SVM stack with optimized consensus and enhanced performance</p>
-                <div className="space-y-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Network Type:</span>
-                    <span className="font-semibold text-slate-700">SVM Chain</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Consensus:</span>
-                    <span className="font-semibold text-slate-700">Optimized</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Status:</span>
-                    <span className="font-semibold text-emerald-600">Coming Soon</span>
-                  </div>
-                </div>
-                <div className="mt-6 flex items-center text-emerald-600 group-hover:text-emerald-700">
-                  <span className="font-medium">Explore network</span>
-                  <Icons.ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-            </Link>
+              ))}
+            </div>
           </div>
 
-          {/* Trust indicators */}
+          {/* Bridge Arrow */}
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-4 px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-50 to-purple-50 border border-slate-200">
+              <span className="text-slate-600 font-medium">Bridged via</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold text-slate-700">Wormhole</span>
+                <span className="text-slate-400">•</span>
+                <span className="text-sm font-semibold text-slate-700">Allbridge</span>
+              </div>
+              <Icons.ArrowDown className="w-5 h-5 text-slate-500" />
+            </div>
+          </div>
+
+          {/* Destination Networks (SVM) */}
+          <div className="mb-20">
+            <div className="text-center mb-12">
+              <h3 className="text-2xl font-bold text-slate-900 mb-4">Destination Networks (Pay To)</h3>
+              <p className="text-slate-600">Fast, low-cost SVM networks for final settlement</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+              {/* Solana */}
+              <div className="group">
+                <div className="p-8 rounded-2xl bg-white/60 border border-slate-200 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
+                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-purple-500/25">
+                    <span className="text-2xl font-black text-white">S</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-3">Solana</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">TPS:</span>
+                      <span className="font-semibold text-slate-700">65,000+</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Finality:</span>
+                      <span className="font-semibold text-slate-700">~400ms</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Status:</span>
+                      <span className="font-semibold text-emerald-600">Live</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Sonic SVM */}
+              <div className="group">
+                <div className="p-8 rounded-2xl bg-white/60 border border-slate-200 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
+                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-blue-500/25">
+                    <span className="text-2xl">⚡</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-3">Sonic</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">TPS:</span>
+                      <span className="font-semibold text-slate-700">100,000+</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Finality:</span>
+                      <span className="font-semibold text-slate-700">~200ms</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Status:</span>
+                      <span className="font-semibold text-emerald-600">Live</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Eclipse */}
+              <div className="group">
+                <div className="p-8 rounded-2xl bg-white/60 border border-slate-200 hover:shadow-xl hover:shadow-orange-500/10 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
+                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-orange-500 to-orange-700 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-orange-500/25">
+                    <span className="text-2xl font-black text-white">E</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-3">Eclipse</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Type:</span>
+                      <span className="font-semibold text-slate-700">Layer 2</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Settlement:</span>
+                      <span className="font-semibold text-slate-700">Ethereum</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Status:</span>
+                      <span className="font-semibold text-emerald-600">Live</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* s00n */}
+              <div className="group">
+                <div className="p-8 rounded-2xl bg-white/60 border border-slate-200 hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
+                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-emerald-500/25">
+                    <span className="text-2xl font-black text-white">s</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-3">s00n</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Type:</span>
+                      <span className="font-semibold text-slate-700">SVM Chain</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Consensus:</span>
+                      <span className="font-semibold text-slate-700">Optimized</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Status:</span>
+                      <span className="font-semibold text-blue-600">Coming Soon</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Cross-Chain Stats */}
           <div className="text-center">
             <div className="inline-flex items-center gap-8 p-8 rounded-2xl bg-white/60 border border-slate-200 backdrop-blur-sm">
               <div className="text-center">
-                <div className="text-3xl font-black text-slate-900 mb-1">$50M+</div>
-                <div className="text-sm text-slate-600">Transaction Volume</div>
+                <div className="text-3xl font-black text-slate-900 mb-1">6+</div>
+                <div className="text-sm text-slate-600">EVM Networks</div>
               </div>
               <div className="w-px h-12 bg-slate-200"></div>
               <div className="text-center">
-                <div className="text-3xl font-black text-slate-900 mb-1">99.9%</div>
-                <div className="text-sm text-slate-600">Uptime SLA</div>
+                <div className="text-3xl font-black text-slate-900 mb-1">4+</div>
+                <div className="text-sm text-slate-600">SVM Networks</div>
               </div>
               <div className="w-px h-12 bg-slate-200"></div>
               <div className="text-center">
-                <div className="text-3xl font-black text-slate-900 mb-1">24/7</div>
-                <div className="text-sm text-slate-600">Monitoring</div>
+                <div className="text-3xl font-black text-slate-900 mb-1">2</div>
+                <div className="text-sm text-slate-600">Bridge Partners</div>
+              </div>
+              <div className="w-px h-12 bg-slate-200"></div>
+              <div className="text-center">
+                <div className="text-3xl font-black text-slate-900 mb-1">0%</div>
+                <div className="text-sm text-slate-600">Platform Fees</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Premium CTA Section - Fullscreen */}
+      {/* Developer-Focused CTA Section */}
       <section className="relative min-h-screen flex items-center justify-center py-32 px-6 sm:px-8 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
         {/* Premium background effects */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-emerald-600/10"></div>
@@ -492,26 +657,26 @@ app.post('/api/verify-payment', async (req, res) => {
         <div className="relative w-full max-w-none">
           <div className="text-center max-w-5xl mx-auto">
             <h2 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-[-0.03em] text-white mb-8">
-              Ready to transform
+              Ready to build the future
               <br />
               <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-emerald-400 bg-clip-text text-transparent">
-                payment infrastructure?
+                of payments?
               </span>
             </h2>
             
             <p className="text-xl text-slate-300 mb-16 max-w-3xl mx-auto leading-relaxed font-light">
-              Join thousands of developers building the future of decentralized payments. 
-              From startup to enterprise, SVM-Pay scales with your business.
+              Join thousands of developers already building with SVM-Pay. 
+              From your first payment to enterprise scale, we've got you covered.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-8 mb-20">
-              <Link href="https://github.com/openSVM/svm-pay" target="_blank">
+              <Link href="#quickstart">
                 <Button 
                   size="lg"
                   className="h-16 px-12 bg-white hover:bg-slate-100 text-slate-900 font-bold rounded-2xl transition-all duration-300 shadow-2xl shadow-white/10 hover:shadow-white/20 hover:scale-105 text-lg"
                 >
-                  Start building for free
-                  <Icons.ArrowRight className="ml-3 h-5 w-5" />
+                  <Icons.Code className="mr-3 h-5 w-5" />
+                  Start coding now
                 </Button>
               </Link>
               
@@ -521,42 +686,72 @@ app.post('/api/verify-payment', async (req, res) => {
                 className="inline-flex items-center gap-3 h-16 px-8 text-slate-300 hover:text-white font-medium transition-all duration-300 text-lg border border-slate-600 rounded-2xl hover:border-slate-400 hover:bg-white/5 backdrop-blur-sm"
               >
                 <Icons.Github className="h-5 w-5" />
-                Star on GitHub
+                View source code
                 <Icons.ArrowRight className="h-4 w-4" />
               </Link>
             </div>
 
-            {/* Enterprise stats */}
+            {/* Quick Links for Developers */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-16">
+              <Link 
+                href="https://github.com/openSVM/svm-pay/blob/main/docs/developer-guide.md"
+                target="_blank"
+                className="group p-6 rounded-xl bg-white/5 border border-slate-700 hover:border-slate-500 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm"
+              >
+                <Icons.BookOpen className="w-8 h-8 text-blue-400 mb-4 group-hover:scale-110 transition-transform" />
+                <h4 className="font-bold text-white mb-2">Developer Guide</h4>
+                <p className="text-slate-400 text-sm">Complete integration tutorials</p>
+              </Link>
+
+              <Link 
+                href="https://github.com/openSVM/svm-pay/tree/main/examples"
+                target="_blank"
+                className="group p-6 rounded-xl bg-white/5 border border-slate-700 hover:border-slate-500 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm"
+              >
+                <Icons.Code className="w-8 h-8 text-purple-400 mb-4 group-hover:scale-110 transition-transform" />
+                <h4 className="font-bold text-white mb-2">Examples</h4>
+                <p className="text-slate-400 text-sm">Production-ready code samples</p>
+              </Link>
+
+              <Link 
+                href="https://github.com/openSVM/svm-pay/blob/main/docs/cross-chain-payments.md"
+                target="_blank"
+                className="group p-6 rounded-xl bg-white/5 border border-slate-700 hover:border-slate-500 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm"
+              >
+                <Icons.ArrowLeftRight className="w-8 h-8 text-emerald-400 mb-4 group-hover:scale-110 transition-transform" />
+                <h4 className="font-bold text-white mb-2">Cross-Chain</h4>
+                <p className="text-slate-400 text-sm">Bridge integration guide</p>
+              </Link>
+            </div>
+
+            {/* Developer stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-16 border-t border-slate-700">
               <div className="text-center">
-                <div className="text-4xl font-black text-white mb-2">10,000+</div>
-                <div className="text-slate-400 font-medium">Active Developers</div>
+                <div className="text-4xl font-black text-white mb-2">10+</div>
+                <div className="text-slate-400 font-medium">Supported Networks</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-black text-white mb-2">$100M+</div>
-                <div className="text-slate-400 font-medium">Processed Volume</div>
+                <div className="text-4xl font-black text-white mb-2">0%</div>
+                <div className="text-slate-400 font-medium">Platform Fees</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-black text-white mb-2">99.99%</div>
-                <div className="text-slate-400 font-medium">Uptime Guarantee</div>
+                <div className="text-4xl font-black text-white mb-2">3</div>
+                <div className="text-slate-400 font-medium">Framework SDKs</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-black text-white mb-2">4+</div>
-                <div className="text-slate-400 font-medium">SVM Networks</div>
+                <div className="text-4xl font-black text-white mb-2">MIT</div>
+                <div className="text-slate-400 font-medium">Open Source</div>
               </div>
             </div>
 
-            {/* Enterprise trust signals */}
+            {/* Installation command showcase */}
             <div className="mt-16 p-8 rounded-2xl bg-white/5 border border-slate-700 backdrop-blur-sm">
-              <p className="text-slate-400 text-sm mb-4 font-medium">Trusted by industry leaders</p>
-              <div className="flex items-center justify-center gap-8 text-slate-500">
-                <div className="text-sm font-mono">Enterprise Grade</div>
-                <div className="w-px h-4 bg-slate-600"></div>
-                <div className="text-sm font-mono">SOC 2 Compliant</div>
-                <div className="w-px h-4 bg-slate-600"></div>
-                <div className="text-sm font-mono">24/7 Support</div>
-                <div className="w-px h-4 bg-slate-600"></div>
-                <div className="text-sm font-mono">MIT Licensed</div>
+              <p className="text-slate-400 text-sm mb-4 font-medium">Get started in seconds</p>
+              <div className="flex items-center justify-center gap-4 text-slate-200 font-mono">
+                <span className="text-slate-500">$</span>
+                <span>npm install svm-pay</span>
+                <span className="text-slate-500">&&</span>
+                <span>npm run dev</span>
               </div>
             </div>
           </div>
