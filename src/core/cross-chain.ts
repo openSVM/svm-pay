@@ -91,8 +91,10 @@ export class CrossChainPaymentManager {
         paymentRecord.updatedAt = Date.now();
         this.paymentStore.set(paymentId, paymentRecord);
         
-        // Monitor bridge transfer status
-        await this.monitorBridgeTransfer(paymentId, bridge, bridgeTransferResult.transferId);
+        // Monitor bridge transfer status (don't await - let it run in background)
+        this.monitorBridgeTransfer(paymentId, bridge, bridgeTransferResult.transferId).catch(error => {
+          console.error(`Background monitoring failed for payment ${paymentId}:`, error);
+        });
         
         return {
           paymentId,
@@ -108,7 +110,15 @@ export class CrossChainPaymentManager {
       }
       
     } catch (error) {
-      throw new Error(`Failed to execute cross-chain payment: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      // Preserve original error information and stack trace
+      if (error instanceof Error) {
+        const wrappedError = new Error(`Failed to execute cross-chain payment: ${error.message}`);
+        wrappedError.stack = error.stack;
+        wrappedError.cause = error;
+        throw wrappedError;
+      } else {
+        throw new Error(`Failed to execute cross-chain payment: ${String(error)}`);
+      }
     }
   }
   
@@ -136,13 +146,17 @@ export class CrossChainPaymentManager {
   ): Promise<void> {
     const maxAttempts = 60; // Monitor for up to 10 minutes (10s intervals)
     let attempts = 0;
+    let isMonitoring = true;
     
     const monitor = async (): Promise<void> => {
+      if (!isMonitoring) return;
+      
       try {
         const bridgeStatus = await bridge.checkTransferStatus(transferId);
         
         switch (bridgeStatus) {
           case BridgeTransferStatus.COMPLETED:
+            isMonitoring = false;
             await this.updatePaymentStatus(paymentId, PaymentStatus.BRIDGE_CONFIRMED);
             // TODO: Handle final payment on destination network
             await this.updatePaymentStatus(paymentId, PaymentStatus.CONFIRMED);
@@ -150,6 +164,7 @@ export class CrossChainPaymentManager {
             
           case BridgeTransferStatus.FAILED:
           case BridgeTransferStatus.REFUNDED:
+            isMonitoring = false;
             await this.updatePaymentStatus(paymentId, PaymentStatus.BRIDGE_FAILED);
             return;
             
@@ -157,12 +172,16 @@ export class CrossChainPaymentManager {
           case BridgeTransferStatus.INITIATED:
             attempts++;
             if (attempts >= maxAttempts) {
+              isMonitoring = false;
               await this.updatePaymentStatus(paymentId, PaymentStatus.EXPIRED, 'Bridge transfer timed out');
               return;
             }
             
-            // Wait 10 seconds before next check
-            setTimeout(monitor, 10000);
+            // Wait 10 seconds before next check using Promise-based approach
+            await new Promise(resolve => setTimeout(resolve, 10000));
+            if (isMonitoring) {
+              await monitor();
+            }
             break;
         }
       } catch (error) {
@@ -170,17 +189,22 @@ export class CrossChainPaymentManager {
         attempts++;
         
         if (attempts >= maxAttempts) {
+          isMonitoring = false;
           await this.updatePaymentStatus(paymentId, PaymentStatus.FAILED, 'Failed to monitor bridge transfer');
           return;
         }
         
-        // Retry after 10 seconds
-        setTimeout(monitor, 10000);
+        // Retry after 10 seconds using Promise-based approach
+        await new Promise(resolve => setTimeout(resolve, 10000));
+        if (isMonitoring) {
+          await monitor();
+        }
       }
     };
     
-    // Start monitoring
-    setTimeout(monitor, 5000); // Initial delay of 5 seconds
+    // Start monitoring with initial delay
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    await monitor();
   }
   
   /**

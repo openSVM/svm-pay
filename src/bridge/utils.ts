@@ -71,9 +71,15 @@ export async function getBestBridgeQuote(
  * @returns A numerical score
  */
 function calculateQuoteScore(quote: BridgeQuote): number {
-  const outputAmount = parseFloat(quote.outputAmount);
-  const inputAmount = parseFloat(quote.inputAmount);
-  const fee = parseFloat(quote.fee);
+  // Use Number for better precision
+  const outputAmount = Number(quote.outputAmount);
+  const inputAmount = Number(quote.inputAmount);
+  const fee = Number(quote.fee);
+  
+  // Validate inputs
+  if (isNaN(outputAmount) || isNaN(inputAmount) || isNaN(fee) || inputAmount === 0) {
+    return 0;
+  }
   
   // Calculate efficiency ratio (output/input)
   const efficiency = outputAmount / inputAmount;
@@ -82,8 +88,9 @@ function calculateQuoteScore(quote: BridgeQuote): number {
   const timeScore = Math.max(0, (600 - quote.estimatedTime) / 600);
   
   // Calculate fee score (lower fees are better)
+  // Use a more reasonable penalty multiplier to avoid overly penalizing valid fee ratios
   const feeRatio = fee / inputAmount;
-  const feeScore = Math.max(0, 1 - feeRatio * 100); // Penalize high fee ratios
+  const feeScore = Math.max(0, 1 - feeRatio * 10); // Reduced penalty multiplier from 100 to 10
   
   // Weighted score: 50% efficiency, 30% time, 20% fees
   return (efficiency * 0.5) + (timeScore * 0.3) + (feeScore * 0.2);
@@ -136,6 +143,39 @@ export function initializeDefaultBridges(): void {
 }
 
 /**
+ * Common token addresses for validation
+ */
+const COMMON_TOKEN_PATTERNS = {
+  ethereum: /^0x[a-fA-F0-9]{40}$/,
+  solana: /^[A-Za-z0-9]{32,44}$/,
+  // Add more patterns as needed
+};
+
+/**
+ * Validate a token address format
+ * 
+ * @param token The token address to validate
+ * @param network The network to validate against
+ * @returns True if valid, false otherwise
+ */
+function isValidTokenAddress(token: string, network: string): boolean {
+  if (!token) return false;
+  
+  // Check for common EVM token address format
+  if (['ethereum', 'bnb-chain', 'polygon', 'arbitrum', 'optimism', 'avalanche'].includes(network)) {
+    return COMMON_TOKEN_PATTERNS.ethereum.test(token);
+  }
+  
+  // Check for SVM token address format
+  if (['solana', 'sonic', 'eclipse', 'soon'].includes(network)) {
+    return COMMON_TOKEN_PATTERNS.solana.test(token);
+  }
+  
+  // Default to basic validation
+  return token.length > 0;
+}
+
+/**
  * Validate a cross-chain transfer request
  * 
  * @param request The request to validate
@@ -154,12 +194,22 @@ export function validateCrossChainRequest(request: CrossChainTransferRequest): v
     throw new Error('Token address is required');
   }
   
-  if (!request.amount || parseFloat(request.amount) <= 0) {
+  // Validate token address format
+  if (!isValidTokenAddress(request.token, request.sourceNetwork)) {
+    throw new Error(`Invalid token address format for ${request.sourceNetwork} network`);
+  }
+  
+  if (!request.amount || Number(request.amount) <= 0 || isNaN(Number(request.amount))) {
     throw new Error('Amount must be a positive number');
   }
   
   if (!request.recipient) {
     throw new Error('Recipient address is required');
+  }
+  
+  // Validate recipient address format
+  if (!isValidTokenAddress(request.recipient, request.destinationNetwork)) {
+    throw new Error(`Invalid recipient address format for ${request.destinationNetwork} network`);
   }
   
   if (request.sourceNetwork === request.destinationNetwork) {
@@ -193,9 +243,22 @@ export function formatTransferTime(seconds: number): string {
  * @returns Formatted fee string
  */
 export function formatBridgeFee(fee: string, inputAmount: string): string {
-  const feeNum = parseFloat(fee);
-  const inputNum = parseFloat(inputAmount);
+  // Use Number for better precision in calculations
+  const feeNum = Number(fee);
+  const inputNum = Number(inputAmount);
+  
+  // Check for valid numbers
+  if (isNaN(feeNum) || isNaN(inputNum) || inputNum === 0) {
+    return `${fee} (0.00%)`;
+  }
+  
+  // Calculate percentage with higher precision
   const percentage = (feeNum / inputNum) * 100;
   
-  return `${fee} (${percentage.toFixed(2)}%)`;
+  // Round to appropriate decimal places
+  const formattedPercentage = percentage < 0.01 ? 
+    percentage.toFixed(4) : 
+    percentage.toFixed(2);
+  
+  return `${fee} (${formattedPercentage}%)`;
 }

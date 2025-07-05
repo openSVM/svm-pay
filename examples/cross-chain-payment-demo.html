@@ -216,7 +216,7 @@
                     const timeMinutes = Math.round(quote.estimatedTime / 60);
                     
                     quotesHtml += `
-                        <div class="bridge-option" onclick="selectBridge('${bridgeId}')">
+                        <div class="bridge-option" onclick="selectBridge(event, '${bridgeId}')">
                             <strong>${quote.bridge}</strong><br>
                             Output: ${quote.outputAmount} tokens<br>
                             Fee: ${quote.fee} (${feePercentage}%)<br>
@@ -233,7 +233,7 @@
             }
         };
 
-        window.selectBridge = function(bridgeId) {
+        window.selectBridge = function(event, bridgeId) {
             // Remove previous selection
             document.querySelectorAll('.bridge-option').forEach(el => {
                 el.classList.remove('selected');
