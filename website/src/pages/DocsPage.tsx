@@ -11,6 +11,17 @@ import {
   Search
 } from 'lucide-react'
 import { useState } from 'react'
+import { 
+  GamingTutorials, 
+  DeFiTutorials, 
+  SaaSTutorials, 
+  SocialTutorials 
+} from '../components/TutorialSections'
+import { 
+  EnterpriseTutorials, 
+  CrossChainTutorials, 
+  MobileTutorials 
+} from '../components/AdvancedTutorialSections'
 
 // Documentation sections
 const sections = [
@@ -20,6 +31,19 @@ const sections = [
       { name: 'Developer Guide', href: '/docs/developer-guide', icon: Book },
       { name: 'API Reference', href: '/docs/api', icon: Code },
       { name: 'CLI Tool', href: '/docs/cli', icon: Terminal },
+    ]
+  },
+  {
+    title: 'Tutorials',
+    items: [
+      { name: 'E-commerce Tutorials', href: '/docs/tutorials/ecommerce', icon: Book },
+      { name: 'Gaming & NFT Tutorials', href: '/docs/tutorials/gaming', icon: Book },
+      { name: 'DeFi Integration Tutorials', href: '/docs/tutorials/defi', icon: Book },
+      { name: 'SaaS & Service Tutorials', href: '/docs/tutorials/saas', icon: Book },
+      { name: 'Creator & Social Tutorials', href: '/docs/tutorials/social', icon: Book },
+      { name: 'Enterprise Tutorials', href: '/docs/tutorials/enterprise', icon: Book },
+      { name: 'Cross-Chain Tutorials', href: '/docs/tutorials/cross-chain', icon: Book },
+      { name: 'Mobile & IoT Tutorials', href: '/docs/tutorials/mobile', icon: Book },
     ]
   },
   {
@@ -154,6 +178,14 @@ export function DocsPage() {
           <Route path="/developer-guide" element={<DeveloperGuideDoc />} />
           <Route path="/api" element={<ApiDoc />} />
           <Route path="/cli" element={<CliDoc />} />
+          <Route path="/tutorials/ecommerce" element={<EcommerceTutorials />} />
+          <Route path="/tutorials/gaming" element={<GamingTutorials />} />
+          <Route path="/tutorials/defi" element={<DeFiTutorials />} />
+          <Route path="/tutorials/saas" element={<SaaSTutorials />} />
+          <Route path="/tutorials/social" element={<SocialTutorials />} />
+          <Route path="/tutorials/enterprise" element={<EnterpriseTutorials />} />
+          <Route path="/tutorials/cross-chain" element={<CrossChainTutorials />} />
+          <Route path="/tutorials/mobile" element={<MobileTutorials />} />
           <Route path="/cross-chain" element={<CrossChainDoc />} />
           <Route path="/architecture" element={<ArchitectureDoc />} />
           <Route path="/security" element={<SecurityDoc />} />
@@ -909,6 +941,261 @@ function monitorPayment(payment: Payment) {
             <li>Recovery procedures</li>
             <li>Post-incident analysis</li>
           </ul>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+// E-commerce Tutorials
+function EcommerceTutorials() {
+  const tutorials = [
+    {
+      title: "Online Store Integration",
+      description: "Complete e-commerce store with Solana payments",
+      level: "Beginner",
+      time: "30 minutes",
+      code: `// E-commerce checkout with SVM-Pay
+import { SVMPay, PaymentForm } from '@svm-pay/sdk'
+
+const EcommerceCheckout = ({ cartItems, total }) => {
+  const handlePayment = async (paymentData) => {
+    const payment = SVMPay.createPayment({
+      recipient: process.env.STORE_WALLET,
+      amount: total,
+      token: 'USDC',
+      metadata: {
+        orderId: generateOrderId(),
+        items: cartItems,
+        customerEmail: paymentData.email
+      }
+    })
+
+    const result = await payment.execute()
+    
+    if (result.status === 'SUCCESS') {
+      // Update inventory
+      await updateInventory(cartItems)
+      // Send confirmation email
+      await sendOrderConfirmation(paymentData.email, result.transactionId)
+      // Redirect to success page
+      router.push('/order-success')
+    }
+  }
+
+  return <PaymentForm onSubmit={handlePayment} amount={total} />
+}`
+    },
+    {
+      title: "Marketplace with Escrow",
+      description: "Multi-vendor marketplace with escrow payments",
+      level: "Advanced",
+      time: "2 hours",
+      code: `// Marketplace escrow system
+import { EscrowManager, MultisigWallet } from '@svm-pay/sdk'
+
+const MarketplaceEscrow = ({ seller, buyer, item }) => {
+  const createEscrowPayment = async () => {
+    // Create escrow account
+    const escrow = await EscrowManager.create({
+      seller: seller.wallet,
+      buyer: buyer.wallet,
+      arbitrator: process.env.MARKETPLACE_ARBITRATOR,
+      amount: item.price,
+      token: 'USDC',
+      releaseConditions: {
+        autoReleaseAfter: 7 * 24 * 60 * 60, // 7 days
+        requiresConfirmation: true
+      }
+    })
+
+    // Handle dispute resolution
+    escrow.onDispute(async (dispute) => {
+      await notifyArbitrator(dispute)
+      await freezeEscrow(escrow.id)
+    })
+
+    return escrow
+  }
+}`
+    },
+    {
+      title: "Subscription Box Service",
+      description: "Recurring payments for subscription boxes",
+      level: "Intermediate",
+      time: "1 hour",
+      code: `// Subscription box payments
+import { SubscriptionManager, InventoryManager } from '@svm-pay/sdk'
+
+const SubscriptionBox = ({ customer, plan }) => {
+  const setupSubscription = async () => {
+    const subscription = await SubscriptionManager.create({
+      customer: customer.wallet,
+      merchant: process.env.BUSINESS_WALLET,
+      amount: plan.price,
+      interval: plan.interval, // 'monthly', 'quarterly'
+      token: 'USDC',
+      metadata: {
+        planId: plan.id,
+        customerId: customer.id
+      }
+    })
+
+    // Handle successful payments
+    subscription.onPayment(async (payment) => {
+      await InventoryManager.reserve({
+        customerId: customer.id,
+        items: plan.items,
+        deliveryDate: getNextDeliveryDate()
+      })
+      
+      await sendShippingNotification(customer.email)
+    })
+
+    // Handle failed payments
+    subscription.onFailure(async (failure) => {
+      await handleFailedPayment(customer, failure)
+    })
+
+    return subscription
+  }
+}`
+    },
+    {
+      title: "Digital Product Store",
+      description: "Instant delivery of digital products",
+      level: "Beginner",
+      time: "45 minutes",
+      code: `// Digital product delivery
+import { SVMPay, FileManager, LicenseManager } from '@svm-pay/sdk'
+
+const DigitalStore = ({ product, customer }) => {
+  const purchaseDigitalProduct = async () => {
+    const payment = SVMPay.createPayment({
+      recipient: process.env.STORE_WALLET,
+      amount: product.price,
+      token: 'USDC',
+      metadata: {
+        productId: product.id,
+        customerId: customer.id,
+        type: 'digital'
+      }
+    })
+
+    payment.onSuccess(async (result) => {
+      // Generate unique download link
+      const downloadLink = await FileManager.generateSecureLink({
+        fileId: product.fileId,
+        expiresIn: 24 * 60 * 60, // 24 hours
+        maxDownloads: 3
+      })
+
+      // Create software license if applicable
+      if (product.type === 'software') {
+        await LicenseManager.generate({
+          productId: product.id,
+          customerId: customer.id,
+          licenseType: product.licenseType
+        })
+      }
+
+      // Send download email
+      await sendDownloadEmail(customer.email, downloadLink)
+    })
+
+    return payment.execute()
+  }
+}`
+    },
+    {
+      title: "Flash Sale Management",
+      description: "High-volume flash sale with rate limiting",
+      level: "Advanced",
+      time: "1.5 hours",
+      code: `// Flash sale with rate limiting
+import { SVMPay, RateLimiter, InventoryManager } from '@svm-pay/sdk'
+
+const FlashSale = ({ product, saleConfig }) => {
+  const rateLimiter = new RateLimiter({
+    maxTransactions: 100,
+    timeWindow: 60000, // 1 minute
+    queueSize: 1000
+  })
+
+  const processSalePurchase = async (customer) => {
+    // Check rate limit
+    const canProceed = await rateLimiter.checkLimit(customer.wallet)
+    if (!canProceed) {
+      throw new Error('Rate limit exceeded. Please try again later.')
+    }
+
+    // Reserve inventory atomically
+    const reservation = await InventoryManager.reserve({
+      productId: product.id,
+      quantity: 1,
+      customerId: customer.id,
+      expiresIn: 300 // 5 minutes to complete payment
+    })
+
+    const payment = SVMPay.createPayment({
+      recipient: process.env.STORE_WALLET,
+      amount: saleConfig.salePrice,
+      token: 'USDC',
+      metadata: {
+        reservationId: reservation.id,
+        originalPrice: product.price,
+        discount: product.price - saleConfig.salePrice
+      }
+    })
+
+    payment.onSuccess(async () => {
+      await reservation.confirm()
+      await sendPurchaseConfirmation(customer.email)
+    })
+
+    payment.onFailure(async () => {
+      await reservation.release()
+    })
+
+    return payment.execute()
+  }
+}`
+    }
+  ]
+
+  return (
+    <div className="pt-20 p-8 max-w-6xl">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-4xl font-bold text-slate-900 mb-6">E-commerce Tutorials</h1>
+        <p className="text-xl text-slate-600 mb-8">
+          Build sophisticated e-commerce solutions with Solana payments
+        </p>
+
+        <div className="space-y-8">
+          {tutorials.map((tutorial, index) => (
+            <div key={index} className="bg-white border border-slate-200 rounded-lg p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h3 className="text-xl font-semibold text-slate-900 mb-2">{tutorial.title}</h3>
+                  <p className="text-slate-600 mb-2">{tutorial.description}</p>
+                  <div className="flex space-x-4 text-sm text-slate-500">
+                    <span>Level: {tutorial.level}</span>
+                    <span>Time: {tutorial.time}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-slate-900 rounded-lg p-4">
+                <pre className="text-sm text-slate-100 overflow-x-auto">
+                  <code>{tutorial.code}</code>
+                </pre>
+              </div>
+            </div>
+          ))}
         </div>
       </motion.div>
     </div>
