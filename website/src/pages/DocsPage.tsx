@@ -1,173 +1,68 @@
 import { Routes, Route, Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { 
-  Book, 
   Code, 
-  Terminal, 
   FileText, 
-  Shield, 
-  Zap,
+  Database,
+  Network,
   ChevronRight,
-  Search
+  Search,
+  ExternalLink
 } from 'lucide-react'
 import { useState } from 'react'
-import { 
-  GamingTutorials, 
-  DeFiTutorials, 
-  SaaSTutorials, 
-  SocialTutorials 
-} from '../components/TutorialSections'
-import { 
-  EnterpriseTutorials, 
-  CrossChainTutorials, 
-  MobileTutorials 
-} from '../components/AdvancedTutorialSections'
 
-// Import individual tutorial components
-import { 
-  OnlineStoreIntegrationTutorial, 
-  MarketplaceEscrowTutorial,
-  SubscriptionBoxTutorial,
-  DigitalProductStoreTutorial,
-  FlashSaleManagementTutorial
-} from './tutorials/EcommerceTutorials'
-import { 
-  InGameCurrencyTutorial, 
-  NFTMarketplaceTutorial,
-  TournamentPrizeDistributionTutorial,
-  PlayToEarnRewardsTutorial,
-  GameAssetRentalTutorial
-} from './tutorials/GamingTutorials'
-import { 
-  SaaSSubscriptionBillingTutorial, 
-  FreelancePaymentEscrowTutorial,
-  ConsultingTimeTrackingTutorial,
-  APIUsageBillingTutorial,
-  SoftwareLicenseManagementTutorial,
-  N8nIntegrationTutorial
-} from './tutorials/SaaSTutorials'
-import {
-  YieldFarmingRewardsTutorial,
-  CrossChainArbitrageBotTutorial,
-  LendingProtocolIntegrationTutorial,
-  DEXTradingFeeDistributionTutorial,
-  AutomatedMarketMakerTutorial
-} from './tutorials/DeFiTutorials'
-import {
-  CreatorTippingSystemTutorial,
-  ContentCreatorSubscriptionsTutorial,
-  NFTDropPlatformTutorial,
-  CommunityRewardSystemTutorial
-} from './tutorials/SocialTutorials'
-import {
-  MultiChainArbitrageTutorial,
-  CrossChainLiquidityPoolTutorial,
-  PaymentRoutingOptimizationTutorial,
-  CrossChainGovernanceTutorial
-} from './tutorials/CrossChainTutorials'
-import {
-  MobileWalletIntegrationTutorial,
-  IoTMicropaymentsTutorial,
-  SmartCityPaymentsTutorial,
-  V2XPaymentsTutorial
-} from './tutorials/MobileTutorials'
-
-// Documentation sections
-const sections = [
+// API Documentation sections - focused on actual source files
+const apiSections = [
   {
-    title: 'Getting Started',
+    title: 'Core SDK',
     items: [
-      { name: 'Developer Guide', href: '/docs/developer-guide', icon: Book },
-      { name: 'API Reference', href: '/docs/api', icon: Code },
-      { name: 'CLI Tool', href: '/docs/cli', icon: Terminal },
+      { name: 'SVMPay Class', href: '/docs/sdk/svmpay', icon: Code },
+      { name: 'SVMPayServer Class', href: '/docs/sdk/server', icon: Code },
+      { name: 'Core Types', href: '/docs/core/types', icon: FileText },
+      { name: 'URL Scheme', href: '/docs/core/url-scheme', icon: FileText },
+      { name: 'Reference Generation', href: '/docs/core/reference', icon: FileText },
     ]
   },
   {
-    title: 'E-commerce Tutorials',
+    title: 'Network Adapters',
     items: [
-      { name: 'Online Store Integration', href: '/docs/tutorials/ecommerce/online-store', icon: Book },
-      { name: 'Marketplace with Escrow', href: '/docs/tutorials/ecommerce/marketplace-escrow', icon: Book },
-      { name: 'Subscription Box Service', href: '/docs/tutorials/ecommerce/subscription-box', icon: Book },
-      { name: 'Digital Product Store', href: '/docs/tutorials/ecommerce/digital-products', icon: Book },
-      { name: 'Flash Sale Management', href: '/docs/tutorials/ecommerce/flash-sales', icon: Book },
+      { name: 'Solana Adapter', href: '/docs/network/solana', icon: Network },
+      { name: 'Sonic Adapter', href: '/docs/network/sonic', icon: Network },
+      { name: 'Eclipse Adapter', href: '/docs/network/eclipse', icon: Network },
+      { name: 'Soon Adapter', href: '/docs/network/soon', icon: Network },
+      { name: 'Adapter Factory', href: '/docs/network/factory', icon: Network },
     ]
   },
   {
-    title: 'Gaming & NFT Tutorials',
+    title: 'Bridge System',
     items: [
-      { name: 'In-Game Currency Exchange', href: '/docs/tutorials/gaming/currency-exchange', icon: Book },
-      { name: 'NFT Marketplace for Games', href: '/docs/tutorials/gaming/nft-marketplace', icon: Book },
-      { name: 'Tournament Prize Distribution', href: '/docs/tutorials/gaming/tournament-prizes', icon: Book },
-      { name: 'Play-to-Earn Rewards', href: '/docs/tutorials/gaming/play-to-earn', icon: Book },
-      { name: 'Game Asset Rental System', href: '/docs/tutorials/gaming/asset-rental', icon: Book },
+      { name: 'Bridge Adapters', href: '/docs/bridge/adapters', icon: Network },
+      { name: 'Cross-Chain Manager', href: '/docs/bridge/cross-chain', icon: Network },
+      { name: 'Bridge Types', href: '/docs/bridge/types', icon: FileText },
     ]
   },
   {
-    title: 'SaaS & Service Tutorials',
+    title: 'Request Handlers',
     items: [
-      { name: 'SaaS Subscription Billing', href: '/docs/tutorials/saas/subscription-billing', icon: Book },
-      { name: 'Freelance Payment Escrow', href: '/docs/tutorials/saas/freelance-escrow', icon: Book },
-      { name: 'Consulting Time Tracking', href: '/docs/tutorials/saas/time-tracking', icon: Book },
-      { name: 'API Usage Billing', href: '/docs/tutorials/saas/api-billing', icon: Book },
-      { name: 'Software License Management', href: '/docs/tutorials/saas/license-management', icon: Book },
-      { name: 'n8n Workflow Automation', href: '/docs/tutorials/saas/n8n-integration', icon: Book },
+      { name: 'Transfer Handler', href: '/docs/handlers/transfer', icon: Code },
+      { name: 'Transaction Handler', href: '/docs/handlers/transaction', icon: Code },
+      { name: 'Cross-Chain Handler', href: '/docs/handlers/cross-chain', icon: Code },
     ]
   },
   {
-    title: 'DeFi & Finance Tutorials',
+    title: 'CLI Integration',
     items: [
-      { name: 'Yield Farming Rewards', href: '/docs/tutorials/defi/yield-farming', icon: Book },
-      { name: 'Cross-Chain Arbitrage Bot', href: '/docs/tutorials/defi/arbitrage-bot', icon: Book },
-      { name: 'Lending Protocol Integration', href: '/docs/tutorials/defi/lending-protocol', icon: Book },
-      { name: 'DEX Trading Fee Distribution', href: '/docs/tutorials/defi/dex-fees', icon: Book },
-      { name: 'Automated Market Maker', href: '/docs/tutorials/defi/amm', icon: Book },
+      { name: 'CLI Commands', href: '/docs/cli/commands', icon: FileText },
+      { name: 'Configuration', href: '/docs/cli/config', icon: FileText },
+      { name: 'Solana Utils', href: '/docs/cli/solana', icon: FileText },
+      { name: 'History Management', href: '/docs/cli/history', icon: Database },
     ]
   },
   {
-    title: 'Creator & Social Tutorials',
+    title: 'WalletConnect',
     items: [
-      { name: 'Creator Tipping System', href: '/docs/tutorials/social/creator-tipping', icon: Book },
-      { name: 'Content Creator Subscriptions', href: '/docs/tutorials/social/creator-subscriptions', icon: Book },
-      { name: 'NFT Drop Platform', href: '/docs/tutorials/social/nft-drops', icon: Book },
-      { name: 'Social Media Monetization', href: '/docs/tutorials/social/social-monetization', icon: Book },
-      { name: 'Live Streaming Donations', href: '/docs/tutorials/social/live-streaming', icon: Book },
-      { name: 'Community Reward System', href: '/docs/tutorials/social/community-rewards', icon: Book },
-    ]
-  },
-  {
-    title: 'Enterprise Tutorials',
-    items: [
-      { name: 'B2B Invoice Processing', href: '/docs/tutorials/enterprise/b2b-invoicing', icon: Book },
-      { name: 'Employee Payroll System', href: '/docs/tutorials/enterprise/payroll-system', icon: Book },
-      { name: 'Supply Chain Payments', href: '/docs/tutorials/enterprise/supply-chain', icon: Book },
-      { name: 'Treasury Management', href: '/docs/tutorials/enterprise/treasury-management', icon: Book },
-      { name: 'Vendor Payment Management', href: '/docs/tutorials/enterprise/vendor-management', icon: Book },
-    ]
-  },
-  {
-    title: 'Cross-Chain Advanced Tutorials',
-    items: [
-      { name: 'Multi-Chain Arbitrage', href: '/docs/tutorials/cross-chain/arbitrage', icon: Book },
-      { name: 'Cross-Chain Liquidity Pools', href: '/docs/tutorials/cross-chain/liquidity-pools', icon: Book },
-      { name: 'Payment Routing Optimization', href: '/docs/tutorials/cross-chain/payment-routing', icon: Book },
-      { name: 'Cross-Chain Governance', href: '/docs/tutorials/cross-chain/governance', icon: Book },
-    ]
-  },
-  {
-    title: 'Mobile & IoT Tutorials',
-    items: [
-      { name: 'Mobile Wallet Integration', href: '/docs/tutorials/mobile/wallet-integration', icon: Book },
-      { name: 'IoT Device Micropayments', href: '/docs/tutorials/mobile/iot-micropayments', icon: Book },
-      { name: 'Smart City Payments', href: '/docs/tutorials/mobile/smart-city', icon: Book },
-      { name: 'Vehicle-to-Everything Payments', href: '/docs/tutorials/mobile/v2x-payments', icon: Book },
-    ]
-  },
-  {
-    title: 'Advanced',
-    items: [
-      { name: 'Cross-Chain Payments', href: '/docs/cross-chain', icon: Zap },
-      { name: 'Architecture', href: '/docs/architecture', icon: FileText },
-      { name: 'Security', href: '/docs/security', icon: Shield },
+      { name: 'WalletConnect Integration', href: '/docs/walletconnect/integration', icon: Code },
+      { name: 'Connection Manager', href: '/docs/walletconnect/manager', icon: Code },
     ]
   }
 ]
@@ -179,12 +74,24 @@ function DocsSidebar() {
   return (
     <div className="w-64 bg-slate-50 border-r border-slate-200 min-h-screen pt-20">
       <div className="p-6">
+        {/* Cross-navigation */}
+        <div className="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+          <h3 className="text-sm font-semibold text-purple-900 mb-2">Need Tutorials?</h3>
+          <Link 
+            to="/tutorials" 
+            className="inline-flex items-center text-sm text-purple-700 hover:text-purple-900 transition-colors"
+          >
+            <ExternalLink className="w-4 h-4 mr-1" />
+            Go to Tutorials
+          </Link>
+        </div>
+
         {/* Search */}
         <div className="relative mb-6">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search docs..."
+            placeholder="Search API docs..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -192,7 +99,7 @@ function DocsSidebar() {
         </div>
 
         {/* Navigation */}
-        {sections.map((section) => (
+        {apiSections.map((section) => (
           <div key={section.title} className="mb-6">
             <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">
               {section.title}
@@ -234,13 +141,29 @@ function DocsHome() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-4xl font-bold text-slate-900 mb-6">Documentation</h1>
-        <p className="text-xl text-slate-600 mb-12 max-w-3xl">
-          Everything you need to integrate SVM-Pay into your application and start accepting cross-chain payments.
+        <h1 className="text-4xl font-bold text-slate-900 mb-6">API Reference</h1>
+        <p className="text-xl text-slate-600 mb-8 max-w-3xl">
+          Complete API documentation for all SVM-Pay classes, methods, types, and integrations. 
+          Find detailed specifications for every component in the SVM-Pay ecosystem.
         </p>
 
+        {/* Cross-navigation */}
+        <div className="mb-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+          <h3 className="text-lg font-semibold text-blue-900 mb-2">Looking for Tutorials?</h3>
+          <p className="text-blue-800 mb-3">
+            Need step-by-step guides and implementation examples? Check out our comprehensive tutorials section.
+          </p>
+          <Link 
+            to="/tutorials" 
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <ExternalLink className="w-4 h-4 mr-2" />
+            Browse Tutorials
+          </Link>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sections.flatMap(section => section.items).map((item, index) => (
+          {apiSections.flatMap(section => section.items).map((item, index) => (
             <motion.div
               key={item.href}
               initial={{ opacity: 0, y: 20 }}
@@ -261,7 +184,7 @@ function DocsHome() {
                   {item.name}
                 </h3>
                 <p className="text-slate-600 text-sm">
-                  {getDocDescription(item.name)}
+                  {getApiDescription(item.name)}
                 </p>
               </Link>
             </motion.div>
@@ -272,16 +195,32 @@ function DocsHome() {
   )
 }
 
-function getDocDescription(name: string): string {
+function getApiDescription(name: string): string {
   const descriptions: Record<string, string> = {
-    'Developer Guide': 'Complete guide to integrating SVM-Pay with code examples and tutorials.',
-    'API Reference': 'Detailed API documentation with all methods, parameters, and responses.',
-    'CLI Tool': 'Command-line interface for testing and managing SVM-Pay transactions.',
-    'Cross-Chain Payments': 'Learn how to implement cross-chain payments between EVM and SVM networks.',
-    'Architecture': 'Technical architecture overview and system design principles.',
-    'Security': 'Security best practices and recommendations for production deployments.'
+    'SVMPay Class': 'Main SDK class for creating payment URLs and processing transactions.',
+    'SVMPayServer Class': 'Server-side SDK with additional features for transaction verification.',
+    'Core Types': 'TypeScript type definitions for all SVM-Pay interfaces and enums.',
+    'URL Scheme': 'Payment URL creation and parsing functionality.',
+    'Reference Generation': 'Utilities for generating unique payment reference IDs.',
+    'Solana Adapter': 'Network adapter for Solana blockchain integration.',
+    'Sonic Adapter': 'Network adapter for Sonic SVM network integration.',
+    'Eclipse Adapter': 'Network adapter for Eclipse SVM network integration.',
+    'Soon Adapter': 'Network adapter for Soon SVM network integration.',
+    'Adapter Factory': 'Factory pattern for managing network adapters.',
+    'Bridge Adapters': 'Interface definitions for cross-chain bridge integrations.',
+    'Cross-Chain Manager': 'Manager for handling cross-chain payment operations.',
+    'Bridge Types': 'Type definitions for bridge operations and results.',
+    'Transfer Handler': 'Handler for processing simple token transfer requests.',
+    'Transaction Handler': 'Handler for processing complex transaction requests.',
+    'Cross-Chain Handler': 'Handler for processing cross-chain payment requests.',
+    'CLI Commands': 'Command-line interface specifications and options.',
+    'Configuration': 'Configuration management for CLI and SDK settings.',
+    'Solana Utils': 'Utilities for Solana-specific operations and wallet management.',
+    'History Management': 'Payment history storage and retrieval functionality.',
+    'WalletConnect Integration': 'Integration with WalletConnect protocol for wallet connections.',
+    'Connection Manager': 'Manager for handling wallet connection states and operations.'
   }
-  return descriptions[name] || 'Documentation for SVM-Pay integration.'
+  return descriptions[name] || 'API documentation for SVM-Pay component.'
 }
 
 export function DocsPage() {
@@ -291,80 +230,49 @@ export function DocsPage() {
       <div className="flex-1">
         <Routes>
           <Route path="/" element={<DocsHome />} />
-          <Route path="/developer-guide" element={<DeveloperGuideDoc />} />
-          <Route path="/api" element={<ApiDoc />} />
-          <Route path="/cli" element={<CliDoc />} />
           
-          {/* E-commerce Tutorials */}
-          <Route path="/tutorials/ecommerce" element={<EcommerceTutorials />} />
-          <Route path="/tutorials/ecommerce/online-store" element={<OnlineStoreIntegrationTutorial />} />
-          <Route path="/tutorials/ecommerce/marketplace-escrow" element={<MarketplaceEscrowTutorial />} />
-          <Route path="/tutorials/ecommerce/subscription-box" element={<SubscriptionBoxTutorial />} />
-          <Route path="/tutorials/ecommerce/digital-products" element={<DigitalProductStoreTutorial />} />
-          <Route path="/tutorials/ecommerce/flash-sales" element={<FlashSaleManagementTutorial />} />
+          {/* Core SDK */}
+          <Route path="/sdk/svmpay" element={<SVMPayClassDoc />} />
+          <Route path="/sdk/server" element={<SVMPayServerClassDoc />} />
+          <Route path="/core/types" element={<CoreTypesDoc />} />
+          <Route path="/core/url-scheme" element={<URLSchemeDoc />} />
+          <Route path="/core/reference" element={<ReferenceDoc />} />
           
-          {/* Gaming Tutorials */}
-          <Route path="/tutorials/gaming" element={<GamingTutorials />} />
-          <Route path="/tutorials/gaming/currency-exchange" element={<InGameCurrencyTutorial />} />
-          <Route path="/tutorials/gaming/nft-marketplace" element={<NFTMarketplaceTutorial />} />
-          <Route path="/tutorials/gaming/tournament-prizes" element={<TournamentPrizeDistributionTutorial />} />
-          <Route path="/tutorials/gaming/play-to-earn" element={<PlayToEarnRewardsTutorial />} />
-          <Route path="/tutorials/gaming/asset-rental" element={<GameAssetRentalTutorial />} />
+          {/* Network Adapters */}
+          <Route path="/network/solana" element={<SolanaAdapterDoc />} />
+          <Route path="/network/sonic" element={<SonicAdapterDoc />} />
+          <Route path="/network/eclipse" element={<EclipseAdapterDoc />} />
+          <Route path="/network/soon" element={<SoonAdapterDoc />} />
+          <Route path="/network/factory" element={<AdapterFactoryDoc />} />
           
-          {/* SaaS Tutorials */}
-          <Route path="/tutorials/saas" element={<SaaSTutorials />} />
-          <Route path="/tutorials/saas/subscription-billing" element={<SaaSSubscriptionBillingTutorial />} />
-          <Route path="/tutorials/saas/freelance-escrow" element={<FreelancePaymentEscrowTutorial />} />
-          <Route path="/tutorials/saas/time-tracking" element={<ConsultingTimeTrackingTutorial />} />
-          <Route path="/tutorials/saas/api-billing" element={<APIUsageBillingTutorial />} />
-          <Route path="/tutorials/saas/license-management" element={<SoftwareLicenseManagementTutorial />} />
-          <Route path="/tutorials/saas/n8n-integration" element={<N8nIntegrationTutorial />} />
+          {/* Bridge System */}
+          <Route path="/bridge/adapters" element={<BridgeAdaptersDoc />} />
+          <Route path="/bridge/cross-chain" element={<CrossChainManagerDoc />} />
+          <Route path="/bridge/types" element={<BridgeTypesDoc />} />
           
-          {/* DeFi Tutorials */}
-          <Route path="/tutorials/defi" element={<DeFiTutorials />} />
-          <Route path="/tutorials/defi/yield-farming" element={<YieldFarmingRewardsTutorial />} />
-          <Route path="/tutorials/defi/arbitrage-bot" element={<CrossChainArbitrageBotTutorial />} />
-          <Route path="/tutorials/defi/lending-protocol" element={<LendingProtocolIntegrationTutorial />} />
-          <Route path="/tutorials/defi/dex-fees" element={<DEXTradingFeeDistributionTutorial />} />
-          <Route path="/tutorials/defi/amm" element={<AutomatedMarketMakerTutorial />} />
+          {/* Request Handlers */}
+          <Route path="/handlers/transfer" element={<TransferHandlerDoc />} />
+          <Route path="/handlers/transaction" element={<TransactionHandlerDoc />} />
+          <Route path="/handlers/cross-chain" element={<CrossChainHandlerDoc />} />
           
-          {/* Social Tutorials */}
-          <Route path="/tutorials/social" element={<SocialTutorials />} />
-          <Route path="/tutorials/social/creator-tipping" element={<CreatorTippingSystemTutorial />} />
-          <Route path="/tutorials/social/creator-subscriptions" element={<ContentCreatorSubscriptionsTutorial />} />
-          <Route path="/tutorials/social/nft-drops" element={<NFTDropPlatformTutorial />} />
-          <Route path="/tutorials/social/community-rewards" element={<CommunityRewardSystemTutorial />} />
+          {/* CLI Integration */}
+          <Route path="/cli/commands" element={<CLICommandsDoc />} />
+          <Route path="/cli/config" element={<CLIConfigDoc />} />
+          <Route path="/cli/solana" element={<CLISolanaDoc />} />
+          <Route path="/cli/history" element={<CLIHistoryDoc />} />
           
-          {/* Other category pages */}
-          <Route path="/tutorials/defi" element={<DeFiTutorials />} />
-          <Route path="/tutorials/social" element={<SocialTutorials />} />
-          <Route path="/tutorials/enterprise" element={<EnterpriseTutorials />} />
-          <Route path="/tutorials/cross-chain" element={<CrossChainTutorials />} />
-          <Route path="/tutorials/mobile" element={<MobileTutorials />} />
-          
-          {/* Cross-Chain Advanced Tutorial Routes */}
-          <Route path="/tutorials/cross-chain/arbitrage" element={<MultiChainArbitrageTutorial />} />
-          <Route path="/tutorials/cross-chain/liquidity-pools" element={<CrossChainLiquidityPoolTutorial />} />
-          <Route path="/tutorials/cross-chain/payment-routing" element={<PaymentRoutingOptimizationTutorial />} />
-          <Route path="/tutorials/cross-chain/governance" element={<CrossChainGovernanceTutorial />} />
-          
-          {/* Mobile & IoT Tutorial Routes */}
-          <Route path="/tutorials/mobile/wallet-integration" element={<MobileWalletIntegrationTutorial />} />
-          <Route path="/tutorials/mobile/iot-micropayments" element={<IoTMicropaymentsTutorial />} />
-          <Route path="/tutorials/mobile/smart-city" element={<SmartCityPaymentsTutorial />} />
-          <Route path="/tutorials/mobile/v2x-payments" element={<V2XPaymentsTutorial />} />
-          
-          <Route path="/cross-chain" element={<CrossChainDoc />} />
-          <Route path="/architecture" element={<ArchitectureDoc />} />
-          <Route path="/security" element={<SecurityDoc />} />
+          {/* WalletConnect */}
+          <Route path="/walletconnect/integration" element={<WalletConnectIntegrationDoc />} />
+          <Route path="/walletconnect/manager" element={<WalletConnectManagerDoc />} />
         </Routes>
       </div>
     </div>
   )
 }
 
-// Individual documentation components
-function DeveloperGuideDoc() {
+// API Documentation Components
+
+function SVMPayClassDoc() {
   return (
     <div className="pt-20 p-8 max-w-4xl">
       <motion.div
@@ -372,170 +280,50 @@ function DeveloperGuideDoc() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-4xl font-bold text-slate-900 mb-6">Developer Guide</h1>
+        <h1 className="text-4xl font-bold text-slate-900 mb-6">SVMPay Class</h1>
         
         <div className="prose prose-slate max-w-none">
           <p className="text-xl text-slate-600 mb-8">
-            Welcome to the SVM-Pay Developer Guide! This guide will help you integrate SVM-Pay into your applications and start accepting payments across multiple SVM networks.
+            Main SDK class for SVM-Pay operations. Handles payment URL creation, transaction processing, and payment status monitoring.
           </p>
 
-          <h2>Quick Start</h2>
-          <p>Get started with SVM-Pay in just a few minutes:</p>
-
-          <h3>1. Installation</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <code className="text-green-400">npm install svm-pay</code>
-          </div>
-
-          <h3>2. Basic Usage</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
+          <h2>Import</h2>
+          <div className="bg-slate-900 rounded-lg p-4 mb-6">
             <pre className="text-slate-100">
-{`import { SVMPay } from 'svm-pay'
-
-const svmPay = new SVMPay()
-
-// Create a payment URL
-const paymentUrl = svmPay.createTransferUrl(
-  'YOUR_WALLET_ADDRESS',
-  '1.0',
-  {
-    label: 'Your Store',
-    message: 'Payment for Order #123',
-    references: ['order-123']
-  }
-)`}
+{`import { SVMPay } from 'svm-pay'`}
             </pre>
           </div>
 
-          <h3>3. Cross-Chain Payments</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`import { CrossChainRequestFactory, EVMNetwork, SVMNetwork } from 'svm-pay'
-
-// Create cross-chain payment request
-const request = CrossChainRequestFactory.createTransferRequest({
-  sourceNetwork: EVMNetwork.ETHEREUM,
-  destinationNetwork: SVMNetwork.SOLANA,
-  recipient: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
-  amount: '100',
-  token: '0xA0b86a33E6441c4d0C85c81a1a4e18a3f3F3f77f'
-})
-
-// Execute payment
-const result = await paymentManager.executePayment(request)`}
-            </pre>
-          </div>
-
-          <h2>Integration Examples</h2>
-          
-          <h3>React Integration</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`import { useSVMPay } from 'svm-pay/react'
-
-function PaymentForm() {
-  const { executePayment, loading, error } = useSVMPay()
-  
-  const handlePayment = async () => {
-    await executePayment({
-      recipient: walletAddress,
-      amount: 50,
-      token: 'USDC'
-    })
-  }
-  
-  return (
-    <button onClick={handlePayment} disabled={loading}>
-      {loading ? 'Processing...' : 'Pay with SVM-Pay'}
-    </button>
-  )
-}`}
-            </pre>
-          </div>
-
-          <h3>URL Scheme</h3>
-          <p>SVM-Pay supports URL schemes for easy payment links:</p>
-          <div className="bg-slate-100 rounded-lg p-4 mb-4">
-            <code className="text-slate-800">
-              solana:DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263?amount=100&token=USDC&label=Store%20Payment
-            </code>
-          </div>
-
-          <h2>Error Handling</h2>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`try {
-  const result = await svmPay.executePayment(request)
-  console.log('Payment successful:', result.signature)
-} catch (error) {
-  if (error instanceof PaymentError) {
-    console.error('Payment failed:', error.message)
-    // Handle specific payment errors
-  } else {
-    console.error('Unexpected error:', error)
-  }
-}`}
-            </pre>
-          </div>
-        </div>
-      </motion.div>
-    </div>
-  )
-}
-
-function ApiDoc() {
-  return (
-    <div className="pt-20 p-8 max-w-4xl">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h1 className="text-4xl font-bold text-slate-900 mb-6">API Reference</h1>
-        
-        <div className="prose prose-slate max-w-none">
-          <p className="text-xl text-slate-600 mb-8">
-            Complete API reference for SVM-Pay with all methods, parameters, and responses.
-          </p>
-
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
-            <h3 className="text-lg font-semibold text-blue-900 mb-2">📋 Quick Navigation</h3>
-            <ul className="text-sm text-blue-800 space-y-1">
-              <li><a href="#core-classes" className="hover:underline">Core Classes</a></li>
-              <li><a href="#types-interfaces" className="hover:underline">Types & Interfaces</a></li>
-              <li><a href="#react-components" className="hover:underline">React Components</a></li>
-              <li><a href="#vue-components" className="hover:underline">Vue Components</a></li>
-              <li><a href="#angular-components" className="hover:underline">Angular Components</a></li>
-              <li><a href="#bridge-adapters" className="hover:underline">Bridge Adapters</a></li>
-              <li><a href="#network-adapters" className="hover:underline">Network Adapters</a></li>
-              <li><a href="#error-handling" className="hover:underline">Error Handling</a></li>
+          <h2>Constructor</h2>
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold mb-3">new SVMPay(config?: SVMPayConfig)</h3>
+            <p className="text-slate-600 mb-4">Creates a new SVMPay SDK instance.</p>
+            
+            <h4 className="font-semibold mb-2">Parameters:</h4>
+            <ul className="text-slate-600 space-y-1 mb-4">
+              <li><code>config?: SVMPayConfig</code> - Optional configuration object</li>
+              <li><code>config.defaultNetwork?: SVMNetwork</code> - Default network to use (default: 'solana')</li>
+              <li><code>config.apiEndpoint?: string</code> - API endpoint for server operations</li>
+              <li><code>config.debug?: boolean</code> - Enable debug logging (default: false)</li>
             </ul>
-          </div>
 
-          <h2 id="core-classes">Core Classes</h2>
-
-          <h3>SVMPay</h3>
-          <p>Main class for SVM-Pay operations. Handles payment URL creation, transaction processing, and payment status monitoring.</p>
-          
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-4">
-            <h4 className="text-lg font-semibold mb-2">Constructor</h4>
-            <div className="bg-slate-900 rounded-lg p-4 mb-2">
+            <div className="bg-slate-900 rounded-lg p-4">
               <pre className="text-slate-100">
-{`new SVMPay(config?: SVMPayConfig)`}
+{`const svmPay = new SVMPay({
+  defaultNetwork: 'solana',
+  debug: true
+})`}
               </pre>
             </div>
-            <p className="text-sm text-slate-600 mb-2">Parameters:</p>
-            <ul className="text-sm text-slate-600 ml-4 mb-2">
-              <li><code>config.defaultNetwork?: SVMNetwork</code> - Default network to use</li>
-              <li><code>config.apiEndpoint?: string</code> - API endpoint for server operations</li>
-              <li><code>config.debug?: boolean</code> - Enable debug logging</li>
-            </ul>
           </div>
 
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-4">
-            <h4 className="text-lg font-semibold mb-2">createTransferUrl()</h4>
-            <p className="text-sm text-slate-600 mb-2">Creates a payment URL for token transfers.</p>
-            <div className="bg-slate-900 rounded-lg p-4 mb-2">
+          <h2>Methods</h2>
+
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold mb-3">createTransferUrl()</h3>
+            <p className="text-slate-600 mb-4">Creates a payment URL for token transfers.</p>
+            
+            <div className="bg-slate-900 rounded-lg p-4 mb-4">
               <pre className="text-slate-100">
 {`createTransferUrl(
   recipient: string,
@@ -551,188 +339,187 @@ function ApiDoc() {
 ): string`}
               </pre>
             </div>
-            <p className="text-sm text-slate-600 mb-2">Parameters:</p>
-            <ul className="text-sm text-slate-600 ml-4 mb-2">
-              <li><code>recipient: string</code> - Recipient's wallet address</li>
-              <li><code>amount: string</code> - Amount to transfer</li>
-              <li><code>options.network?: SVMNetwork</code> - Target network</li>
-              <li><code>options.splToken?: string</code> - SPL token mint address</li>
-              <li><code>options.label?: string</code> - Payment label</li>
-              <li><code>options.message?: string</code> - Payment message</li>
-              <li><code>options.memo?: string</code> - Transaction memo</li>
-              <li><code>options.references?: string[]</code> - Reference IDs</li>
-            </ul>
-            <p className="text-sm text-slate-600 mb-2">Returns: <code>string</code> - Payment URL</p>
-          </div>
 
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-4">
-            <h4 className="text-lg font-semibold mb-2">createTransactionUrl()</h4>
-            <p className="text-sm text-slate-600 mb-2">Creates a payment URL for complex transactions.</p>
-            <div className="bg-slate-900 rounded-lg p-4 mb-2">
+            <h4 className="font-semibold mb-2">Parameters:</h4>
+            <ul className="text-slate-600 space-y-1 mb-4">
+              <li><code>recipient: string</code> - Recipient's wallet address (base58 encoded)</li>
+              <li><code>amount: string</code> - Amount to transfer as string</li>
+              <li><code>options.network?: SVMNetwork</code> - Target SVM network</li>
+              <li><code>options.splToken?: string</code> - SPL token mint address for token transfers</li>
+              <li><code>options.label?: string</code> - Display label for the payment</li>
+              <li><code>options.message?: string</code> - Payment description</li>
+              <li><code>options.memo?: string</code> - On-chain memo</li>
+              <li><code>options.references?: string[]</code> - Reference IDs for tracking</li>
+            </ul>
+
+            <h4 className="font-semibold mb-2">Returns:</h4>
+            <p className="text-slate-600 mb-4"><code>string</code> - Payment URL</p>
+
+            <h4 className="font-semibold mb-2">Example:</h4>
+            <div className="bg-slate-900 rounded-lg p-4">
               <pre className="text-slate-100">
-{`createTransactionUrl(
-  recipient: string,
-  link: string,
-  options?: {
-    network?: SVMNetwork;
-    label?: string;
-    message?: string;
-    memo?: string;
-    references?: string[];
+{`const paymentUrl = svmPay.createTransferUrl(
+  'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
+  '1.5',
+  {
+    label: 'Coffee Shop',
+    message: 'Payment for coffee and pastry',
+    splToken: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' // USDC
   }
-): string`}
+)`}
               </pre>
             </div>
-            <p className="text-sm text-slate-600 mb-2">Parameters:</p>
-            <ul className="text-sm text-slate-600 ml-4 mb-2">
-              <li><code>recipient: string</code> - Recipient's wallet address</li>
-              <li><code>link: string</code> - URL to fetch transaction details</li>
-              <li><code>options</code> - Additional options (same as createTransferUrl)</li>
-            </ul>
-            <p className="text-sm text-slate-600 mb-2">Returns: <code>string</code> - Payment URL</p>
           </div>
 
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-4">
-            <h4 className="text-lg font-semibold mb-2">parseUrl()</h4>
-            <p className="text-sm text-slate-600 mb-2">Parses a payment URL to extract payment request details.</p>
-            <div className="bg-slate-900 rounded-lg p-4 mb-2">
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold mb-3">parseUrl()</h3>
+            <p className="text-slate-600 mb-4">Parses a payment URL to extract payment request details.</p>
+            
+            <div className="bg-slate-900 rounded-lg p-4 mb-4">
               <pre className="text-slate-100">
 {`parseUrl(url: string): PaymentRequest`}
               </pre>
             </div>
-            <p className="text-sm text-slate-600 mb-2">Parameters:</p>
-            <ul className="text-sm text-slate-600 ml-4 mb-2">
+
+            <h4 className="font-semibold mb-2">Parameters:</h4>
+            <ul className="text-slate-600 space-y-1 mb-4">
               <li><code>url: string</code> - Payment URL to parse</li>
             </ul>
-            <p className="text-sm text-slate-600 mb-2">Returns: <code>PaymentRequest</code> - Parsed payment request</p>
+
+            <h4 className="font-semibold mb-2">Returns:</h4>
+            <p className="text-slate-600 mb-4"><code>PaymentRequest</code> - Parsed payment request object</p>
+
+            <h4 className="font-semibold mb-2">Example:</h4>
+            <div className="bg-slate-900 rounded-lg p-4">
+              <pre className="text-slate-100">
+{`const request = svmPay.parseUrl('solana:DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263?amount=1.5&label=Coffee')
+console.log(request.recipient) // 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263'
+console.log(request.amount)    // '1.5'`}
+              </pre>
+            </div>
           </div>
 
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-4">
-            <h4 className="text-lg font-semibold mb-2">generateReference()</h4>
-            <p className="text-sm text-slate-600 mb-2">Generates a unique reference ID for payment tracking.</p>
-            <div className="bg-slate-900 rounded-lg p-4 mb-2">
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold mb-3">generateReference()</h3>
+            <p className="text-slate-600 mb-4">Generates a unique reference ID for payment tracking.</p>
+            
+            <div className="bg-slate-900 rounded-lg p-4 mb-4">
               <pre className="text-slate-100">
 {`generateReference(): string`}
               </pre>
             </div>
-            <p className="text-sm text-slate-600 mb-2">Returns: <code>string</code> - Unique reference ID</p>
-          </div>
 
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-4">
-            <h4 className="text-lg font-semibold mb-2">checkWalletBalance()</h4>
-            <p className="text-sm text-slate-600 mb-2">Checks wallet balance using CLI integration.</p>
-            <div className="bg-slate-900 rounded-lg p-4 mb-2">
+            <h4 className="font-semibold mb-2">Returns:</h4>
+            <p className="text-slate-600 mb-4"><code>string</code> - Unique reference ID</p>
+
+            <h4 className="font-semibold mb-2">Example:</h4>
+            <div className="bg-slate-900 rounded-lg p-4">
               <pre className="text-slate-100">
-{`checkWalletBalance(): Promise<any>`}
+{`const reference = svmPay.generateReference()
+console.log(reference) // 'ref_1a2b3c4d5e6f'`}
               </pre>
             </div>
-            <p className="text-sm text-slate-600 mb-2">Returns: <code>Promise&lt;any&gt;</code> - Wallet balance information</p>
           </div>
 
-          <h3>SVMPayServer</h3>
-          <p>Server-side SDK for SVM-Pay operations. Includes additional features for server environments like transaction verification and webhook handling.</p>
-          
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-4">
-            <h4 className="text-lg font-semibold mb-2">Constructor</h4>
-            <div className="bg-slate-900 rounded-lg p-4 mb-2">
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold mb-3">checkWalletBalance()</h3>
+            <p className="text-slate-600 mb-4">Checks wallet balance using CLI integration.</p>
+            
+            <div className="bg-slate-900 rounded-lg p-4 mb-4">
               <pre className="text-slate-100">
-{`new SVMPayServer(config?: ServerSDKConfig)`}
+{`async checkWalletBalance(): Promise<{
+  balance: any;
+  address: string;
+}>`}
               </pre>
             </div>
-            <p className="text-sm text-slate-600 mb-2">Parameters:</p>
-            <ul className="text-sm text-slate-600 ml-4 mb-2">
-              <li><code>config.defaultNetwork?: SVMNetwork</code> - Default network to use</li>
-              <li><code>config.debug?: boolean</code> - Enable debug logging</li>
-              <li><code>config.secretKey?: string</code> - Secret key for server operations</li>
+
+            <h4 className="font-semibold mb-2">Returns:</h4>
+            <p className="text-slate-600 mb-4"><code>Promise&lt;object&gt;</code> - Wallet balance and address information</p>
+
+            <h4 className="font-semibold mb-2">Throws:</h4>
+            <ul className="text-slate-600 space-y-1 mb-4">
+              <li><code>Error</code> - If private key is not configured</li>
             </ul>
-          </div>
 
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-4">
-            <h4 className="text-lg font-semibold mb-2">generateOrderReference()</h4>
-            <p className="text-sm text-slate-600 mb-2">Generates a deterministic reference ID from an order ID.</p>
-            <div className="bg-slate-900 rounded-lg p-4 mb-2">
+            <h4 className="font-semibold mb-2">Example:</h4>
+            <div className="bg-slate-900 rounded-lg p-4">
               <pre className="text-slate-100">
-{`generateOrderReference(orderId: string): string`}
-              </pre>
-            </div>
-            <p className="text-sm text-slate-600 mb-2">Parameters:</p>
-            <ul className="text-sm text-slate-600 ml-4 mb-2">
-              <li><code>orderId: string</code> - Order ID to generate reference from</li>
-            </ul>
-            <p className="text-sm text-slate-600 mb-2">Returns: <code>string</code> - Deterministic reference ID</p>
-          </div>
-
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-4">
-            <h4 className="text-lg font-semibold mb-2">verifyTransaction()</h4>
-            <p className="text-sm text-slate-600 mb-2">Verifies a transaction against a payment request.</p>
-            <div className="bg-slate-900 rounded-lg p-4 mb-2">
-              <pre className="text-slate-100">
-{`verifyTransaction(
-  transaction: any,
-  request: PaymentRequest
-): boolean`}
-              </pre>
-            </div>
-            <p className="text-sm text-slate-600 mb-2">Parameters:</p>
-            <ul className="text-sm text-slate-600 ml-4 mb-2">
-              <li><code>transaction: any</code> - Transaction to verify</li>
-              <li><code>request: PaymentRequest</code> - Payment request to verify against</li>
-            </ul>
-            <p className="text-sm text-slate-600 mb-2">Returns: <code>boolean</code> - Whether transaction is valid</p>
-          </div>
-
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-4">
-            <h4 className="text-lg font-semibold mb-2">handleWebhook()</h4>
-            <p className="text-sm text-slate-600 mb-2">Handles transaction webhooks for payment processing.</p>
-            <div className="bg-slate-900 rounded-lg p-4 mb-2">
-              <pre className="text-slate-100">
-{`handleWebhook(
-  signature: string,
-  reference: string
-): Promise<PaymentStatus>`}
-              </pre>
-            </div>
-            <p className="text-sm text-slate-600 mb-2">Parameters:</p>
-            <ul className="text-sm text-slate-600 ml-4 mb-2">
-              <li><code>signature: string</code> - Transaction signature</li>
-              <li><code>reference: string</code> - Reference ID</li>
-            </ul>
-            <p className="text-sm text-slate-600 mb-2">Returns: <code>Promise&lt;PaymentStatus&gt;</code> - Payment status</p>
-          </div>
-
-          <h2 id="types-interfaces">Types & Interfaces</h2>
-
-          <h3>SVMPayConfig</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`interface SVMPayConfig {
-  /** Default network to use if not specified */
-  defaultNetwork?: SVMNetwork;
-  
-  /** API endpoint for server-side operations */
-  apiEndpoint?: string;
-  
-  /** Whether to enable debug logging */
-  debug?: boolean;
+{`try {
+  const result = await svmPay.checkWalletBalance()
+  console.log('Balance:', result.balance)
+  console.log('Address:', result.address)
+} catch (error) {
+  console.error('Balance check failed:', error.message)
 }`}
+              </pre>
+            </div>
+          </div>
+
+          <h2>Related Types</h2>
+          <ul className="list-disc list-inside text-slate-600 space-y-2">
+            <li><Link to="/docs/core/types#svmpayconfig" className="text-purple-600 hover:underline">SVMPayConfig</Link></li>
+            <li><Link to="/docs/core/types#paymentrequest" className="text-purple-600 hover:underline">PaymentRequest</Link></li>
+            <li><Link to="/docs/core/types#svmnetwork" className="text-purple-600 hover:underline">SVMNetwork</Link></li>
+          </ul>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+function CoreTypesDoc() {
+  return (
+    <div className="pt-20 p-8 max-w-4xl">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-4xl font-bold text-slate-900 mb-6">Core Types</h1>
+        
+        <div className="prose prose-slate max-w-none">
+          <p className="text-xl text-slate-600 mb-8">
+            TypeScript type definitions for all SVM-Pay interfaces, enums, and data structures.
+          </p>
+
+          <h2>Import</h2>
+          <div className="bg-slate-900 rounded-lg p-4 mb-6">
+            <pre className="text-slate-100">
+{`import { 
+  SVMNetwork, 
+  EVMNetwork, 
+  PaymentRequest, 
+  TransferRequest,
+  PaymentStatus
+} from 'svm-pay'`}
             </pre>
           </div>
 
-          <h3>SVMNetwork</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
+          <h2>Network Enums</h2>
+
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mb-6">
+            <h3 id="svmnetwork" className="text-lg font-semibold mb-3">SVMNetwork</h3>
+            <p className="text-slate-600 mb-4">Supported SVM networks for payments.</p>
+            
+            <div className="bg-slate-900 rounded-lg p-4">
+              <pre className="text-slate-100">
 {`enum SVMNetwork {
   SOLANA = 'solana',
   SONIC = 'sonic',
   ECLIPSE = 'eclipse',
   SOON = 'soon'
 }`}
-            </pre>
+              </pre>
+            </div>
           </div>
 
-          <h3>EVMNetwork</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold mb-3">EVMNetwork</h3>
+            <p className="text-slate-600 mb-4">Supported EVM networks for cross-chain payments.</p>
+            
+            <div className="bg-slate-900 rounded-lg p-4">
+              <pre className="text-slate-100">
 {`enum EVMNetwork {
   ETHEREUM = 'ethereum',
   BNB_CHAIN = 'bnb-chain',
@@ -741,12 +528,18 @@ function ApiDoc() {
   OPTIMISM = 'optimism',
   AVALANCHE = 'avalanche'
 }`}
-            </pre>
+              </pre>
+            </div>
           </div>
 
-          <h3>PaymentRequest</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
+          <h2>Request Types</h2>
+
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mb-6">
+            <h3 id="paymentrequest" className="text-lg font-semibold mb-3">PaymentRequest</h3>
+            <p className="text-slate-600 mb-4">Base interface for all payment requests.</p>
+            
+            <div className="bg-slate-900 rounded-lg p-4">
+              <pre className="text-slate-100">
 {`interface PaymentRequest {
   /** The type of payment request */
   type: RequestType;
@@ -769,12 +562,16 @@ function ApiDoc() {
   /** Optional reference IDs for transaction identification */
   references?: string[];
 }`}
-            </pre>
+              </pre>
+            </div>
           </div>
 
-          <h3>TransferRequest</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold mb-3">TransferRequest</h3>
+            <p className="text-slate-600 mb-4">Request for simple token transfers.</p>
+            
+            <div className="bg-slate-900 rounded-lg p-4">
+              <pre className="text-slate-100">
 {`interface TransferRequest extends PaymentRequest {
   type: RequestType.TRANSFER;
   
@@ -784,51 +581,40 @@ function ApiDoc() {
   /** The SPL token mint address (if transferring an SPL token) */
   splToken?: string;
 }`}
-            </pre>
+              </pre>
+            </div>
           </div>
 
-          <h3>TransactionRequest</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`interface TransactionRequest extends PaymentRequest {
-  type: RequestType.TRANSACTION;
+          <h2>Configuration</h2>
+
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mb-6">
+            <h3 id="svmpayconfig" className="text-lg font-semibold mb-3">SVMPayConfig</h3>
+            <p className="text-slate-600 mb-4">Configuration options for SVMPay SDK.</p>
+            
+            <div className="bg-slate-900 rounded-lg p-4">
+              <pre className="text-slate-100">
+{`interface SVMPayConfig {
+  /** Default network to use if not specified */
+  defaultNetwork?: SVMNetwork;
   
-  /** The URL to fetch the transaction details from */
-  link: string;
+  /** API endpoint for server-side operations */
+  apiEndpoint?: string;
+  
+  /** Whether to enable debug logging */
+  debug?: boolean;
 }`}
-            </pre>
+              </pre>
+            </div>
           </div>
 
-          <h3>CrossChainTransferRequest</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`interface CrossChainTransferRequest extends PaymentRequest {
-  type: RequestType.CROSS_CHAIN_TRANSFER;
-  
-  /** The source network where the payment originates */
-  sourceNetwork: SupportedNetwork;
-  
-  /** The destination network where the payment should arrive */
-  destinationNetwork: SVMNetwork;
-  
-  /** The amount to transfer (as a string to preserve precision) */
-  amount: string;
-  
-  /** The token to transfer (contract address for EVM, mint address for SVM) */
-  token: string;
-  
-  /** Optional bridge to use for the transfer */
-  bridge?: string;
-  
-  /** Optional bridge-specific parameters */
-  bridgeParams?: Record<string, any>;
-}`}
-            </pre>
-          </div>
+          <h2>Status and Storage</h2>
 
-          <h3>PaymentStatus</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold mb-3">PaymentStatus</h3>
+            <p className="text-slate-600 mb-4">Status values for payment tracking.</p>
+            
+            <div className="bg-slate-900 rounded-lg p-4">
+              <pre className="text-slate-100">
 {`enum PaymentStatus {
   CREATED = 'created',
   PENDING = 'pending',
@@ -840,12 +626,16 @@ function ApiDoc() {
   BRIDGE_CONFIRMED = 'bridge-confirmed',
   BRIDGE_FAILED = 'bridge-failed'
 }`}
-            </pre>
+              </pre>
+            </div>
           </div>
 
-          <h3>PaymentRecord</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold mb-3">PaymentRecord</h3>
+            <p className="text-slate-600 mb-4">Complete payment record with status and metadata.</p>
+            
+            <div className="bg-slate-900 rounded-lg p-4">
+              <pre className="text-slate-100">
 {`interface PaymentRecord {
   /** Unique identifier for the payment */
   id: string;
@@ -877,1091 +667,123 @@ function ApiDoc() {
   /** Bridge quote used for cross-chain transfer */
   bridgeQuote?: BridgeQuote;
 }`}
-            </pre>
-          </div>
-
-          <h2 id="react-components">React Components</h2>
-
-          <h3>SVMPayProvider</h3>
-          <p>Context provider for SVM-Pay React integration.</p>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`<SVMPayProvider config={{ defaultNetwork: 'solana' }}>
-  <App />
-</SVMPayProvider>`}
-            </pre>
-          </div>
-
-          <h3>PaymentButton</h3>
-          <p>React component for payment buttons.</p>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`<PaymentButton
-  svmPay={svmPay}
-  recipient="recipient-address"
-  amount="1.0"
-  onComplete={(status, signature) => {
-    console.log('Payment completed:', status, signature);
-  }}
-/>`}
-            </pre>
-          </div>
-
-          <h3>QRCodePayment</h3>
-          <p>React component for QR code payments.</p>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`<QRCodePayment
-  svmPay={svmPay}
-  recipient="recipient-address"
-  amount="1.0"
-  size={250}
-/>`}
-            </pre>
-          </div>
-
-          <h2 id="vue-components">Vue Components</h2>
-
-          <h3>Vue Plugin</h3>
-          <p>Vue plugin for SVM-Pay integration.</p>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`import { createSVMPayPlugin } from 'svm-pay/vue-integration';
-
-app.use(createSVMPayPlugin({
-  defaultNetwork: 'solana'
-}));`}
-            </pre>
-          </div>
-
-          <h2 id="angular-components">Angular Components</h2>
-
-          <h3>SVMPayModule</h3>
-          <p>Angular module for SVM-Pay integration.</p>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`import { SVMPayModule } from 'svm-pay/angular';
-
-@NgModule({
-  imports: [
-    SVMPayModule.forRoot({
-      defaultNetwork: 'solana'
-    })
-  ]
-})`}
-            </pre>
-          </div>
-
-          <h2 id="bridge-adapters">Bridge Adapters</h2>
-
-          <h3>BridgeAdapter</h3>
-          <p>Interface for bridge adapters in cross-chain transfers.</p>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`interface BridgeAdapter {
-  /** Bridge information */
-  info: BridgeInfo;
-  
-  /** Quote a cross-chain transfer */
-  quote(request: CrossChainTransferRequest): Promise<BridgeQuote>;
-  
-  /** Execute a cross-chain transfer */
-  execute(request: CrossChainTransferRequest, quote: BridgeQuote): Promise<BridgeTransferResult>;
-  
-  /** Check the status of a bridge transfer */
-  checkTransferStatus(transferId: string): Promise<BridgeTransferStatus>;
-  
-  /** Check if this bridge supports a specific network pair and token */
-  supportsTransfer(
-    sourceNetwork: SupportedNetwork, 
-    destinationNetwork: SVMNetwork, 
-    token: string
-  ): boolean;
-}`}
-            </pre>
-          </div>
-
-          <h3>BridgeQuote</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`interface BridgeQuote {
-  /** Unique identifier for the quote */
-  id: string;
-  
-  /** Input amount (source network) */
-  inputAmount: string;
-  
-  /** Output amount (destination network) */
-  outputAmount: string;
-  
-  /** Bridge fee */
-  fee: string;
-  
-  /** Estimated transfer time in seconds */
-  estimatedTime: number;
-  
-  /** Quote expiry timestamp */
-  expiresAt: number;
-  
-  /** Additional quote data */
-  data?: Record<string, any>;
-}`}
-            </pre>
-          </div>
-
-          <h2 id="network-adapters">Network Adapters</h2>
-
-          <h3>NetworkAdapter</h3>
-          <p>Interface for network adapters handling different SVM networks.</p>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`interface NetworkAdapter {
-  /** The network this adapter handles */
-  network: SVMNetwork;
-  
-  /** Create a transaction from a transfer request */
-  createTransferTransaction(request: TransferRequest): Promise<string>;
-  
-  /** Fetch a transaction from a transaction request */
-  fetchTransaction(request: TransactionRequest): Promise<string>;
-  
-  /** Submit a signed transaction to the network */
-  submitTransaction(transaction: string, signature: string): Promise<string>;
-  
-  /** Check the status of a transaction */
-  checkTransactionStatus(signature: string): Promise<PaymentStatus>;
-}`}
-            </pre>
-          </div>
-
-          <h2 id="error-handling">Error Handling</h2>
-          <p>SVM-Pay provides specific error types for different failure scenarios:</p>
-
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`// Base error class
-class PaymentError extends Error {
-  code: string;
-  details?: any;
-}
-
-// Network-specific errors
-class NetworkError extends PaymentError {
-  // Network connection, RPC, or blockchain errors
-}
-
-// Bridge-specific errors
-class BridgeError extends PaymentError {
-  // Cross-chain bridge operation errors
-}
-
-// Validation errors
-class ValidationError extends PaymentError {
-  // Input validation or parameter errors
-}
-
-// Transaction errors
-class TransactionError extends PaymentError {
-  // Transaction creation, signing, or submission errors
-}`}
-            </pre>
-          </div>
-
-          <h2>Example Usage</h2>
-          
-          <h3>Basic Payment</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`import { SVMPay } from 'svm-pay';
-
-const svmPay = new SVMPay({
-  defaultNetwork: 'solana',
-  debug: true
-});
-
-const paymentUrl = svmPay.createTransferUrl(
-  'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
-  '1.0',
-  {
-    label: 'Coffee Shop',
-    message: 'Payment for coffee'
-  }
-);
-
-console.log('Payment URL:', paymentUrl);`}
-            </pre>
-          </div>
-
-          <h3>Cross-Chain Payment</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`import { CrossChainPaymentManager } from 'svm-pay';
-
-const manager = new CrossChainPaymentManager();
-
-const request = {
-  type: 'cross-chain-transfer',
-  sourceNetwork: 'ethereum',
-  destinationNetwork: 'solana',
-  recipient: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
-  amount: '100',
-  token: 'USDC'
-};
-
-const quote = await manager.getQuote(request);
-const result = await manager.executePayment(request, quote);
-
-console.log('Payment result:', result);`}
-            </pre>
-          </div>
-
-          <h3>Server-Side Integration</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`import { SVMPayServer } from 'svm-pay/server';
-
-const server = new SVMPayServer({
-  defaultNetwork: 'solana',
-  secretKey: process.env.SECRET_KEY
-});
-
-// Create payment URL with order tracking
-const paymentUrl = server.createTransferUrl(
-  'recipient-address',
-  '50.00',
-  {
-    orderId: 'order-123',
-    label: 'E-commerce Store',
-    message: 'Payment for Order #123'
-  }
-);
-
-// Handle webhook
-app.post('/webhook', async (req, res) => {
-  const { signature, reference } = req.body;
-  
-  try {
-    const status = await server.handleWebhook(signature, reference);
-    console.log('Payment status:', status);
-    res.json({ status: 'success' });
-  } catch (error) {
-    console.error('Webhook error:', error);
-    res.status(400).json({ error: error.message });
-  }
-});`}
-            </pre>
-          </div>
-
-          <h3>React Integration</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`import { SVMPayProvider, SimplePaymentButton } from 'svm-pay/react-integration';
-
-function App() {
-  return (
-    <SVMPayProvider config={{ defaultNetwork: 'solana' }}>
-      <PaymentPage />
-    </SVMPayProvider>
-  );
-}
-
-function PaymentPage() {
-  const handlePaymentComplete = (status, signature) => {
-    console.log('Payment completed:', status, signature);
-    // Handle successful payment
-  };
-
-  return (
-    <div>
-      <h1>Checkout</h1>
-      <SimplePaymentButton
-        recipient="DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263"
-        amount="25.00"
-        onComplete={handlePaymentComplete}
-      />
-    </div>
-  );
-}`}
-            </pre>
-          </div>
-        </div>
-      </motion.div>
-    </div>
-  )
-}
-
-function CliDoc() {
-  return (
-    <div className="pt-20 p-8 max-w-4xl">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h1 className="text-4xl font-bold text-slate-900 mb-6">CLI Tool</h1>
-        
-        <div className="prose prose-slate max-w-none">
-          <p className="text-xl text-slate-600 mb-8">
-            Command-line interface for testing and managing SVM-Pay transactions.
-          </p>
-
-          <h2>Installation</h2>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <code className="text-green-400">npm install -g svm-pay-cli</code>
-          </div>
-
-          <h2>Commands</h2>
-
-          <h3>Create Payment URL</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <code className="text-green-400">svm-pay create-url --recipient WALLET_ADDRESS --amount 1.0 --label "Test Payment"</code>
-          </div>
-
-          <h3>Test Cross-Chain Payment</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <code className="text-green-400">svm-pay test-crosschain --from ethereum --to solana --amount 100 --token USDC</code>
-          </div>
-
-          <h3>Get Bridge Quotes</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <code className="text-green-400">svm-pay get-quotes --from ethereum --to solana --amount 100 --token USDC</code>
-          </div>
-
-          <h3>Check Payment Status</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <code className="text-green-400">svm-pay status --payment-id PAYMENT_ID</code>
-          </div>
-
-          <h2>Options</h2>
-          <table className="min-w-full divide-y divide-slate-200 mb-6">
-            <thead className="bg-slate-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Option</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Description</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Example</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-slate-200">
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-900">--recipient</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">Target wallet address</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263</td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-900">--amount</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">Payment amount</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">1.0</td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-900">--token</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">Token symbol or address</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">USDC</td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-900">--network</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">Network name</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">ethereum, solana</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <h2>Configuration</h2>
-          <p>Create a config file at <code>~/.svm-pay/config.json</code>:</p>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`{
-  "networks": {
-    "ethereum": {
-      "rpc": "https://mainnet.infura.io/v3/YOUR_KEY"
-    },
-    "solana": {
-      "rpc": "https://api.mainnet-beta.solana.com"
-    }
-  },
-  "bridges": {
-    "wormhole": {
-      "enabled": true
-    },
-    "allbridge": {
-      "enabled": true
-    }
-  }
-}`}
-            </pre>
-          </div>
-        </div>
-      </motion.div>
-    </div>
-  )
-}
-
-function CrossChainDoc() {
-  return (
-    <div className="pt-20 p-8 max-w-4xl">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h1 className="text-4xl font-bold text-slate-900 mb-6">Cross-Chain Payments</h1>
-        
-        <div className="prose prose-slate max-w-none">
-          <p className="text-xl text-slate-600 mb-8">
-            Learn how to implement cross-chain payments between EVM and SVM networks using SVM-Pay.
-          </p>
-
-          <h2>Supported Networks</h2>
-          
-          <h3>EVM Networks (Source)</h3>
-          <ul>
-            <li>Ethereum</li>
-            <li>BNB Chain</li>
-            <li>Polygon</li>
-            <li>Arbitrum</li>
-            <li>Optimism</li>
-            <li>Avalanche</li>
-          </ul>
-
-          <h3>SVM Networks (Destination)</h3>
-          <ul>
-            <li>Solana</li>
-            <li>Sonic</li>
-            <li>Eclipse</li>
-            <li>s00n</li>
-          </ul>
-
-          <h2>Bridge Partners</h2>
-          
-          <h3>Wormhole</h3>
-          <p>Fast and secure cross-chain transfers with:</p>
-          <ul>
-            <li>~5 minute transfer time</li>
-            <li>Support for major tokens (USDC, USDT, WETH, WBTC)</li>
-            <li>High security with Guardian network</li>
-          </ul>
-
-          <h3>Allbridge</h3>
-          <p>Cost-effective cross-chain solution with:</p>
-          <ul>
-            <li>~3 minute transfer time</li>
-            <li>Lower fees compared to other bridges</li>
-            <li>Wide token support</li>
-          </ul>
-
-          <h2>Implementation Example</h2>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`import { 
-  CrossChainPaymentManager, 
-  CrossChainRequestFactory,
-  EVMNetwork,
-  SVMNetwork 
-} from 'svm-pay'
-
-// Initialize payment manager
-const paymentManager = new CrossChainPaymentManager({
-  bridges: ['wormhole', 'allbridge'],
-  monitoring: true
-})
-
-// Create payment request
-const request = CrossChainRequestFactory.createTransferRequest({
-  sourceNetwork: EVMNetwork.ETHEREUM,
-  destinationNetwork: SVMNetwork.SOLANA,
-  recipient: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
-  amount: '100',
-  token: '0xA0b86a33E6441c4d0C85c81a1a4e18a3f3F3f77f', // USDC
-  bridgePreference: 'fastest'
-})
-
-// Execute payment
-const result = await paymentManager.executePayment(request)
-
-// Monitor payment status
-result.on('status', (status) => {
-  console.log('Payment status:', status)
-  switch (status) {
-    case 'INITIATED':
-      console.log('Payment started')
-      break
-    case 'BRIDGING':
-      console.log('Transferring via bridge')
-      break
-    case 'BRIDGE_CONFIRMED':
-      console.log('Bridge transfer confirmed')
-      break
-    case 'COMPLETED':
-      console.log('Payment completed successfully')
-      break
-  }
-})`}
-            </pre>
-          </div>
-
-          <h2>Bridge Selection</h2>
-          <p>SVM-Pay automatically selects the best bridge based on:</p>
-          <ul>
-            <li><strong>Speed</strong>: Transfer time from source to destination</li>
-            <li><strong>Cost</strong>: Bridge fees and gas costs</li>
-            <li><strong>Reliability</strong>: Success rate and uptime</li>
-          </ul>
-
-          <p>You can also specify bridge preferences:</p>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`// Fastest transfer
-const request = { 
-  ...baseRequest, 
-  bridgePreference: 'fastest' 
-}
-
-// Cheapest fees
-const request = { 
-  ...baseRequest, 
-  bridgePreference: 'cheapest' 
-}
-
-// Most reliable
-const request = { 
-  ...baseRequest, 
-  bridgePreference: 'most_reliable' 
-}`}
-            </pre>
-          </div>
-
-          <h2>Error Handling</h2>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`try {
-  const result = await paymentManager.executePayment(request)
-} catch (error) {
-  if (error instanceof BridgeError) {
-    console.error('Bridge error:', error.message)
-    // Retry with different bridge
-  } else if (error instanceof NetworkError) {
-    console.error('Network error:', error.message)
-    // Check network connectivity
-  } else {
-    console.error('Unexpected error:', error)
-  }
-}`}
-            </pre>
-          </div>
-        </div>
-      </motion.div>
-    </div>
-  )
-}
-
-function ArchitectureDoc() {
-  return (
-    <div className="pt-20 p-8 max-w-4xl">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h1 className="text-4xl font-bold text-slate-900 mb-6">Architecture</h1>
-        
-        <div className="prose prose-slate max-w-none">
-          <p className="text-xl text-slate-600 mb-8">
-            Technical architecture overview and system design principles of SVM-Pay.
-          </p>
-
-          <h2>System Overview</h2>
-          <p>SVM-Pay is designed as a modular, extensible payment infrastructure with the following key components:</p>
-
-          <h3>Core Components</h3>
-          <ul>
-            <li><strong>Payment Manager</strong>: Orchestrates payment flows</li>
-            <li><strong>Network Adapters</strong>: Handle network-specific operations</li>
-            <li><strong>Bridge Adapters</strong>: Integrate with cross-chain bridges</li>
-            <li><strong>URL Parser</strong>: Processes payment URLs</li>
-            <li><strong>Storage Layer</strong>: Persists payment data</li>
-          </ul>
-
-          <h2>Architecture Principles</h2>
-          
-          <h3>1. Modularity</h3>
-          <p>Each component is designed as an independent module with clear interfaces:</p>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`interface NetworkAdapter {
-  createTransaction(request: TransactionRequest): Promise<Transaction>
-  submitTransaction(transaction: Transaction): Promise<string>
-  getTransactionStatus(hash: string): Promise<TransactionStatus>
-}`}
-            </pre>
-          </div>
-
-          <h3>2. Extensibility</h3>
-          <p>New networks and bridges can be added without modifying core code:</p>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`// Add new network
-NetworkAdapterFactory.register('new-network', NewNetworkAdapter)
-
-// Add new bridge
-BridgeAdapterFactory.register('new-bridge', NewBridgeAdapter)`}
-            </pre>
-          </div>
-
-          <h3>3. Type Safety</h3>
-          <p>Full TypeScript support with comprehensive type definitions:</p>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`interface CrossChainTransferRequest {
-  sourceNetwork: EVMNetwork
-  destinationNetwork: SVMNetwork
-  recipient: string
-  amount: string
-  token: string
-}`}
-            </pre>
-          </div>
-
-          <h2>Data Flow</h2>
-          <ol>
-            <li><strong>Request Creation</strong>: User creates payment request</li>
-            <li><strong>Validation</strong>: System validates request parameters</li>
-            <li><strong>Bridge Selection</strong>: Optimal bridge is selected</li>
-            <li><strong>Transaction Creation</strong>: Network-specific transactions are created</li>
-            <li><strong>Execution</strong>: Transactions are submitted and monitored</li>
-            <li><strong>Completion</strong>: Final status is reported</li>
-          </ol>
-
-          <h2>Security Considerations</h2>
-          <ul>
-            <li><strong>Input Validation</strong>: All inputs are validated before processing</li>
-            <li><strong>Address Verification</strong>: Wallet addresses are verified for each network</li>
-            <li><strong>Amount Validation</strong>: Payment amounts are checked for validity</li>
-            <li><strong>Error Handling</strong>: Comprehensive error handling prevents failures</li>
-          </ul>
-
-          <h2>Performance Optimizations</h2>
-          <ul>
-            <li><strong>Caching</strong>: Network data is cached to reduce latency</li>
-            <li><strong>Batch Processing</strong>: Multiple requests can be batched</li>
-            <li><strong>Async Operations</strong>: Non-blocking operations for better performance</li>
-            <li><strong>Connection Pooling</strong>: Efficient network connection management</li>
-          </ul>
-        </div>
-      </motion.div>
-    </div>
-  )
-}
-
-function SecurityDoc() {
-  return (
-    <div className="pt-20 p-8 max-w-4xl">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h1 className="text-4xl font-bold text-slate-900 mb-6">Security</h1>
-        
-        <div className="prose prose-slate max-w-none">
-          <p className="text-xl text-slate-600 mb-8">
-            Security best practices and recommendations for production deployments of SVM-Pay.
-          </p>
-
-          <h2>Security Features</h2>
-
-          <h3>Input Validation</h3>
-          <p>All user inputs are thoroughly validated:</p>
-          <ul>
-            <li>Wallet address format validation</li>
-            <li>Amount range checking</li>
-            <li>Token address verification</li>
-            <li>Network parameter validation</li>
-          </ul>
-
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`// Address validation example
-function validateAddress(address: string, network: Network): boolean {
-  switch (network.type) {
-    case 'EVM':
-      return ethers.utils.isAddress(address)
-    case 'SVM':
-      return isValidSolanaAddress(address)
-    default:
-      return false
-  }
-}`}
-            </pre>
-          </div>
-
-          <h3>Transaction Security</h3>
-          <ul>
-            <li>Secure transaction signing</li>
-            <li>Nonce management</li>
-            <li>Gas limit validation</li>
-            <li>Double-spend protection</li>
-          </ul>
-
-          <h3>Bridge Security</h3>
-          <p>Cross-chain transfers use secure bridge protocols:</p>
-          <ul>
-            <li><strong>Wormhole</strong>: Guardian network validation</li>
-            <li><strong>Allbridge</strong>: Multi-signature validation</li>
-            <li>Slippage protection</li>
-            <li>Transfer amount limits</li>
-          </ul>
-
-          <h2>Best Practices</h2>
-
-          <h3>Environment Setup</h3>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`// Use environment variables for sensitive data
-const config = {
-  networks: {
-    ethereum: {
-      rpc: process.env.ETHEREUM_RPC_URL,
-      privateKey: process.env.ETHEREUM_PRIVATE_KEY
-    }
-  }
-}`}
-            </pre>
-          </div>
-
-          <h3>Error Handling</h3>
-          <p>Implement comprehensive error handling:</p>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`try {
-  const result = await executePayment(request)
-} catch (error) {
-  // Log error details for debugging
-  console.error('Payment failed:', error)
-  
-  // Don't expose sensitive information to users
-  throw new Error('Payment processing failed')
-}`}
-            </pre>
-          </div>
-
-          <h3>Rate Limiting</h3>
-          <p>Implement rate limiting to prevent abuse:</p>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`import rateLimit from 'express-rate-limit'
-
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
-})
-
-app.use('/api/payments', limiter)`}
-            </pre>
-          </div>
-
-          <h2>Security Checklist</h2>
-          <ul>
-            <li>✅ Use HTTPS for all API communications</li>
-            <li>✅ Validate all inputs before processing</li>
-            <li>✅ Store private keys securely</li>
-            <li>✅ Implement proper error handling</li>
-            <li>✅ Use rate limiting on API endpoints</li>
-            <li>✅ Monitor transactions for anomalies</li>
-            <li>✅ Keep dependencies updated</li>
-            <li>✅ Implement logging and monitoring</li>
-          </ul>
-
-          <h2>Vulnerability Prevention</h2>
-
-          <h3>Common Attack Vectors</h3>
-          <ul>
-            <li><strong>Address poisoning</strong>: Always validate recipient addresses</li>
-            <li><strong>Amount manipulation</strong>: Validate payment amounts</li>
-            <li><strong>Replay attacks</strong>: Use proper nonce management</li>
-            <li><strong>Bridge exploits</strong>: Monitor bridge security status</li>
-          </ul>
-
-          <h3>Monitoring</h3>
-          <p>Implement comprehensive monitoring:</p>
-          <div className="bg-slate-900 rounded-lg p-4 mb-4">
-            <pre className="text-slate-100">
-{`// Monitor payment anomalies
-function monitorPayment(payment: Payment) {
-  if (payment.amount > LARGE_AMOUNT_THRESHOLD) {
-    alerts.send('Large payment detected', payment)
-  }
-  
-  if (payment.status === 'FAILED') {
-    analytics.track('payment_failed', payment)
-  }
-}`}
-            </pre>
-          </div>
-
-          <h2>Incident Response</h2>
-          <p>Have a plan for security incidents:</p>
-          <ul>
-            <li>Immediate response procedures</li>
-            <li>Communication protocols</li>
-            <li>Recovery procedures</li>
-            <li>Post-incident analysis</li>
-          </ul>
-        </div>
-      </motion.div>
-    </div>
-  )
-}
-
-// E-commerce Tutorials
-function EcommerceTutorials() {
-  const tutorials = [
-    {
-      title: "Online Store Integration",
-      description: "Complete e-commerce store with Solana payments",
-      level: "Beginner",
-      time: "30 minutes",
-      code: `// E-commerce checkout with SVM-Pay
-import { SVMPay, PaymentForm } from '@svm-pay/sdk'
-
-const EcommerceCheckout = ({ cartItems, total }) => {
-  const handlePayment = async (paymentData) => {
-    const payment = SVMPay.createPayment({
-      recipient: process.env.STORE_WALLET,
-      amount: total,
-      token: 'USDC',
-      metadata: {
-        orderId: generateOrderId(),
-        items: cartItems,
-        customerEmail: paymentData.email
-      }
-    })
-
-    const result = await payment.execute()
-    
-    if (result.status === 'SUCCESS') {
-      // Update inventory
-      await updateInventory(cartItems)
-      // Send confirmation email
-      await sendOrderConfirmation(paymentData.email, result.transactionId)
-      // Redirect to success page
-      router.push('/order-success')
-    }
-  }
-
-  return <PaymentForm onSubmit={handlePayment} amount={total} />
-}`
-    },
-    {
-      title: "Marketplace with Escrow",
-      description: "Multi-vendor marketplace with escrow payments",
-      level: "Advanced",
-      time: "2 hours",
-      code: `// Marketplace escrow system
-import { EscrowManager, MultisigWallet } from '@svm-pay/sdk'
-
-const MarketplaceEscrow = ({ seller, buyer, item }) => {
-  const createEscrowPayment = async () => {
-    // Create escrow account
-    const escrow = await EscrowManager.create({
-      seller: seller.wallet,
-      buyer: buyer.wallet,
-      arbitrator: process.env.MARKETPLACE_ARBITRATOR,
-      amount: item.price,
-      token: 'USDC',
-      releaseConditions: {
-        autoReleaseAfter: 7 * 24 * 60 * 60, // 7 days
-        requiresConfirmation: true
-      }
-    })
-
-    // Handle dispute resolution
-    escrow.onDispute(async (dispute) => {
-      await notifyArbitrator(dispute)
-      await freezeEscrow(escrow.id)
-    })
-
-    return escrow
-  }
-}`
-    },
-    {
-      title: "Subscription Box Service",
-      description: "Recurring payments for subscription boxes",
-      level: "Intermediate",
-      time: "1 hour",
-      code: `// Subscription box payments
-import { SubscriptionManager, InventoryManager } from '@svm-pay/sdk'
-
-const SubscriptionBox = ({ customer, plan }) => {
-  const setupSubscription = async () => {
-    const subscription = await SubscriptionManager.create({
-      customer: customer.wallet,
-      merchant: process.env.BUSINESS_WALLET,
-      amount: plan.price,
-      interval: plan.interval, // 'monthly', 'quarterly'
-      token: 'USDC',
-      metadata: {
-        planId: plan.id,
-        customerId: customer.id
-      }
-    })
-
-    // Handle successful payments
-    subscription.onPayment(async (payment) => {
-      await InventoryManager.reserve({
-        customerId: customer.id,
-        items: plan.items,
-        deliveryDate: getNextDeliveryDate()
-      })
-      
-      await sendShippingNotification(customer.email)
-    })
-
-    // Handle failed payments
-    subscription.onFailure(async (failure) => {
-      await handleFailedPayment(customer, failure)
-    })
-
-    return subscription
-  }
-}`
-    },
-    {
-      title: "Digital Product Store",
-      description: "Instant delivery of digital products",
-      level: "Beginner",
-      time: "45 minutes",
-      code: `// Digital product delivery
-import { SVMPay, FileManager, LicenseManager } from '@svm-pay/sdk'
-
-const DigitalStore = ({ product, customer }) => {
-  const purchaseDigitalProduct = async () => {
-    const payment = SVMPay.createPayment({
-      recipient: process.env.STORE_WALLET,
-      amount: product.price,
-      token: 'USDC',
-      metadata: {
-        productId: product.id,
-        customerId: customer.id,
-        type: 'digital'
-      }
-    })
-
-    payment.onSuccess(async (result) => {
-      // Generate unique download link
-      const downloadLink = await FileManager.generateSecureLink({
-        fileId: product.fileId,
-        expiresIn: 24 * 60 * 60, // 24 hours
-        maxDownloads: 3
-      })
-
-      // Create software license if applicable
-      if (product.type === 'software') {
-        await LicenseManager.generate({
-          productId: product.id,
-          customerId: customer.id,
-          licenseType: product.licenseType
-        })
-      }
-
-      // Send download email
-      await sendDownloadEmail(customer.email, downloadLink)
-    })
-
-    return payment.execute()
-  }
-}`
-    },
-    {
-      title: "Flash Sale Management",
-      description: "High-volume flash sale with rate limiting",
-      level: "Advanced",
-      time: "1.5 hours",
-      code: `// Flash sale with rate limiting
-import { SVMPay, RateLimiter, InventoryManager } from '@svm-pay/sdk'
-
-const FlashSale = ({ product, saleConfig }) => {
-  const rateLimiter = new RateLimiter({
-    maxTransactions: 100,
-    timeWindow: 60000, // 1 minute
-    queueSize: 1000
-  })
-
-  const processSalePurchase = async (customer) => {
-    // Check rate limit
-    const canProceed = await rateLimiter.checkLimit(customer.wallet)
-    if (!canProceed) {
-      throw new Error('Rate limit exceeded. Please try again later.')
-    }
-
-    // Reserve inventory atomically
-    const reservation = await InventoryManager.reserve({
-      productId: product.id,
-      quantity: 1,
-      customerId: customer.id,
-      expiresIn: 300 // 5 minutes to complete payment
-    })
-
-    const payment = SVMPay.createPayment({
-      recipient: process.env.STORE_WALLET,
-      amount: saleConfig.salePrice,
-      token: 'USDC',
-      metadata: {
-        reservationId: reservation.id,
-        originalPrice: product.price,
-        discount: product.price - saleConfig.salePrice
-      }
-    })
-
-    payment.onSuccess(async () => {
-      await reservation.confirm()
-      await sendPurchaseConfirmation(customer.email)
-    })
-
-    payment.onFailure(async () => {
-      await reservation.release()
-    })
-
-    return payment.execute()
-  }
-}`
-    }
-  ]
-
-  return (
-    <div className="pt-20 p-8 max-w-6xl">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h1 className="text-4xl font-bold text-slate-900 mb-6">E-commerce Tutorials</h1>
-        <p className="text-xl text-slate-600 mb-8">
-          Build sophisticated e-commerce solutions with Solana payments
-        </p>
-
-        <div className="space-y-8">
-          {tutorials.map((tutorial, index) => (
-            <div key={index} className="bg-white border border-slate-200 rounded-lg p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-xl font-semibold text-slate-900 mb-2">{tutorial.title}</h3>
-                  <p className="text-slate-600 mb-2">{tutorial.description}</p>
-                  <div className="flex space-x-4 text-sm text-slate-500">
-                    <span>Level: {tutorial.level}</span>
-                    <span>Time: {tutorial.time}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-slate-900 rounded-lg p-4">
-                <pre className="text-sm text-slate-100 overflow-x-auto">
-                  <code>{tutorial.code}</code>
-                </pre>
-              </div>
+              </pre>
             </div>
-          ))}
+          </div>
         </div>
       </motion.div>
     </div>
   )
 }
+
+// Placeholder components for other documentation sections
+function SVMPayServerClassDoc() {
+  return (
+    <div className="pt-20 p-8 max-w-4xl">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-4xl font-bold text-slate-900 mb-6">SVMPayServer Class</h1>
+        <p className="text-xl text-slate-600 mb-8">
+          Server-side SDK with additional features for transaction verification and webhook handling.
+        </p>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <p className="text-blue-900">
+            📚 This documentation section is being expanded. Please refer to the source code at 
+            <code className="mx-1 px-2 py-1 bg-blue-200 rounded">src/sdk/server.ts</code> for detailed implementation.
+          </p>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+function URLSchemeDoc() {
+  return (
+    <div className="pt-20 p-8 max-w-4xl">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-4xl font-bold text-slate-900 mb-6">URL Scheme</h1>
+        <p className="text-xl text-slate-600 mb-8">
+          Payment URL creation and parsing functionality for SVM-Pay protocol.
+        </p>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <p className="text-blue-900">
+            📚 This documentation section is being expanded. Please refer to the source code at 
+            <code className="mx-1 px-2 py-1 bg-blue-200 rounded">src/core/url-scheme.ts</code> for detailed implementation.
+          </p>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+function ReferenceDoc() {
+  return (
+    <div className="pt-20 p-8 max-w-4xl">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-4xl font-bold text-slate-900 mb-6">Reference Generation</h1>
+        <p className="text-xl text-slate-600 mb-8">
+          Utilities for generating unique payment reference IDs for transaction tracking.
+        </p>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <p className="text-blue-900">
+            📚 This documentation section is being expanded. Please refer to the source code at 
+            <code className="mx-1 px-2 py-1 bg-blue-200 rounded">src/core/reference.ts</code> for detailed implementation.
+          </p>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+// Network Adapter Documentation
+function SolanaAdapterDoc() {
+  return (
+    <div className="pt-20 p-8 max-w-4xl">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-4xl font-bold text-slate-900 mb-6">Solana Network Adapter</h1>
+        <p className="text-xl text-slate-600 mb-8">
+          Network adapter for Solana blockchain integration and transaction processing.
+        </p>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <p className="text-blue-900">
+            📚 This documentation section is being expanded. Please refer to the source code at 
+            <code className="mx-1 px-2 py-1 bg-blue-200 rounded">src/network/solana.ts</code> for detailed implementation.
+          </p>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+// Placeholder components for remaining sections
+function SonicAdapterDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">Sonic Adapter</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function EclipseAdapterDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">Eclipse Adapter</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function SoonAdapterDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">Soon Adapter</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function AdapterFactoryDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">Adapter Factory</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function BridgeAdaptersDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">Bridge Adapters</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function CrossChainManagerDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">Cross-Chain Manager</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function BridgeTypesDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">Bridge Types</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function TransferHandlerDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">Transfer Handler</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function TransactionHandlerDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">Transaction Handler</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function CrossChainHandlerDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">Cross-Chain Handler</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function CLICommandsDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">CLI Commands</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function CLIConfigDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">CLI Configuration</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function CLISolanaDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">CLI Solana Utils</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function CLIHistoryDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">CLI History Management</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function WalletConnectIntegrationDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">WalletConnect Integration</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function WalletConnectManagerDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">WalletConnect Manager</h1><p className="text-slate-600">Documentation coming soon...</p></div> }

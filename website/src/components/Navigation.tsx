@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Book, PlayCircle, Home, Menu, X } from 'lucide-react'
+import { Book, PlayCircle, Home, Menu, X, Code } from 'lucide-react'
 import { useState } from 'react'
 
 export function Navigation() {
@@ -9,7 +9,8 @@ export function Navigation() {
 
   const navigation = [
     { name: 'Home', href: '/', icon: Home },
-    { name: 'Documentation', href: '/docs', icon: Book },
+    { name: 'Documentation', href: '/docs', icon: Code },
+    { name: 'Tutorials', href: '/tutorials', icon: Book },
     { name: 'Demo', href: '/demo', icon: PlayCircle },
   ]
 
@@ -29,7 +30,8 @@ export function Navigation() {
           <div className="hidden md:flex items-center space-x-8">
             {navigation.map((item) => {
               const isActive = location.pathname === item.href || 
-                (item.href === '/docs' && location.pathname.startsWith('/docs'))
+                (item.href === '/docs' && location.pathname.startsWith('/docs')) ||
+                (item.href === '/tutorials' && location.pathname.startsWith('/tutorials'))
               return (
                 <Link
                   key={item.name}
@@ -76,7 +78,8 @@ export function Navigation() {
           >
             {navigation.map((item) => {
               const isActive = location.pathname === item.href || 
-                (item.href === '/docs' && location.pathname.startsWith('/docs'))
+                (item.href === '/docs' && location.pathname.startsWith('/docs')) ||
+                (item.href === '/tutorials' && location.pathname.startsWith('/tutorials'))
               return (
                 <Link
                   key={item.name}
