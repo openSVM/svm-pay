@@ -1,0 +1,245 @@
+{
+  "name": "E-commerce Order Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "order-webhook",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "name": "Order Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [180, 200],
+      "id": "order-webhook-node"
+    },
+    {
+      "parameters": {
+        "resource": "payment",
+        "operation": "createRequest",
+        "recipient": "={{$json.merchant_wallet}}",
+        "amount": "={{$json.order_total}}",
+        "token": "USDC",
+        "label": "Order Payment",
+        "message": "Payment for order #{{$json.order_id}}",
+        "metadata": {
+          "order_id": "={{$json.order_id}}",
+          "customer_id": "={{$json.customer_id}}",
+          "items": "={{$json.items}}"
+        }
+      },
+      "name": "Create Payment Request",
+      "type": "svmPay",
+      "typeVersion": 1,
+      "position": [400, 200],
+      "id": "payment-request-node",
+      "credentials": {
+        "svmPayApi": {
+          "id": "svm-pay-credentials",
+          "name": "SVM-Pay API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{$node['Order Webhook'].json.callback_url}}",
+        "sendBody": true,
+        "bodyContentType": "json",
+        "jsonData": "{\n  \"order_id\": \"{{$node['Order Webhook'].json.order_id}}\",\n  \"payment_url\": \"{{$json.paymentUrl}}\",\n  \"status\": \"payment_created\",\n  \"amount\": \"{{$node['Order Webhook'].json.order_total}}\",\n  \"currency\": \"USDC\"\n}",
+        "options": {}
+      },
+      "name": "Send Payment URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [620, 200],
+      "id": "send-payment-url-node"
+    },
+    {
+      "parameters": {
+        "eventTypes": ["payment.completed"],
+        "verifySignature": true
+      },
+      "name": "Payment Confirmation",
+      "type": "svmPayWebhook",
+      "typeVersion": 1,
+      "position": [180, 400],
+      "id": "payment-confirmation-node",
+      "credentials": {
+        "svmPayApi": {
+          "id": "svm-pay-credentials",
+          "name": "SVM-Pay API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "payment",
+        "operation": "verifyPayment",
+        "transactionId": "={{$json.event.data.transactionId}}"
+      },
+      "name": "Verify Payment",
+      "type": "svmPay",
+      "typeVersion": 1,
+      "position": [400, 400],
+      "id": "verify-payment-node",
+      "credentials": {
+        "svmPayApi": {
+          "id": "svm-pay-credentials",
+          "name": "SVM-Pay API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.verified}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "Payment Verified?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [620, 400],
+      "id": "payment-verified-if"
+    },
+    {
+      "parameters": {
+        "url": "={{$node['Payment Confirmation'].json.event.data.merchant_callback_url}}",
+        "sendBody": true,
+        "bodyContentType": "json",
+        "jsonData": "{\n  \"order_id\": \"{{$node['Payment Confirmation'].json.event.data.orderId}}\",\n  \"transaction_id\": \"{{$node['Payment Confirmation'].json.event.data.transactionId}}\",\n  \"status\": \"completed\",\n  \"amount\": \"{{$node['Payment Confirmation'].json.event.data.amount}}\",\n  \"currency\": \"{{$node['Payment Confirmation'].json.event.data.token}}\"\n}",
+        "options": {}
+      },
+      "name": "Update Order Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [840, 360],
+      "id": "update-order-status-node"
+    },
+    {
+      "parameters": {
+        "fromEmail": "noreply@store.com",
+        "toEmail": "={{$node['Payment Confirmation'].json.event.data.customerEmail}}",
+        "subject": "Order Confirmation - #{{$node['Payment Confirmation'].json.event.data.orderId}}",
+        "text": "Dear Customer,\n\nYour payment of {{$node['Payment Confirmation'].json.event.data.amount}} {{$node['Payment Confirmation'].json.event.data.token}} has been confirmed.\n\nOrder Details:\n- Order ID: {{$node['Payment Confirmation'].json.event.data.orderId}}\n- Transaction ID: {{$node['Payment Confirmation'].json.event.data.transactionId}}\n- Amount: {{$node['Payment Confirmation'].json.event.data.amount}} {{$node['Payment Confirmation'].json.event.data.token}}\n\nThank you for your purchase!\n\nBest regards,\nYour Store Team",
+        "options": {}
+      },
+      "name": "Send Confirmation Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [840, 440],
+      "id": "send-confirmation-email-node"
+    },
+    {
+      "parameters": {
+        "fromEmail": "admin@store.com",
+        "toEmail": "admin@store.com",
+        "subject": "Payment Verification Failed - Order #{{$node['Payment Confirmation'].json.event.data.orderId}}",
+        "text": "Payment verification failed for order #{{$node['Payment Confirmation'].json.event.data.orderId}}.\n\nPlease review the transaction manually.\n\nTransaction ID: {{$node['Payment Confirmation'].json.event.data.transactionId}}",
+        "options": {}
+      },
+      "name": "Alert Admin",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [840, 520],
+      "id": "alert-admin-node"
+    }
+  ],
+  "connections": {
+    "Order Webhook": {
+      "main": [
+        [
+          {
+            "node": "Create Payment Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Payment Request": {
+      "main": [
+        [
+          {
+            "node": "Send Payment URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payment Confirmation": {
+      "main": [
+        [
+          {
+            "node": "Verify Payment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Payment": {
+      "main": [
+        [
+          {
+            "node": "Payment Verified?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payment Verified?": {
+      "main": [
+        [
+          {
+            "node": "Update Order Status",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Alert Admin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "timezone": "UTC"
+  },
+  "versionId": "1",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "id": "ecommerce-automation",
+  "tags": [
+    {
+      "id": "svm-pay",
+      "name": "SVM-Pay"
+    },
+    {
+      "id": "ecommerce",
+      "name": "E-commerce"
+    },
+    {
+      "id": "payments",
+      "name": "Payments"
+    }
+  ]
+}

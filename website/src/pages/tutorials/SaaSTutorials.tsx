@@ -1029,6 +1029,1562 @@ cron.schedule('0 0 1 * *', generateMonthlyInvoices)`,
   )
 }
 
+export function N8nIntegrationTutorial() {
+  return (
+    <TutorialLayout
+      title="n8n Workflow Automation"
+      description="Integrate SVM-Pay with n8n for automated payment workflows and event-driven transactions"
+      level="Intermediate"
+      time="2 hours"
+      category="SaaS & Service Tutorials"
+      categoryPath="/docs/tutorials/saas"
+      overview="Build powerful automation workflows using n8n and SVM-Pay. This tutorial covers setting up n8n nodes, creating custom payment workflows, handling webhooks, and automating complex payment scenarios. Learn to trigger payments based on events, process bulk transactions, and integrate with external services."
+      prerequisites={[
+        "Basic understanding of n8n workflow automation",
+        "Experience with webhooks and APIs",
+        "Knowledge of SVM-Pay SDK",
+        "Understanding of payment automation concepts"
+      ]}
+      steps={[
+        {
+          title: "Set Up n8n Environment and SVM-Pay Integration",
+          description: "Install n8n and configure the SVM-Pay integration with custom nodes and credentials.",
+          code: `# Install n8n locally or use n8n cloud
+npm install -g n8n
+
+# Start n8n
+n8n start
+
+# Create custom SVM-Pay node package
+mkdir n8n-nodes-svm-pay
+cd n8n-nodes-svm-pay
+
+# Initialize the node package
+npm init -y
+
+# Install dependencies
+npm install --save n8n-workflow n8n-core @svm-pay/sdk
+
+# Package.json configuration for n8n custom nodes
+{
+  "name": "n8n-nodes-svm-pay",
+  "version": "1.0.0",
+  "description": "SVM-Pay nodes for n8n workflow automation",
+  "keywords": ["n8n", "n8n-community-node-package", "svm-pay", "solana", "payments"],
+  "license": "MIT",
+  "homepage": "https://github.com/openSVM/n8n-nodes-svm-pay",
+  "author": {
+    "name": "SVM-Pay Team",
+    "email": "support@svm-pay.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openSVM/n8n-nodes-svm-pay.git"
+  },
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/SVMPayApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/SVMPay.node.js",
+      "dist/nodes/SVMPayWebhook.node.js",
+      "dist/nodes/SVMPayBatch.node.js"
+    ]
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc && gulp build:icons",
+    "dev": "tsc --watch",
+    "format": "prettier nodes credentials --write",
+    "lint": "eslint nodes credentials package.json",
+    "lintfix": "eslint nodes credentials package.json --fix",
+    "prepublishOnly": "npm run build && npm run lint -s"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.6",
+    "gulp": "^4.0.2",
+    "n8n-workflow": "*",
+    "typescript": "~4.8.0"
+  }
+}`,
+          language: "JSON",
+          notes: [
+            "Install n8n locally for development or use n8n Cloud for production",
+            "Create a dedicated package for SVM-Pay custom nodes",
+            "Follow n8n's community node package structure",
+            "Configure proper TypeScript and build tools for n8n compatibility"
+          ]
+        },
+        {
+          title: "Create SVM-Pay Credentials Node",
+          description: "Set up authentication credentials for SVM-Pay in n8n workflows.",
+          code: `// credentials/SVMPayApi.credentials.ts
+import {
+  IAuthenticateGeneric,
+  ICredentialTestRequest,
+  ICredentialType,
+  INodeProperties,
+} from 'n8n-workflow';
+
+export class SVMPayApi implements ICredentialType {
+  name = 'svmPayApi';
+  displayName = 'SVM-Pay API';
+  documentationUrl = 'https://docs.svm-pay.dev/integrations/n8n';
+  properties: INodeProperties[] = [
+    {
+      displayName: 'Environment',
+      name: 'environment',
+      type: 'options',
+      options: [
+        {
+          name: 'Production (Mainnet)',
+          value: 'mainnet',
+        },
+        {
+          name: 'Development (Devnet)',
+          value: 'devnet',
+        },
+      ],
+      default: 'devnet',
+      description: 'The SVM network environment to use',
+    },
+    {
+      displayName: 'Private Key',
+      name: 'privateKey',
+      type: 'string',
+      typeOptions: {
+        password: true,
+      },
+      default: '',
+      description: 'Your wallet private key in base58 format',
+      required: true,
+    },
+    {
+      displayName: 'API Key (Optional)',
+      name: 'apiKey',
+      type: 'string',
+      typeOptions: {
+        password: true,
+      },
+      default: '',
+      description: 'Optional API key for enhanced features',
+    },
+    {
+      displayName: 'Default Token',
+      name: 'defaultToken',
+      type: 'string',
+      default: 'USDC',
+      description: 'Default token for payments (e.g., USDC, SOL)',
+    },
+    {
+      displayName: 'Webhook Secret',
+      name: 'webhookSecret',
+      type: 'string',
+      typeOptions: {
+        password: true,
+      },
+      default: '',
+      description: 'Secret for webhook verification',
+    },
+  ];
+
+  authenticate: IAuthenticateGeneric = {
+    type: 'generic',
+    properties: {
+      headers: {
+        'X-API-Key': '={{$credentials.apiKey}}',
+        'User-Agent': 'n8n-svm-pay/1.0.0',
+      },
+    },
+  };
+
+  test: ICredentialTestRequest = {
+    request: {
+      baseURL: '={{$credentials.environment === "mainnet" ? "https://api.svm-pay.dev" : "https://api-dev.svm-pay.dev"}}',
+      url: '/v1/wallet/balance',
+      method: 'GET',
+    },
+  };
+}`,
+          language: "TypeScript",
+          notes: [
+            "Store sensitive credentials securely in n8n's credential system",
+            "Support both mainnet and devnet environments",
+            "Include test functionality to verify credential validity",
+            "Provide clear descriptions for each credential field"
+          ]
+        },
+        {
+          title: "Create SVM-Pay Payment Node",
+          description: "Build the main SVM-Pay node for processing payments and transfers.",
+          code: `// nodes/SVMPay.node.ts
+import {
+  IExecuteFunctions,
+  INodeExecutionData,
+  INodeType,
+  INodeTypeDescription,
+  NodeOperationError,
+} from 'n8n-workflow';
+import { SVMPay } from '@svm-pay/sdk';
+
+export class SVMPayNode implements INodeType {
+  description: INodeTypeDescription = {
+    displayName: 'SVM-Pay',
+    name: 'svmPay',
+    icon: 'file:svmpay.svg',
+    group: ['payment'],
+    version: 1,
+    subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
+    description: 'Process payments and transfers using SVM-Pay',
+    defaults: {
+      name: 'SVM-Pay',
+    },
+    inputs: ['main'],
+    outputs: ['main'],
+    credentials: [
+      {
+        name: 'svmPayApi',
+        required: true,
+      },
+    ],
+    properties: [
+      {
+        displayName: 'Resource',
+        name: 'resource',
+        type: 'options',
+        noDataExpression: true,
+        options: [
+          {
+            name: 'Payment',
+            value: 'payment',
+          },
+          {
+            name: 'Transfer',
+            value: 'transfer',
+          },
+          {
+            name: 'Balance',
+            value: 'balance',
+          },
+          {
+            name: 'Transaction',
+            value: 'transaction',
+          },
+        ],
+        default: 'payment',
+      },
+      {
+        displayName: 'Operation',
+        name: 'operation',
+        type: 'options',
+        noDataExpression: true,
+        displayOptions: {
+          show: {
+            resource: ['payment'],
+          },
+        },
+        options: [
+          {
+            name: 'Create Payment Request',
+            value: 'createRequest',
+            description: 'Create a payment request URL',
+            action: 'Create payment request',
+          },
+          {
+            name: 'Process Payment',
+            value: 'processPayment',
+            description: 'Process a direct payment',
+            action: 'Process payment',
+          },
+          {
+            name: 'Verify Payment',
+            value: 'verifyPayment',
+            description: 'Verify a payment transaction',
+            action: 'Verify payment',
+          },
+        ],
+        default: 'createRequest',
+      },
+      {
+        displayName: 'Recipient Address',
+        name: 'recipient',
+        type: 'string',
+        required: true,
+        displayOptions: {
+          show: {
+            resource: ['payment', 'transfer'],
+            operation: ['createRequest', 'processPayment', 'transfer'],
+          },
+        },
+        default: '',
+        description: 'The recipient wallet address',
+      },
+      {
+        displayName: 'Amount',
+        name: 'amount',
+        type: 'string',
+        required: true,
+        displayOptions: {
+          show: {
+            resource: ['payment', 'transfer'],
+            operation: ['createRequest', 'processPayment', 'transfer'],
+          },
+        },
+        default: '',
+        description: 'Payment amount (supports expressions)',
+      },
+      {
+        displayName: 'Token',
+        name: 'token',
+        type: 'string',
+        displayOptions: {
+          show: {
+            resource: ['payment', 'transfer'],
+            operation: ['createRequest', 'processPayment', 'transfer'],
+          },
+        },
+        default: 'USDC',
+        description: 'Token symbol (e.g., USDC, SOL)',
+      },
+      {
+        displayName: 'Payment Label',
+        name: 'label',
+        type: 'string',
+        displayOptions: {
+          show: {
+            resource: ['payment'],
+            operation: ['createRequest'],
+          },
+        },
+        default: '',
+        description: 'Label for the payment request',
+      },
+      {
+        displayName: 'Payment Message',
+        name: 'message',
+        type: 'string',
+        displayOptions: {
+          show: {
+            resource: ['payment'],
+            operation: ['createRequest'],
+          },
+        },
+        default: '',
+        description: 'Message for the payment request',
+      },
+      {
+        displayName: 'Metadata',
+        name: 'metadata',
+        type: 'json',
+        default: '{}',
+        description: 'Additional metadata for the payment',
+      },
+    ],
+  };
+
+  async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
+    const items = this.getInputData();
+    const returnData: INodeExecutionData[] = [];
+    const credentials = await this.getCredentials('svmPayApi');
+
+    // Initialize SVM-Pay SDK
+    const svmPay = new SVMPay({
+      network: credentials.environment as string,
+      privateKey: credentials.privateKey as string,
+      apiKey: credentials.apiKey as string,
+      defaultToken: credentials.defaultToken as string,
+    });
+
+    for (let i = 0; i < items.length; i++) {
+      try {
+        const resource = this.getNodeParameter('resource', i) as string;
+        const operation = this.getNodeParameter('operation', i) as string;
+
+        let responseData: any = {};
+
+        if (resource === 'payment') {
+          if (operation === 'createRequest') {
+            const recipient = this.getNodeParameter('recipient', i) as string;
+            const amount = this.getNodeParameter('amount', i) as string;
+            const token = this.getNodeParameter('token', i) as string;
+            const label = this.getNodeParameter('label', i) as string;
+            const message = this.getNodeParameter('message', i) as string;
+            const metadata = this.getNodeParameter('metadata', i) as object;
+
+            const paymentUrl = svmPay.createTransferUrl(recipient, amount, {
+              token,
+              label,
+              message,
+              metadata,
+            });
+
+            responseData = {
+              paymentUrl,
+              recipient,
+              amount,
+              token,
+              label,
+              message,
+              metadata,
+              createdAt: new Date().toISOString(),
+            };
+
+          } else if (operation === 'processPayment') {
+            const recipient = this.getNodeParameter('recipient', i) as string;
+            const amount = this.getNodeParameter('amount', i) as string;
+            const token = this.getNodeParameter('token', i) as string;
+            const metadata = this.getNodeParameter('metadata', i) as object;
+
+            const result = await svmPay.processDirectPayment({
+              recipient,
+              amount,
+              token,
+              metadata,
+            });
+
+            responseData = {
+              success: result.success,
+              transactionId: result.transactionId,
+              signature: result.signature,
+              recipient,
+              amount,
+              token,
+              metadata,
+              processedAt: new Date().toISOString(),
+            };
+
+          } else if (operation === 'verifyPayment') {
+            const transactionId = this.getNodeParameter('transactionId', i) as string;
+            
+            const verification = await svmPay.verifyTransaction(transactionId);
+
+            responseData = {
+              verified: verification.verified,
+              transactionId,
+              status: verification.status,
+              amount: verification.amount,
+              token: verification.token,
+              sender: verification.sender,
+              recipient: verification.recipient,
+              timestamp: verification.timestamp,
+            };
+          }
+        }
+
+        returnData.push({
+          json: responseData,
+          pairedItem: {
+            item: i,
+          },
+        });
+
+      } catch (error) {
+        if (this.continueOnFail()) {
+          returnData.push({
+            json: {
+              error: error.message,
+            },
+            pairedItem: {
+              item: i,
+            },
+          });
+        } else {
+          throw new NodeOperationError(this.getNode(), error.message, {
+            itemIndex: i,
+          });
+        }
+      }
+    }
+
+    return [returnData];
+  }
+}`,
+          language: "TypeScript",
+          notes: [
+            "Implement comprehensive payment operations within n8n",
+            "Support both payment URL generation and direct processing",
+            "Include proper error handling with continue-on-fail support",
+            "Provide detailed output data for downstream workflow nodes"
+          ]
+        },
+        {
+          title: "Create Webhook Node for Payment Events",
+          description: "Build a webhook node to receive and process payment events in real-time.",
+          code: `// nodes/SVMPayWebhook.node.ts
+import {
+  IDataObject,
+  INodeType,
+  INodeTypeDescription,
+  IWebhookFunctions,
+  IWebhookResponseData,
+  NodeOperationError,
+} from 'n8n-workflow';
+import { createHmac } from 'crypto';
+
+export class SVMPayWebhookNode implements INodeType {
+  description: INodeTypeDescription = {
+    displayName: 'SVM-Pay Webhook',
+    name: 'svmPayWebhook',
+    icon: 'file:svmpay.svg',
+    group: ['trigger'],
+    version: 1,
+    description: 'Handle SVM-Pay webhook events',
+    defaults: {
+      name: 'SVM-Pay Webhook',
+    },
+    inputs: [],
+    outputs: ['main'],
+    credentials: [
+      {
+        name: 'svmPayApi',
+        required: true,
+      },
+    ],
+    webhooks: [
+      {
+        name: 'default',
+        httpMethod: 'POST',
+        responseMode: 'onReceived',
+        path: 'webhook',
+      },
+    ],
+    properties: [
+      {
+        displayName: 'Event Types',
+        name: 'eventTypes',
+        type: 'multiOptions',
+        options: [
+          {
+            name: 'Payment Completed',
+            value: 'payment.completed',
+          },
+          {
+            name: 'Payment Failed',
+            value: 'payment.failed',
+          },
+          {
+            name: 'Payment Pending',
+            value: 'payment.pending',
+          },
+          {
+            name: 'Transfer Completed',
+            value: 'transfer.completed',
+          },
+          {
+            name: 'Transfer Failed',
+            value: 'transfer.failed',
+          },
+          {
+            name: 'Subscription Renewal',
+            value: 'subscription.renewed',
+          },
+          {
+            name: 'Invoice Generated',
+            value: 'invoice.generated',
+          },
+          {
+            name: 'All Events',
+            value: '*',
+          },
+        ],
+        default: ['payment.completed'],
+        description: 'The webhook events to listen for',
+      },
+      {
+        displayName: 'Verify Signature',
+        name: 'verifySignature',
+        type: 'boolean',
+        default: true,
+        description: 'Whether to verify the webhook signature for security',
+      },
+    ],
+  };
+
+  async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
+    const credentials = await this.getCredentials('svmPayApi');
+    const req = this.getRequestObject();
+    const body = this.getBodyData();
+    const eventTypes = this.getNodeParameter('eventTypes') as string[];
+    const verifySignature = this.getNodeParameter('verifySignature') as boolean;
+
+    // Verify webhook signature if enabled
+    if (verifySignature && credentials.webhookSecret) {
+      const signature = req.headers['x-svmpay-signature'] as string;
+      const webhookSecret = credentials.webhookSecret as string;
+      
+      if (!signature) {
+        throw new NodeOperationError(
+          this.getNode(),
+          'Webhook signature missing'
+        );
+      }
+
+      const expectedSignature = createHmac('sha256', webhookSecret)
+        .update(JSON.stringify(body))
+        .digest('hex');
+
+      const receivedSignature = signature.replace('sha256=', '');
+
+      if (expectedSignature !== receivedSignature) {
+        throw new NodeOperationError(
+          this.getNode(),
+          'Webhook signature verification failed'
+        );
+      }
+    }
+
+    // Check if event type matches filter
+    const eventType = body.type as string;
+    if (!eventTypes.includes('*') && !eventTypes.includes(eventType)) {
+      return {
+        workflowData: [[]],
+      };
+    }
+
+    // Process webhook data
+    const webhookData: IDataObject = {
+      event: {
+        id: body.id,
+        type: eventType,
+        timestamp: body.timestamp || new Date().toISOString(),
+        data: body.data,
+      },
+      payment: body.data,
+      metadata: {
+        received_at: new Date().toISOString(),
+        source: 'svm-pay-webhook',
+        verified: verifySignature,
+      },
+    };
+
+    // Add specific data based on event type
+    switch (eventType) {
+      case 'payment.completed':
+        webhookData.transaction = {
+          id: body.data.transactionId,
+          signature: body.data.signature,
+          amount: body.data.amount,
+          token: body.data.token,
+          sender: body.data.sender,
+          recipient: body.data.recipient,
+          status: 'completed',
+        };
+        break;
+
+      case 'payment.failed':
+        webhookData.error = {
+          code: body.data.errorCode,
+          message: body.data.errorMessage,
+          details: body.data.errorDetails,
+        };
+        break;
+
+      case 'subscription.renewed':
+        webhookData.subscription = {
+          id: body.data.subscriptionId,
+          customerId: body.data.customerId,
+          plan: body.data.plan,
+          renewedAt: body.data.renewedAt,
+          nextBilling: body.data.nextBilling,
+        };
+        break;
+    }
+
+    return {
+      workflowData: [[{ json: webhookData }]],
+    };
+  }
+}`,
+          language: "TypeScript",
+          notes: [
+            "Implement secure webhook signature verification",
+            "Filter events based on user configuration",
+            "Structure webhook data for easy consumption by other nodes",
+            "Handle different event types with appropriate data transformation"
+          ]
+        },
+        {
+          title: "Create Batch Payment Node",
+          description: "Build a node for processing multiple payments efficiently in bulk operations.",
+          code: `// nodes/SVMPayBatch.node.ts
+import {
+  IExecuteFunctions,
+  INodeExecutionData,
+  INodeType,
+  INodeTypeDescription,
+  NodeOperationError,
+} from 'n8n-workflow';
+import { SVMPay, BatchPaymentManager } from '@svm-pay/sdk';
+
+export class SVMPayBatchNode implements INodeType {
+  description: INodeTypeDescription = {
+    displayName: 'SVM-Pay Batch',
+    name: 'svmPayBatch',
+    icon: 'file:svmpay.svg',
+    group: ['payment'],
+    version: 1,
+    description: 'Process multiple payments and transfers in batches',
+    defaults: {
+      name: 'SVM-Pay Batch',
+    },
+    inputs: ['main'],
+    outputs: ['main'],
+    credentials: [
+      {
+        name: 'svmPayApi',
+        required: true,
+      },
+    ],
+    properties: [
+      {
+        displayName: 'Operation',
+        name: 'operation',
+        type: 'options',
+        options: [
+          {
+            name: 'Batch Payments',
+            value: 'batchPayments',
+            description: 'Process multiple payments in a single transaction',
+          },
+          {
+            name: 'Bulk Transfers',
+            value: 'bulkTransfers',
+            description: 'Send transfers to multiple recipients',
+          },
+          {
+            name: 'Payroll Distribution',
+            value: 'payrollDistribution',
+            description: 'Distribute payroll payments to employees',
+          },
+          {
+            name: 'Airdrop Campaign',
+            value: 'airdropCampaign',
+            description: 'Execute token airdrop to multiple wallets',
+          },
+        ],
+        default: 'batchPayments',
+      },
+      {
+        displayName: 'Payment Data Source',
+        name: 'dataSource',
+        type: 'options',
+        options: [
+          {
+            name: 'Input Data',
+            value: 'inputData',
+            description: 'Use data from previous nodes',
+          },
+          {
+            name: 'JSON Array',
+            value: 'jsonArray',
+            description: 'Provide payment data as JSON',
+          },
+          {
+            name: 'CSV Data',
+            value: 'csvData',
+            description: 'Upload CSV file with payment data',
+          },
+        ],
+        default: 'inputData',
+      },
+      {
+        displayName: 'Payment Array',
+        name: 'paymentArray',
+        type: 'json',
+        displayOptions: {
+          show: {
+            dataSource: ['jsonArray'],
+          },
+        },
+        default: '[]',
+        description: 'Array of payment objects with recipient, amount, and token',
+      },
+      {
+        displayName: 'Batch Size',
+        name: 'batchSize',
+        type: 'number',
+        default: 10,
+        description: 'Number of payments to process per batch (max 50)',
+        typeOptions: {
+          minValue: 1,
+          maxValue: 50,
+        },
+      },
+      {
+        displayName: 'Delay Between Batches (ms)',
+        name: 'batchDelay',
+        type: 'number',
+        default: 1000,
+        description: 'Delay between batch processing to avoid rate limits',
+      },
+      {
+        displayName: 'Continue on Error',
+        name: 'continueOnError',
+        type: 'boolean',
+        default: false,
+        description: 'Continue processing even if some payments fail',
+      },
+    ],
+  };
+
+  async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
+    const items = this.getInputData();
+    const returnData: INodeExecutionData[] = [];
+    const credentials = await this.getCredentials('svmPayApi');
+
+    const operation = this.getNodeParameter('operation', 0) as string;
+    const dataSource = this.getNodeParameter('dataSource', 0) as string;
+    const batchSize = this.getNodeParameter('batchSize', 0) as number;
+    const batchDelay = this.getNodeParameter('batchDelay', 0) as number;
+    const continueOnError = this.getNodeParameter('continueOnError', 0) as boolean;
+
+    // Initialize SVM-Pay SDK
+    const svmPay = new SVMPay({
+      network: credentials.environment as string,
+      privateKey: credentials.privateKey as string,
+      apiKey: credentials.apiKey as string,
+    });
+
+    const batchManager = new BatchPaymentManager(svmPay);
+
+    try {
+      let paymentData: any[] = [];
+
+      // Extract payment data based on source
+      if (dataSource === 'inputData') {
+        paymentData = items.map(item => item.json);
+      } else if (dataSource === 'jsonArray') {
+        paymentData = this.getNodeParameter('paymentArray', 0) as any[];
+      }
+
+      // Validate payment data
+      const validPayments = paymentData.filter(payment => {
+        return payment.recipient && payment.amount && 
+               typeof payment.recipient === 'string' && 
+               (typeof payment.amount === 'string' || typeof payment.amount === 'number');
+      });
+
+      if (validPayments.length === 0) {
+        throw new NodeOperationError(
+          this.getNode(),
+          'No valid payment data found. Each payment must have recipient and amount.'
+        );
+      }
+
+      // Process based on operation type
+      let results: any[] = [];
+
+      switch (operation) {
+        case 'batchPayments':
+          results = await this.processBatchPayments(
+            batchManager, validPayments, batchSize, batchDelay, continueOnError
+          );
+          break;
+
+        case 'bulkTransfers':
+          results = await this.processBulkTransfers(
+            batchManager, validPayments, batchSize, batchDelay, continueOnError
+          );
+          break;
+
+        case 'payrollDistribution':
+          results = await this.processPayrollDistribution(
+            batchManager, validPayments, batchSize, batchDelay, continueOnError
+          );
+          break;
+
+        case 'airdropCampaign':
+          results = await this.processAirdropCampaign(
+            batchManager, validPayments, batchSize, batchDelay, continueOnError
+          );
+          break;
+      }
+
+      // Prepare return data
+      results.forEach((result, index) => {
+        returnData.push({
+          json: {
+            batchId: result.batchId,
+            operation: operation,
+            results: result.results,
+            summary: result.summary,
+            processedAt: new Date().toISOString(),
+          },
+          pairedItem: {
+            item: index,
+          },
+        });
+      });
+
+    } catch (error) {
+      if (continueOnError) {
+        returnData.push({
+          json: {
+            error: error.message,
+            operation: operation,
+            failed: true,
+          },
+        });
+      } else {
+        throw new NodeOperationError(this.getNode(), error.message);
+      }
+    }
+
+    return [returnData];
+  }
+
+  private async processBatchPayments(
+    batchManager: any,
+    payments: any[],
+    batchSize: number,
+    batchDelay: number,
+    continueOnError: boolean
+  ): Promise<any[]> {
+    const batches = this.chunkArray(payments, batchSize);
+    const results: any[] = [];
+
+    for (let i = 0; i < batches.length; i++) {
+      try {
+        const batch = batches[i];
+        const batchResult = await batchManager.processBatch(batch);
+        
+        results.push({
+          batchId: \`batch_\${i + 1}\`,
+          results: batchResult.transactions,
+          summary: {
+            total: batch.length,
+            successful: batchResult.successful,
+            failed: batchResult.failed,
+            totalAmount: batch.reduce((sum, p) => sum + parseFloat(p.amount), 0),
+          },
+        });
+
+        // Delay between batches
+        if (i < batches.length - 1 && batchDelay > 0) {
+          await new Promise(resolve => setTimeout(resolve, batchDelay));
+        }
+
+      } catch (error) {
+        if (continueOnError) {
+          results.push({
+            batchId: \`batch_\${i + 1}\`,
+            error: error.message,
+            summary: {
+              total: batches[i].length,
+              successful: 0,
+              failed: batches[i].length,
+            },
+          });
+        } else {
+          throw error;
+        }
+      }
+    }
+
+    return results;
+  }
+
+  private async processBulkTransfers(
+    batchManager: any,
+    transfers: any[],
+    batchSize: number,
+    batchDelay: number,
+    continueOnError: boolean
+  ): Promise<any[]> {
+    // Similar to batch payments but optimized for simple transfers
+    return this.processBatchPayments(batchManager, transfers, batchSize, batchDelay, continueOnError);
+  }
+
+  private async processPayrollDistribution(
+    batchManager: any,
+    payroll: any[],
+    batchSize: number,
+    batchDelay: number,
+    continueOnError: boolean
+  ): Promise<any[]> {
+    // Add payroll-specific validation and processing
+    const validatedPayroll = payroll.map(entry => ({
+      ...entry,
+      type: 'payroll',
+      metadata: {
+        employeeId: entry.employeeId,
+        payPeriod: entry.payPeriod,
+        department: entry.department,
+        ...entry.metadata,
+      },
+    }));
+
+    return this.processBatchPayments(batchManager, validatedPayroll, batchSize, batchDelay, continueOnError);
+  }
+
+  private async processAirdropCampaign(
+    batchManager: any,
+    airdrop: any[],
+    batchSize: number,
+    batchDelay: number,
+    continueOnError: boolean
+  ): Promise<any[]> {
+    // Add airdrop-specific validation and processing
+    const validatedAirdrop = airdrop.map(entry => ({
+      ...entry,
+      type: 'airdrop',
+      metadata: {
+        campaignId: entry.campaignId,
+        tier: entry.tier,
+        eligibilityScore: entry.eligibilityScore,
+        ...entry.metadata,
+      },
+    }));
+
+    return this.processBatchPayments(batchManager, validatedAirdrop, batchSize, batchDelay, continueOnError);
+  }
+
+  private chunkArray<T>(array: T[], chunkSize: number): T[][] {
+    const chunks: T[][] = [];
+    for (let i = 0; i < array.length; i += chunkSize) {
+      chunks.push(array.slice(i, i + chunkSize));
+    }
+    return chunks;
+  }
+}`,
+          language: "TypeScript",
+          notes: [
+            "Support multiple batch processing strategies for different use cases",
+            "Implement rate limiting and delay mechanisms to avoid network congestion",
+            "Provide detailed batch processing results and summaries",
+            "Handle failures gracefully with continue-on-error options"
+          ]
+        },
+        {
+          title: "Create Advanced Workflow Examples",
+          description: "Build practical n8n workflows that demonstrate real-world SVM-Pay automation scenarios.",
+          code: `// Example Workflow 1: E-commerce Order Processing
+{
+  "name": "E-commerce Order Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "order-webhook",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "name": "Order Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [180, 200]
+    },
+    {
+      "parameters": {
+        "resource": "payment",
+        "operation": "createRequest",
+        "recipient": "={{$json.merchant_wallet}}",
+        "amount": "={{$json.order_total}}",
+        "token": "USDC",
+        "label": "Order Payment",
+        "message": "Payment for order #{{$json.order_id}}",
+        "metadata": {
+          "order_id": "={{$json.order_id}}",
+          "customer_id": "={{$json.customer_id}}",
+          "items": "={{$json.items}}"
+        }
+      },
+      "name": "Create Payment Request",
+      "type": "svmPay",
+      "position": [400, 200]
+    },
+    {
+      "parameters": {
+        "resource": "http",
+        "operation": "post",
+        "url": "={{$json.callback_url}}",
+        "sendBody": true,
+        "bodyContentType": "json",
+        "jsonData": {
+          "order_id": "={{$node['Order Webhook'].json.order_id}}",
+          "payment_url": "={{$json.paymentUrl}}",
+          "status": "payment_created"
+        }
+      },
+      "name": "Send Payment URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [620, 200]
+    },
+    {
+      "parameters": {
+        "eventTypes": ["payment.completed"],
+        "verifySignature": true
+      },
+      "name": "Payment Confirmation",
+      "type": "svmPayWebhook",
+      "position": [180, 400]
+    },
+    {
+      "parameters": {
+        "resource": "payment",
+        "operation": "verifyPayment",
+        "transactionId": "={{$json.event.data.transactionId}}"
+      },
+      "name": "Verify Payment",
+      "type": "svmPay",
+      "position": [400, 400]
+    },
+    {
+      "parameters": {
+        "subject": "Order Confirmation - #{{$node['Payment Confirmation'].json.event.data.orderId}}",
+        "text": "Your payment of {{$node['Payment Confirmation'].json.event.data.amount}} {{$node['Payment Confirmation'].json.event.data.token}} has been confirmed.\\n\\nOrder ID: {{$node['Payment Confirmation'].json.event.data.orderId}}\\nTransaction: {{$node['Payment Confirmation'].json.event.data.transactionId}}",
+        "toEmail": "={{$node['Payment Confirmation'].json.event.data.customerEmail}}"
+      },
+      "name": "Send Confirmation Email",
+      "type": "n8n-nodes-base.emailSend",
+      "position": [620, 400]
+    }
+  ],
+  "connections": {
+    "Order Webhook": {
+      "main": [["Create Payment Request"]]
+    },
+    "Create Payment Request": {
+      "main": [["Send Payment URL"]]
+    },
+    "Payment Confirmation": {
+      "main": [["Verify Payment"]]
+    },
+    "Verify Payment": {
+      "main": [["Send Confirmation Email"]]
+    }
+  }
+}
+
+// Example Workflow 2: Subscription Billing Automation
+{
+  "name": "Monthly Subscription Billing",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [1],
+          "typeInterval": "months"
+        }
+      },
+      "name": "Monthly Trigger",
+      "type": "n8n-nodes-base.cron",
+      "position": [180, 200]
+    },
+    {
+      "parameters": {
+        "resource": "database",
+        "operation": "select",
+        "query": "SELECT * FROM subscriptions WHERE status = 'active' AND next_billing_date <= NOW()"
+      },
+      "name": "Get Active Subscriptions",
+      "type": "n8n-nodes-base.postgres",
+      "position": [400, 200]
+    },
+    {
+      "parameters": {
+        "operation": "batchPayments",
+        "dataSource": "inputData",
+        "batchSize": 20,
+        "batchDelay": 2000,
+        "continueOnError": true
+      },
+      "name": "Process Subscription Payments",
+      "type": "svmPayBatch",
+      "position": [620, 200]
+    },
+    {
+      "parameters": {
+        "resource": "database",
+        "operation": "update",
+        "query": "UPDATE subscriptions SET last_billing_date = NOW(), next_billing_date = DATE_ADD(NOW(), INTERVAL 1 MONTH) WHERE id = {{$json.subscription_id}}"
+      },
+      "name": "Update Billing Dates",
+      "type": "n8n-nodes-base.postgres",
+      "position": [840, 200]
+    }
+  ],
+  "connections": {
+    "Monthly Trigger": {
+      "main": [["Get Active Subscriptions"]]
+    },
+    "Get Active Subscriptions": {
+      "main": [["Process Subscription Payments"]]
+    },
+    "Process Subscription Payments": {
+      "main": [["Update Billing Dates"]]
+    }
+  }
+}
+
+// Example Workflow 3: Multi-condition Payment Router
+{
+  "name": "Smart Payment Router",
+  "nodes": [
+    {
+      "parameters": {
+        "eventTypes": ["payment.pending"],
+        "verifySignature": true
+      },
+      "name": "Payment Request",
+      "type": "svmPayWebhook",
+      "position": [180, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.event.data.amount}}",
+              "operation": "larger",
+              "value2": "1000"
+            }
+          ]
+        }
+      },
+      "name": "High Value Check",
+      "type": "n8n-nodes-base.if",
+      "position": [400, 200]
+    },
+    {
+      "parameters": {
+        "resource": "payment",
+        "operation": "processPayment",
+        "recipient": "={{$json.event.data.recipient}}",
+        "amount": "={{$json.event.data.amount}}",
+        "token": "={{$json.event.data.token}}"
+      },
+      "name": "Process High Value",
+      "type": "svmPay",
+      "position": [620, 160]
+    },
+    {
+      "parameters": {
+        "resource": "payment",
+        "operation": "processPayment",
+        "recipient": "={{$json.event.data.recipient}}",
+        "amount": "={{$json.event.data.amount}}",
+        "token": "={{$json.event.data.token}}"
+      },
+      "name": "Process Regular",
+      "type": "svmPay",
+      "position": [620, 240]
+    },
+    {
+      "parameters": {
+        "subject": "High Value Transaction Alert",
+        "text": "A high value transaction of {{$json.amount}} {{$json.token}} has been processed.",
+        "toEmail": "admin@company.com"
+      },
+      "name": "Alert Admin",
+      "type": "n8n-nodes-base.emailSend",
+      "position": [840, 160]
+    }
+  ],
+  "connections": {
+    "Payment Request": {
+      "main": [["High Value Check"]]
+    },
+    "High Value Check": {
+      "main": [
+        ["Process High Value"],
+        ["Process Regular"]
+      ]
+    },
+    "Process High Value": {
+      "main": [["Alert Admin"]]
+    }
+  }
+}`,
+          language: "JSON",
+          notes: [
+            "Create workflows that demonstrate real business use cases",
+            "Show integration between SVM-Pay nodes and other n8n nodes",
+            "Implement conditional logic and error handling",
+            "Provide templates that users can import and customize"
+          ]
+        },
+        {
+          title: "Deploy and Monitor Workflows",
+          description: "Set up production deployment, monitoring, and maintenance for n8n SVM-Pay workflows.",
+          code: `// Production deployment configuration
+// docker-compose.yml for n8n with SVM-Pay
+version: '3.8'
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    restart: always
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=\${N8N_HOST}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+      - WEBHOOK_URL=\${WEBHOOK_URL}
+      - GENERIC_TIMEZONE=\${GENERIC_TIMEZONE}
+      - N8N_LOG_LEVEL=warn
+      # Database configuration
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=\${POSTGRES_DB}
+      - DB_POSTGRESDB_USER=\${POSTGRES_USER}
+      - DB_POSTGRESDB_PASSWORD=\${POSTGRES_PASSWORD}
+      # Security
+      - N8N_USER_MANAGEMENT_JWT_SECRET=\${JWT_SECRET}
+      - N8N_ENCRYPTION_KEY=\${ENCRYPTION_KEY}
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./custom-nodes:/home/node/.n8n/custom
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:13
+    restart: always
+    environment:
+      - POSTGRES_DB=\${POSTGRES_DB}
+      - POSTGRES_USER=\${POSTGRES_USER}
+      - POSTGRES_PASSWORD=\${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:6-alpine
+    restart: always
+    volumes:
+      - redis_data:/data
+
+volumes:
+  n8n_data:
+  postgres_data:
+  redis_data:
+
+# Monitoring configuration
+# monitoring.js - Health check and performance monitoring
+const express = require('express');
+const axios = require('axios');
+const app = express();
+
+// Health check endpoint
+app.get('/health', async (req, res) => {
+  try {
+    // Check n8n health
+    const n8nHealth = await axios.get('http://localhost:5678/healthz');
+    
+    // Check SVM-Pay connection
+    const svmPayHealth = await axios.get('https://api.svm-pay.dev/health');
+    
+    // Check database connection
+    const dbHealth = await checkDatabaseConnection();
+    
+    const status = {
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      services: {
+        n8n: n8nHealth.status === 200 ? 'healthy' : 'unhealthy',
+        svmPay: svmPayHealth.status === 200 ? 'healthy' : 'unhealthy',
+        database: dbHealth ? 'healthy' : 'unhealthy'
+      }
+    };
+    
+    res.json(status);
+  } catch (error) {
+    res.status(500).json({
+      status: 'unhealthy',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Workflow execution metrics
+app.get('/metrics', async (req, res) => {
+  try {
+    const metrics = await getWorkflowMetrics();
+    res.json(metrics);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+async function getWorkflowMetrics() {
+  // Query n8n database for execution statistics
+  const query = \`
+    SELECT 
+      w.name as workflow_name,
+      COUNT(e.id) as total_executions,
+      COUNT(CASE WHEN e.finished = true AND e.status = 'success' THEN 1 END) as successful_executions,
+      COUNT(CASE WHEN e.finished = true AND e.status = 'error' THEN 1 END) as failed_executions,
+      AVG(e.execution_time) as avg_execution_time,
+      MAX(e.start_time) as last_execution
+    FROM workflow_entity w
+    LEFT JOIN execution_entity e ON w.id = e.workflow_id
+    WHERE e.start_time >= NOW() - INTERVAL '24 hours'
+    GROUP BY w.id, w.name
+    ORDER BY total_executions DESC
+  \`;
+  
+  return await executeQuery(query);
+}
+
+// Error tracking and alerting
+class ErrorTracker {
+  constructor() {
+    this.errorThresholds = {
+      payment_failure_rate: 0.05, // 5% max failure rate
+      webhook_timeout_rate: 0.10, // 10% max timeout rate
+      api_error_rate: 0.02 // 2% max API error rate
+    };
+  }
+
+  async trackError(workflowId, nodeId, errorType, errorMessage) {
+    const errorEvent = {
+      timestamp: new Date().toISOString(),
+      workflowId,
+      nodeId,
+      errorType,
+      errorMessage,
+      severity: this.calculateSeverity(errorType)
+    };
+
+    // Store error in database
+    await this.storeError(errorEvent);
+
+    // Check if alert should be sent
+    await this.checkAlertThresholds(errorType);
+  }
+
+  async checkAlertThresholds(errorType) {
+    const recentErrors = await this.getRecentErrors(errorType, '1 hour');
+    const errorRate = recentErrors.length / await this.getTotalExecutions('1 hour');
+
+    if (errorRate > this.errorThresholds[\`\${errorType}_rate\`]) {
+      await this.sendAlert({
+        type: 'error_threshold_exceeded',
+        errorType,
+        currentRate: errorRate,
+        threshold: this.errorThresholds[\`\${errorType}_rate\`],
+        timestamp: new Date().toISOString()
+      });
+    }
+  }
+
+  async sendAlert(alert) {
+    // Send to Slack, email, or other notification service
+    console.log('ALERT:', alert);
+    
+    // Example: Send to Slack webhook
+    if (process.env.SLACK_WEBHOOK_URL) {
+      await axios.post(process.env.SLACK_WEBHOOK_URL, {
+        text: \`🚨 SVM-Pay n8n Alert: \${alert.type}\`,
+        attachments: [{
+          color: 'danger',
+          fields: [
+            { title: 'Error Type', value: alert.errorType, short: true },
+            { title: 'Current Rate', value: \`\${(alert.currentRate * 100).toFixed(2)}%\`, short: true },
+            { title: 'Threshold', value: \`\${(alert.threshold * 100).toFixed(2)}%\`, short: true },
+            { title: 'Time', value: alert.timestamp, short: true }
+          ]
+        }]
+      });
+    }
+  }
+}
+
+// Performance optimization
+class PerformanceOptimizer {
+  constructor() {
+    this.metrics = new Map();
+  }
+
+  async optimizeWorkflow(workflowId) {
+    const performance = await this.analyzeWorkflowPerformance(workflowId);
+    
+    const recommendations = [];
+
+    // Check for slow nodes
+    if (performance.avgExecutionTime > 30000) { // 30 seconds
+      recommendations.push({
+        type: 'performance',
+        message: 'Consider optimizing slow-running nodes or breaking into smaller workflows',
+        details: performance.slowNodes
+      });
+    }
+
+    // Check for high failure rates
+    if (performance.failureRate > 0.05) { // 5%
+      recommendations.push({
+        type: 'reliability',
+        message: 'High failure rate detected, review error handling and retry logic',
+        details: performance.commonErrors
+      });
+    }
+
+    // Check for resource usage
+    if (performance.memoryUsage > 500) { // 500MB
+      recommendations.push({
+        type: 'resource',
+        message: 'High memory usage detected, consider optimizing data processing',
+        details: performance.memoryBreakdown
+      });
+    }
+
+    return recommendations;
+  }
+
+  async analyzeWorkflowPerformance(workflowId) {
+    // Analyze execution data for the workflow
+    return {
+      avgExecutionTime: 15000, // milliseconds
+      failureRate: 0.02,
+      memoryUsage: 300, // MB
+      slowNodes: ['SVMPayBatch', 'DatabaseQuery'],
+      commonErrors: ['timeout', 'rate_limit'],
+      memoryBreakdown: {
+        'SVMPayBatch': 150,
+        'DatabaseQuery': 100,
+        'Other': 50
+      }
+    };
+  }
+}
+
+app.listen(3001, () => {
+  console.log('n8n SVM-Pay monitoring service running on port 3001');
+});`,
+          language: "JavaScript",
+          notes: [
+            "Set up production-ready deployment with proper persistence",
+            "Implement comprehensive monitoring and alerting systems",
+            "Track workflow performance and optimization opportunities",
+            "Provide health checks and metrics for operational visibility"
+          ]
+        }
+      ]}
+      conclusion="You've successfully integrated SVM-Pay with n8n to create powerful payment automation workflows! The integration includes custom nodes for payments, webhooks, and batch processing, along with production deployment and monitoring. You can now automate complex payment scenarios, handle high-volume transactions, and integrate cryptocurrency payments seamlessly into your business processes."
+      nextSteps={[
+        "Explore advanced workflow patterns for specific business use cases",
+        "Implement custom authentication and security measures",
+        "Add support for additional SVM networks and tokens",
+        "Create workflow templates for common payment scenarios",
+        "Build advanced monitoring and analytics dashboards",
+        "Integrate with additional external services and APIs"
+      ]}
+      relatedTutorials={[
+        { title: "API Usage Billing", path: "/docs/tutorials/saas/api-billing" },
+        { title: "SaaS Subscription Billing", path: "/docs/tutorials/saas/subscription-billing" },
+        { title: "Webhook Integration Guide", path: "/docs/tutorials/enterprise/webhook-integration" }
+      ]}
+    />
+  )
+}
+
 export function SoftwareLicenseManagementTutorial() {
   return (
     <TutorialLayout

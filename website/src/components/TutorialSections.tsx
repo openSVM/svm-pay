@@ -1063,6 +1063,86 @@ const SoftwareLicensing = ({ software, customer, licenseType }) => {
     return payment.execute()
   }
 }`
+    },
+    {
+      title: "n8n Workflow Automation",
+      description: "Automate payment workflows with n8n integration",
+      level: "Intermediate",
+      time: "2 hours",
+      code: `// n8n workflow automation with SVM-Pay
+import { SVMPay, WorkflowTrigger, AutomationEngine } from '@svm-pay/sdk'
+
+const N8nIntegration = ({ workflowConfig, triggers }) => {
+  const setupPaymentAutomation = async () => {
+    // Create n8n webhook for payment events
+    const webhook = await WorkflowTrigger.createWebhook({
+      url: process.env.N8N_WEBHOOK_URL,
+      events: ['payment.completed', 'payment.failed', 'subscription.renewed'],
+      secret: process.env.WEBHOOK_SECRET
+    })
+
+    // Configure automated payment workflows
+    const automation = new AutomationEngine({
+      workflows: [
+        {
+          name: 'Invoice Payment Automation',
+          trigger: 'invoice.generated',
+          actions: [
+            {
+              type: 'send_payment_link',
+              recipient: '{{invoice.customer.email}}',
+              amount: '{{invoice.total}}',
+              metadata: {
+                invoiceId: '{{invoice.id}}',
+                dueDate: '{{invoice.dueDate}}'
+              }
+            }
+          ]
+        },
+        {
+          name: 'Subscription Renewal',
+          trigger: 'subscription.expiring',
+          conditions: ['customer.autoRenewal == true'],
+          actions: [
+            {
+              type: 'process_payment',
+              recipient: process.env.BUSINESS_WALLET,
+              amount: '{{subscription.plan.price}}',
+              token: 'USDC'
+            },
+            {
+              type: 'extend_subscription',
+              duration: '{{subscription.plan.duration}}'
+            },
+            {
+              type: 'send_confirmation',
+              template: 'renewal_success'
+            }
+          ]
+        }
+      ]
+    })
+
+    return { webhook, automation }
+  }
+
+  const processWorkflowEvent = async (eventData) => {
+    // Route event to appropriate n8n workflow
+    const workflow = workflowConfig.findWorkflow(eventData.type)
+    
+    if (workflow) {
+      const result = await workflow.execute({
+        data: eventData,
+        context: {
+          timestamp: new Date().toISOString(),
+          source: 'svm-pay-automation'
+        }
+      })
+      
+      return result
+    }
+  }
+}`
     }
   ]
 
