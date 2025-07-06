@@ -1,0 +1,46 @@
+{
+  "name": "n8n-svm-pay-examples",
+  "version": "1.0.0",
+  "description": "Example workflows and custom nodes for integrating SVM-Pay with n8n",
+  "keywords": ["n8n", "svm-pay", "solana", "payments", "automation", "workflows"],
+  "author": "SVM-Pay Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openSVM/svm-pay.git",
+    "directory": "examples/n8n-integration"
+  },
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "nodes/credentials/SVMPayApi.credentials.js"
+    ],
+    "nodes": [
+      "nodes/SVMPay.node.js",
+      "nodes/SVMPayWebhook.node.js",
+      "nodes/SVMPayBatch.node.js"
+    ]
+  },
+  "files": [
+    "nodes",
+    "workflows",
+    "README.md"
+  ],
+  "dependencies": {
+    "@svm-pay/sdk": "^1.1.0",
+    "n8n-workflow": "^1.0.0",
+    "n8n-core": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "typescript": "^4.8.0"
+  },
+  "scripts": {
+    "build": "echo 'Custom nodes ready for n8n'",
+    "install-nodes": "mkdir -p ~/.n8n/custom && cp -r nodes/* ~/.n8n/custom/",
+    "test": "echo 'Tests not implemented yet'"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

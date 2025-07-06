@@ -43,7 +43,8 @@ import {
   FreelancePaymentEscrowTutorial,
   ConsultingTimeTrackingTutorial,
   APIUsageBillingTutorial,
-  SoftwareLicenseManagementTutorial
+  SoftwareLicenseManagementTutorial,
+  N8nIntegrationTutorial
 } from './tutorials/SaaSTutorials'
 import {
   YieldFarmingRewardsTutorial,
@@ -109,6 +110,7 @@ const sections = [
       { name: 'Consulting Time Tracking', href: '/docs/tutorials/saas/time-tracking', icon: Book },
       { name: 'API Usage Billing', href: '/docs/tutorials/saas/api-billing', icon: Book },
       { name: 'Software License Management', href: '/docs/tutorials/saas/license-management', icon: Book },
+      { name: 'n8n Workflow Automation', href: '/docs/tutorials/saas/n8n-integration', icon: Book },
     ]
   },
   {
@@ -316,6 +318,7 @@ export function DocsPage() {
           <Route path="/tutorials/saas/time-tracking" element={<ConsultingTimeTrackingTutorial />} />
           <Route path="/tutorials/saas/api-billing" element={<APIUsageBillingTutorial />} />
           <Route path="/tutorials/saas/license-management" element={<SoftwareLicenseManagementTutorial />} />
+          <Route path="/tutorials/saas/n8n-integration" element={<N8nIntegrationTutorial />} />
           
           {/* DeFi Tutorials */}
           <Route path="/tutorials/defi" element={<DeFiTutorials />} />
