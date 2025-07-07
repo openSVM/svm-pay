@@ -11,6 +11,9 @@ export * from './core/types';
 export * from './sdk/index';
 export * from './sdk/server';
 
+// Export Assembly-BPF SDK
+export * from './sdk/assembly-bpf';
+
 // Export cross-chain functionality
 export * from './core/cross-chain';
 export * from './bridge';

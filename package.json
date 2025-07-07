@@ -135,6 +135,11 @@
       "import": "./dist/sdk/server.js",
       "require": "./dist/sdk/server.js",
       "types": "./dist/sdk/server.d.ts"
+    },
+    "./assembly-bpf": {
+      "import": "./dist/sdk/assembly-bpf/index.js",
+      "require": "./dist/sdk/assembly-bpf/index.js",
+      "types": "./dist/sdk/assembly-bpf/index.d.ts"
     }
   }
 }
