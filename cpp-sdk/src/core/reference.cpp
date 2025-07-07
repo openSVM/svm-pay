@@ -5,6 +5,7 @@
 #include <vector>
 #include <chrono>
 #include <cstring>
+#include <algorithm>
 
 namespace svm_pay {
 

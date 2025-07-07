@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <regex>
 #include <unordered_map>
+#include <iomanip>
 
 namespace svm_pay {
 
@@ -48,13 +49,15 @@ std::string url_decode(const std::string& encoded) {
 std::string url_encode(const std::string& decoded) {
     std::ostringstream encoded;
     encoded.fill('0');
-    encoded << std::hex;
+    encoded << std::hex << std::uppercase;
     
-    for (char c : decoded) {
+    for (unsigned char c : decoded) {
         if (std::isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
             encoded << c;
+        } else if (c == ' ') {
+            encoded << "%20";
         } else {
-            encoded << '%' << std::setw(2) << std::uppercase << static_cast<unsigned char>(c);
+            encoded << '%' << std::setw(2) << static_cast<unsigned>(c);
         }
     }
     
@@ -213,7 +216,7 @@ std::unique_ptr<PaymentRequest> parse_url(const std::string& url) {
         auto references = get_all_params(params, "reference");
         request->references = references;
         
-        return std::move(request);
+        return request;
     }
     
     // Check if this is a transaction request
@@ -242,7 +245,7 @@ std::unique_ptr<PaymentRequest> parse_url(const std::string& url) {
         auto references = get_all_params(params, "reference");
         request->references = references;
         
-        return std::move(request);
+        return request;
     } else {
         // This is a transfer request
         std::string amount = get_param(params, "amount");
@@ -277,7 +280,7 @@ std::unique_ptr<PaymentRequest> parse_url(const std::string& url) {
         auto references = get_all_params(params, "reference");
         request->references = references;
         
-        return std::move(request);
+        return request;
     }
 }
 

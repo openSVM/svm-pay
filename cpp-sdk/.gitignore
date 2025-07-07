@@ -1,0 +1,74 @@
+# Build directories
+build/
+build-*/
+out/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+
+# Compiled Object files
+*.o
+*.obj
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Debug files
+*.dSYM/
+*.pdb
+
+# IDE files
+.vscode/
+.idea/
+*.user
+*.pro.user*
+
+# Temporary files
+*~
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Testing
+CTestTestfile.cmake
+Testing/
+
+# Package files
+*.tar.gz
+*.zip
+*.deb
+*.rpm
+
+# Documentation build
+docs/_build/
+docs/html/
+docs/latex/
+
+# Coverage files
+*.gcno
+*.gcov
+*.gcda
+coverage.info
+coverage/
+
+# Static analysis
+cppcheck-build-dir/
+
+# Clang tools
+compile_commands.json

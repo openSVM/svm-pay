@@ -38,6 +38,7 @@ set(SOURCES
     src/network/adapter.cpp
     src/network/solana.cpp
     src/client.cpp
+    src/svm_pay.cpp
 )
 
 # Header files for installation
@@ -69,6 +70,7 @@ set_target_properties(svm-pay PROPERTIES
 
 # Install targets
 install(TARGETS svm-pay
+    EXPORT svm-pay-targets
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     RUNTIME DESTINATION bin
@@ -76,6 +78,12 @@ install(TARGETS svm-pay
 
 install(DIRECTORY include/svm-pay 
     DESTINATION include
+)
+
+# Export targets
+install(EXPORT svm-pay-targets
+    FILE svm-pay-targets.cmake
+    DESTINATION lib/cmake/svm-pay
 )
 
 # Build tests if enabled

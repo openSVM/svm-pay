@@ -145,7 +145,7 @@ std::future<std::string> SolanaNetworkAdapter::submit_transaction(const std::str
         
         // Parse response to extract transaction signature
         // This is a simplified parser - in a real implementation, use a proper JSON library
-        std::regex sig_regex(R"("result"\s*:\s*"([^"]+)")");
+        std::regex sig_regex("\"result\"\\s*:\\s*\"([^\"]+)\"");
         std::smatch match;
         
         if (std::regex_search(response, match, sig_regex)) {
