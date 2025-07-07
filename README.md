@@ -14,6 +14,7 @@ SVM-Pay is a payment solution for SVM networks (Solana, Sonic SVM, Eclipse, s00n
 - **Cross-Network Compatibility**: Support for Solana, Sonic SVM, Eclipse, and s00n networks
 - **Simple Integration**: One-click integration for developers
 - **Comprehensive SDK**: JavaScript/TypeScript SDK with React, Vue, and Angular components
+- **C++ SDK**: Native C++ SDK for high-performance applications and system integration
 - **Mobile Support**: iOS and Android SDK for mobile applications
 - **No Fees**: SVM-Pay itself charges no fees (only standard network transaction fees apply)
 - **Secure**: Built with security best practices for blockchain payments
@@ -25,6 +26,7 @@ SVM-Pay is a payment solution for SVM networks (Solana, Sonic SVM, Eclipse, s00n
 - [Developer Guide](docs/developer-guide.md)
 - [Architecture](docs/architecture.md)
 - [Security Recommendations](docs/security-recommendations.md)
+- [C++ SDK](cpp-sdk/README.md)
 - [Examples](examples/)
 - [CLI Integration](CLI-INTEGRATION.md)
 
@@ -155,6 +157,42 @@ export class AppComponent {
   }
 }
 ```
+
+## C++ SDK
+
+SVM-Pay includes a comprehensive C++ SDK for high-performance applications and system integration:
+
+```cpp
+#include <svm-pay/svm_pay.hpp>
+
+// Initialize SDK
+svm_pay::initialize_sdk();
+
+// Create client
+svm_pay::Client client(svm_pay::SVMNetwork::SOLANA);
+
+// Create payment URL
+std::string url = client.create_transfer_url("recipient_address", "1.5", {
+    {"label", "Coffee Shop"},
+    {"message", "Payment for coffee"}
+});
+
+// Parse payment URL
+auto request = client.parse_url(url);
+
+// Generate reference ID
+std::string ref = client.generate_reference();
+```
+
+**Features:**
+- Cross-platform support (Windows, Linux, macOS)
+- Asynchronous network operations  
+- Secure reference generation with OpenSSL
+- Complete URL scheme support
+- CMake build system with package management
+- Comprehensive test suite and examples
+
+See [C++ SDK Documentation](cpp-sdk/README.md) for detailed installation and usage instructions.
 
 ## Demo Applications
 

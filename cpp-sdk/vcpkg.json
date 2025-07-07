@@ -1,0 +1,20 @@
+{
+  "name": "svm-pay-cpp",
+  "version": "1.0.0",
+  "dependencies": [
+    "curl",
+    "openssl",
+    {
+      "name": "gtest",
+      "features": [ "gmock" ]
+    }
+  ],
+  "features": {
+    "tests": {
+      "description": "Build with test support",
+      "dependencies": [
+        "gtest"
+      ]
+    }
+  }
+}
