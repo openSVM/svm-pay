@@ -22,6 +22,7 @@ import {
   CrossChainTutorials, 
   MobileTutorials 
 } from '../components/AdvancedTutorialSections'
+import { AssemblyBPFTutorials } from '../components/AssemblyBPFTutorials'
 
 // Import individual tutorial components
 import { 
@@ -160,6 +161,17 @@ const sections = [
       { name: 'IoT Device Micropayments', href: '/docs/tutorials/mobile/iot-micropayments', icon: Book },
       { name: 'Smart City Payments', href: '/docs/tutorials/mobile/smart-city', icon: Book },
       { name: 'Vehicle-to-Everything Payments', href: '/docs/tutorials/mobile/v2x-payments', icon: Book },
+    ]
+  },
+  {
+    title: 'Assembly-BPF SDK',
+    items: [
+      { name: 'Getting Started', href: '/docs/assembly-bpf/getting-started', icon: Code },
+      { name: 'Hello World Program', href: '/docs/assembly-bpf/hello-world', icon: Terminal },
+      { name: 'Payment Processor', href: '/docs/assembly-bpf/payment-processor', icon: Book },
+      { name: 'Cross-Chain Bridge', href: '/docs/assembly-bpf/cross-chain-bridge', icon: Book },
+      { name: 'Memory Management', href: '/docs/assembly-bpf/memory-management', icon: Book },
+      { name: 'API Reference', href: '/docs/assembly-bpf/api-reference', icon: FileText },
     ]
   },
   {
@@ -353,6 +365,15 @@ export function DocsPage() {
           <Route path="/tutorials/mobile/iot-micropayments" element={<IoTMicropaymentsTutorial />} />
           <Route path="/tutorials/mobile/smart-city" element={<SmartCityPaymentsTutorial />} />
           <Route path="/tutorials/mobile/v2x-payments" element={<V2XPaymentsTutorial />} />
+          
+          {/* Assembly-BPF SDK Routes */}
+          <Route path="/assembly-bpf" element={<AssemblyBPFTutorials />} />
+          <Route path="/assembly-bpf/getting-started" element={<AssemblyBPFGettingStarted />} />
+          <Route path="/assembly-bpf/hello-world" element={<AssemblyBPFHelloWorld />} />
+          <Route path="/assembly-bpf/payment-processor" element={<AssemblyBPFPaymentProcessor />} />
+          <Route path="/assembly-bpf/cross-chain-bridge" element={<AssemblyBPFCrossChainBridge />} />
+          <Route path="/assembly-bpf/memory-management" element={<AssemblyBPFMemoryManagement />} />
+          <Route path="/assembly-bpf/api-reference" element={<AssemblyBPFApiReference />} />
           
           <Route path="/cross-chain" element={<CrossChainDoc />} />
           <Route path="/architecture" element={<ArchitectureDoc />} />
@@ -1364,6 +1385,314 @@ const FlashSale = ({ product, saleConfig }) => {
               </div>
             </div>
           ))}
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+// Assembly-BPF SDK Documentation Components
+function AssemblyBPFGettingStarted() {
+  return (
+    <div className="pt-20 p-8 max-w-4xl">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-4xl font-bold text-slate-900 mb-6">Assembly-BPF SDK Getting Started</h1>
+        
+        <div className="prose prose-slate max-w-none">
+          <p className="text-xl text-slate-600 mb-8">
+            Learn how to get started with the Assembly-BPF SDK for low-level BPF program development on SVM networks.
+          </p>
+
+          <h2>Installation</h2>
+          <div className="bg-slate-900 rounded-lg p-4 mb-4">
+            <pre className="text-slate-100">
+{`npm install svm-pay`}
+            </pre>
+          </div>
+
+          <h2>Quick Start</h2>
+          <div className="bg-slate-900 rounded-lg p-4 mb-4">
+            <pre className="text-slate-100">
+{`import { AssemblyBPFSDK, SVMNetwork } from 'svm-pay/assembly-bpf'
+
+// Initialize SDK
+const sdk = new AssemblyBPFSDK({ 
+  network: SVMNetwork.SOLANA,
+  debug: true 
+})
+
+console.log('Assembly-BPF SDK initialized successfully')`}
+            </pre>
+          </div>
+
+          <h2>Key Features</h2>
+          <ul>
+            <li>Assembly abstractions for BPF instruction generation</li>
+            <li>Memory management utilities for stack/heap operations</li>
+            <li>Syscall helpers for SVM network interactions</li>
+            <li>Program templates for common use cases</li>
+            <li>Multi-network support across all SVM chains</li>
+            <li>Compilation and deployment tools</li>
+          </ul>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+function AssemblyBPFHelloWorld() {
+  return (
+    <div className="pt-20 p-8 max-w-4xl">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-4xl font-bold text-slate-900 mb-6">Hello World BPF Program</h1>
+        
+        <div className="prose prose-slate max-w-none">
+          <p className="text-xl text-slate-600 mb-8">
+            Create your first BPF program using the Assembly-BPF SDK.
+          </p>
+
+          <h2>Example</h2>
+          <div className="bg-slate-900 rounded-lg p-4 mb-4">
+            <pre className="text-slate-100">
+{`import { examples } from 'svm-pay/assembly-bpf'
+
+const createHelloWorld = async () => {
+  const { sdk, compilationResult, metadata } = await examples.createHelloWorld()
+  
+  console.log('✅ Hello World compiled successfully')
+  console.log('📜 Assembly:')
+  console.log(compilationResult.assembly)
+  
+  return compilationResult
+}
+
+createHelloWorld()`}
+            </pre>
+          </div>
+
+          <p>This creates a simple BPF program that logs a debug message and exits successfully.</p>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+function AssemblyBPFPaymentProcessor() {
+  return (
+    <div className="pt-20 p-8 max-w-4xl">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-4xl font-bold text-slate-900 mb-6">Payment Processor BPF Program</h1>
+        
+        <div className="prose prose-slate max-w-none">
+          <p className="text-xl text-slate-600 mb-8">
+            Build a payment processor BPF program with fee handling and validation.
+          </p>
+
+          <h2>Implementation</h2>
+          <div className="bg-slate-900 rounded-lg p-4 mb-4">
+            <pre className="text-slate-100">
+{`import { 
+  AssemblyBPFSDK, 
+  BPFTemplates, 
+  SVMNetwork 
+} from 'svm-pay/assembly-bpf'
+
+const createPaymentProcessor = async () => {
+  const sdk = new AssemblyBPFSDK({ network: SVMNetwork.SOLANA })
+  
+  const { metadata, instructions } = BPFTemplates.createPaymentProcessor({
+    networks: [SVMNetwork.SOLANA, SVMNetwork.SONIC],
+    feeRate: 0.01, // 1% fee
+    maxAmount: 1000000
+  })
+  
+  const result = await sdk.compile(instructions, metadata)
+  return result
+}`}
+            </pre>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+function AssemblyBPFCrossChainBridge() {
+  return (
+    <div className="pt-20 p-8 max-w-4xl">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-4xl font-bold text-slate-900 mb-6">Cross-Chain Bridge BPF Program</h1>
+        
+        <div className="prose prose-slate max-w-none">
+          <p className="text-xl text-slate-600 mb-8">
+            Implement cross-chain asset bridging with validation using Assembly-BPF.
+          </p>
+
+          <h2>Advanced Implementation</h2>
+          <div className="bg-slate-900 rounded-lg p-4 mb-4">
+            <pre className="text-slate-100">
+{`import { 
+  AssemblyBPFSDK,
+  BPFTemplates,
+  BPFHelpers,
+  SVMNetwork
+} from 'svm-pay/assembly-bpf'
+
+const createCrossChainBridge = async () => {
+  const sdk = new AssemblyBPFSDK({ network: SVMNetwork.SOLANA })
+  
+  const { metadata, instructions } = BPFTemplates.createCrossChainBridge({
+    supportedNetworks: [
+      SVMNetwork.SOLANA, SVMNetwork.SONIC, 
+      SVMNetwork.ECLIPSE, SVMNetwork.SOON
+    ],
+    bridgeFee: 0.005,
+    minAmount: 1000,
+    maxAmount: 10000000
+  })
+  
+  const builder = sdk.createProgram(metadata)
+  
+  builder
+    .addInstructions(BPFHelpers.createDebugLog('Starting bridge'))
+    .addValidator()
+    .addInstructions(instructions)
+    .addInstructions(BPFHelpers.createDebugLog('Bridge completed'))
+  
+  return await builder.compile({ optimize: true })
+}`}
+            </pre>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+function AssemblyBPFMemoryManagement() {
+  return (
+    <div className="pt-20 p-8 max-w-4xl">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-4xl font-bold text-slate-900 mb-6">Memory Management</h1>
+        
+        <div className="prose prose-slate max-w-none">
+          <p className="text-xl text-slate-600 mb-8">
+            Advanced memory management and syscall handling in Assembly-BPF.
+          </p>
+
+          <h2>Memory Structures</h2>
+          <div className="bg-slate-900 rounded-lg p-4 mb-4">
+            <pre className="text-slate-100">
+{`import { BPFMemoryManager } from 'svm-pay/assembly-bpf'
+
+// Create custom memory structures
+const paymentStruct = BPFMemoryManager.createStruct([
+  { name: 'amount', type: 'u64', offset: 0 },
+  { name: 'recipient', type: 'pubkey', offset: 8 },
+  { name: 'fee', type: 'u64', offset: 40 },
+  { name: 'timestamp', type: 'u64', offset: 48 }
+])
+
+// Allocate stack space
+const stackPtr = BPFMemoryManager.allocateStack(128)`}
+            </pre>
+          </div>
+
+          <h2>Syscall Helpers</h2>
+          <div className="bg-slate-900 rounded-lg p-4 mb-4">
+            <pre className="text-slate-100">
+{`import { BPFSyscallHelper, SVMNetwork } from 'svm-pay/assembly-bpf'
+
+const syscalls = new BPFSyscallHelper(SVMNetwork.SOLANA)
+
+// Network-specific operations
+const balance = syscalls.getAccountBalance(accountPublicKey)
+const validation = syscalls.validateAmount(amount)
+const timestamp = syscalls.getCurrentTimestamp(register)`}
+            </pre>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+function AssemblyBPFApiReference() {
+  return (
+    <div className="pt-20 p-8 max-w-4xl">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-4xl font-bold text-slate-900 mb-6">Assembly-BPF API Reference</h1>
+        
+        <div className="prose prose-slate max-w-none">
+          <p className="text-xl text-slate-600 mb-8">
+            Complete API reference for the Assembly-BPF SDK.
+          </p>
+
+          <h2>Core Classes</h2>
+          
+          <h3>AssemblyBPFSDK</h3>
+          <p>Main SDK class for BPF program development.</p>
+          <div className="bg-slate-900 rounded-lg p-4 mb-4">
+            <pre className="text-slate-100">
+{`class AssemblyBPFSDK {
+  constructor(config: BPFProgramConfig)
+  compile(instructions: BPFInstruction[], metadata: BPFProgramMetadata): Promise<CompilationResult>
+  createProgram(metadata: BPFProgramMetadata): BPFProgramBuilder
+}`}
+            </pre>
+          </div>
+
+          <h3>BPFTemplates</h3>
+          <p>Pre-built program templates for common use cases.</p>
+          <div className="bg-slate-900 rounded-lg p-4 mb-4">
+            <pre className="text-slate-100">
+{`class BPFTemplates {
+  static createPaymentProcessor(config: PaymentProcessorConfig): TemplateResult
+  static createCrossChainBridge(config: CrossChainBridgeConfig): TemplateResult
+  static createPaymentValidator(config: ValidatorConfig): TemplateResult
+  static createTokenTransfer(config: TokenTransferConfig): TemplateResult
+  static createMiddleware(config: MiddlewareConfig): TemplateResult
+}`}
+            </pre>
+          </div>
+
+          <h3>BPFMemoryManager</h3>
+          <p>Memory management utilities for BPF programs.</p>
+          <div className="bg-slate-900 rounded-lg p-4 mb-4">
+            <pre className="text-slate-100">
+{`class BPFMemoryManager {
+  static allocateStack(size: number): number
+  static createStruct(fields: StructField[]): MemoryStruct
+  static validateMemoryAccess(address: number, size: number): boolean
+}`}
+            </pre>
+          </div>
+
+          <p>For complete documentation, see the <a href="/docs/assembly-bpf">Assembly-BPF documentation</a>.</p>
         </div>
       </motion.div>
     </div>
