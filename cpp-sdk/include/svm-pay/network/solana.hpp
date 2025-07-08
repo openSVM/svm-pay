@@ -2,8 +2,12 @@
 
 #include "adapter.hpp"
 #include <string>
+#include <memory>
 
 namespace svm_pay {
+
+// Forward declaration
+class CurlInitializer;
 
 /**
  * Solana network adapter implementation
@@ -67,6 +71,7 @@ public:
 
 private:
     std::string rpc_url_;
+    std::shared_ptr<CurlInitializer> curl_initializer_;  // RAII curl management
     
     /**
      * Make an RPC call to the Solana network

@@ -3,6 +3,7 @@
 #include "../core/types.hpp"
 #include <string>
 #include <future>
+#include <mutex>
 
 namespace svm_pay {
 
@@ -97,6 +98,7 @@ public:
 
 private:
     static std::unordered_map<SVMNetwork, std::unique_ptr<NetworkAdapter>> adapters_;
+    static std::mutex adapters_mutex_;  // Thread safety for adapter registration/access
 };
 
 } // namespace svm_pay

@@ -182,7 +182,7 @@ enum class SVMNetwork {
 
 ### Network Adapters
 
-Network adapters handle network-specific operations:
+Network adapters handle network-specific operations using **asynchronous operations**:
 
 ```cpp
 class NetworkAdapter {
@@ -194,6 +194,36 @@ public:
     virtual std::future<PaymentStatus> check_transaction_status(const std::string& signature) = 0;
 };
 ```
+
+**Important**: All network operations return `std::future<T>` objects for asynchronous execution. You can:
+
+1. **Block and wait for result**:
+   ```cpp
+   auto adapter = client.get_adapter(SVMNetwork::SOLANA);
+   auto future = adapter->create_transfer_transaction(request);
+   std::string transaction = future.get();  // Blocks until complete
+   ```
+
+2. **Wait with timeout**:
+   ```cpp
+   auto future = adapter->check_transaction_status(signature);
+   if (future.wait_for(std::chrono::seconds(30)) == std::future_status::ready) {
+       PaymentStatus status = future.get();
+   } else {
+       // Handle timeout
+   }
+   ```
+
+3. **Check status without blocking**:
+   ```cpp
+   auto future = adapter->submit_transaction(transaction, signature);
+   if (future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+       // Result is available
+       std::string signature = future.get();
+   } else {
+       // Still processing
+   }
+   ```
 
 Currently implemented:
 - `SolanaNetworkAdapter`: Solana network support with RPC integration

@@ -7,7 +7,7 @@
 namespace svm_pay {
 
 Client::Client(SVMNetwork default_network) 
-    : default_network_(default_network), debug_enabled_(false) {
+    : default_network_(default_network), debug_enabled_(false), max_references_(10) {
     
     // Register default adapters
     auto solana_adapter = std::make_unique<SolanaNetworkAdapter>();
@@ -111,6 +111,14 @@ void Client::set_debug_enabled(bool enabled) {
     debug_enabled_ = enabled;
 }
 
+void Client::set_max_references(size_t max_references) {
+    max_references_ = max_references;
+}
+
+size_t Client::get_max_references() const {
+    return max_references_;
+}
+
 SVMNetwork Client::parse_network_from_options(const std::unordered_map<std::string, std::string>& options) {
     auto network_it = options.find("network");
     if (network_it != options.end()) {
@@ -128,8 +136,8 @@ std::vector<std::string> Client::parse_references_from_options(const std::unorde
         references.push_back(reference_it->second);
     }
     
-    // Look for numbered references
-    for (int i = 1; i <= 10; ++i) { // Support up to 10 references
+    // Look for numbered references up to the configured maximum
+    for (size_t i = 1; i <= max_references_; ++i) {
         std::string key = "reference" + std::to_string(i);
         auto it = options.find(key);
         if (it != options.end()) {

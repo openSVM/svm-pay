@@ -112,10 +112,25 @@ public:
      * @param enabled True to enable debug mode, false to disable
      */
     void set_debug_enabled(bool enabled);
+    
+    /**
+     * Set the maximum number of references to parse from options
+     * 
+     * @param max_references Maximum number of references (default: 10)
+     */
+    void set_max_references(size_t max_references);
+    
+    /**
+     * Get the maximum number of references
+     * 
+     * @return The current maximum number of references
+     */
+    size_t get_max_references() const;
 
 private:
     SVMNetwork default_network_;
     bool debug_enabled_;
+    size_t max_references_;  // Maximum number of references to parse (default: 10)
     
     /**
      * Parse network from options
@@ -129,7 +144,7 @@ private:
      * Parse references from options
      * 
      * @param options The options map
-     * @return A vector of reference IDs
+     * @return A vector of reference IDs (limited by max_references_)
      */
     std::vector<std::string> parse_references_from_options(const std::unordered_map<std::string, std::string>& options);
 };

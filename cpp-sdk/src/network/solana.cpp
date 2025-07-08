@@ -1,4 +1,5 @@
 #include "svm-pay/network/solana.hpp"
+#include "svm-pay/network/curl_initializer.hpp"
 #include <curl/curl.h>
 #include <stdexcept>
 #include <regex>
@@ -17,8 +18,8 @@ size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* res
 SolanaNetworkAdapter::SolanaNetworkAdapter(const std::string& rpc_url)
     : NetworkAdapter(SVMNetwork::SOLANA), rpc_url_(rpc_url) {
     
-    // Initialize curl
-    curl_global_init(CURL_GLOBAL_DEFAULT);
+    // Ensure curl is initialized using RAII wrapper
+    curl_initializer_ = CurlInitializer::get_instance();
 }
 
 void SolanaNetworkAdapter::set_rpc_url(const std::string& rpc_url) {

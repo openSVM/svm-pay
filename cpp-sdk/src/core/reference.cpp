@@ -69,7 +69,7 @@ std::vector<unsigned char> decode_base58(const std::string& encoded) {
     
     // Convert from base58
     for (size_t i = leading_ones; i < encoded.size(); i++) {
-        int carry = 0;
+        int carry = -1;  // Initialize to invalid value
         
         // Find the character in the alphabet
         for (int j = 0; j < 58; j++) {
@@ -79,8 +79,9 @@ std::vector<unsigned char> decode_base58(const std::string& encoded) {
             }
         }
         
-        if (carry == 0 && encoded[i] != '1') {
-            throw std::invalid_argument("Invalid base58 character");
+        // Check if character was found
+        if (carry == -1) {
+            throw std::invalid_argument("Invalid base58 character: " + std::string(1, encoded[i]));
         }
         
         for (size_t j = 0; j < result.size(); j++) {

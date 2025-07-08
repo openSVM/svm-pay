@@ -37,6 +37,7 @@ set(SOURCES
     src/core/reference.cpp
     src/network/adapter.cpp
     src/network/solana.cpp
+    src/network/curl_initializer.cpp
     src/client.cpp
     src/svm_pay.cpp
 )
@@ -50,6 +51,7 @@ set(HEADERS
     include/svm-pay/core/reference.hpp
     include/svm-pay/network/adapter.hpp
     include/svm-pay/network/solana.hpp
+    include/svm-pay/network/curl_initializer.hpp
 )
 
 # Create library
