@@ -2,6 +2,7 @@ import './index.css'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { LandingPage } from './pages/LandingPage'
 import { DocsPage } from './pages/DocsPage'
+import { TutorialsPage } from './pages/TutorialsPage'
 import { DemoPage } from './pages/DemoPage'
 import { ExamplesPage } from './pages/ExamplesPage'
 import { PricingPage } from './pages/PricingPage'
@@ -24,6 +25,7 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/docs/*" element={<DocsPage />} />
+          <Route path="/tutorials/*" element={<TutorialsPage />} />
           <Route path="/demo" element={<DemoPage />} />
           <Route path="/examples" element={<ExamplesPage />} />
           <Route path="/pricing" element={<PricingPage />} />
