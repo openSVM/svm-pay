@@ -134,6 +134,10 @@ public:
     void set_default_network(SVMNetwork network);
     SVMNetwork get_default_network() const;
     
+    // Reference parsing configuration
+    void set_max_references(size_t max_references);  // Default: 10
+    size_t get_max_references() const;
+    
     // Adapter management
     void register_adapter(SVMNetwork network, std::unique_ptr<NetworkAdapter> adapter);
     NetworkAdapter* get_adapter(SVMNetwork network);
@@ -347,6 +351,14 @@ client.register_adapter(SVMNetwork::SONIC, std::make_unique<CustomNetworkAdapter
 ### Configuration Options
 
 ```cpp
+svm_pay::Client client(SVMNetwork::SOLANA);
+
+// Configure maximum number of references to parse (default: 10)
+client.set_max_references(5);  // Limit to 5 references for security
+
+// Enable debug mode
+client.set_debug_enabled(true);
+
 std::unordered_map<std::string, std::string> options = {
     {"solana_rpc_url", "https://api.devnet.solana.com"},  // Custom Solana RPC
     {"debug", "true"}  // Enable debug output
@@ -355,20 +367,60 @@ std::unordered_map<std::string, std::string> options = {
 svm_pay::initialize_sdk(options);
 ```
 
-### Error Handling
+### Security Considerations
 
-The SDK uses C++ exceptions for error handling:
+1. **Reference Validation**: All reference IDs are validated for proper base58 encoding and length
+2. **Input Sanitization**: URL parsing includes validation of all components
+3. **Memory Safety**: RAII patterns ensure proper resource cleanup
+4. **Thread Safety**: Network adapter factory uses mutex protection for concurrent access
+5. **Reference Limits**: Configurable limits prevent parsing excessive references (DoS protection)
 
 ```cpp
+// Example: Secure reference handling
+try {
+    std::string ref = client.generate_reference(32);  // 256-bit entropy
+    if (svm_pay::validate_reference(ref)) {
+        // Reference is valid base58 and proper length
+    }
+} catch (const std::runtime_error& e) {
+    // Handle cryptographic failures
+}
+```
+
+### Error Handling
+
+The SDK uses C++ exceptions for error handling with specific exception types for better granularity:
+
+```cpp
+#include <svm-pay/core/exceptions.hpp>
+
 try {
     auto request = client.parse_url(url);
     // Process request...
-} catch (const std::invalid_argument& e) {
-    std::cerr << "Invalid URL: " << e.what() << std::endl;
-} catch (const std::runtime_error& e) {
-    std::cerr << "Runtime error: " << e.what() << std::endl;
+} catch (const svm_pay::URLParseException& e) {
+    std::cerr << "URL parsing error: " << e.what() << std::endl;
+} catch (const svm_pay::AddressValidationException& e) {
+    std::cerr << "Address validation error: " << e.what() << std::endl;
+} catch (const svm_pay::NetworkException& e) {
+    std::cerr << "Network error: " << e.what() << std::endl;
+} catch (const svm_pay::CryptographicException& e) {
+    std::cerr << "Cryptographic error: " << e.what() << std::endl;
+} catch (const svm_pay::ReferenceException& e) {
+    std::cerr << "Reference error: " << e.what() << std::endl;
+} catch (const svm_pay::SVMPayException& e) {
+    std::cerr << "SVM-Pay SDK error: " << e.what() << std::endl;
+} catch (const std::exception& e) {
+    std::cerr << "Unexpected error: " << e.what() << std::endl;
 }
 ```
+
+Exception types:
+- `SVMPayException`: Base exception for all SDK errors
+- `NetworkException`: Network-related failures (RPC calls, HTTP requests)
+- `URLParseException`: URL parsing and validation errors
+- `AddressValidationException`: Address format validation errors
+- `ReferenceException`: Reference ID validation errors
+- `CryptographicException`: Cryptographic operation failures
 
 ## Testing
 

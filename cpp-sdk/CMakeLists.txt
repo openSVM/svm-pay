@@ -49,6 +49,7 @@ set(HEADERS
     include/svm-pay/core/types.hpp
     include/svm-pay/core/url_scheme.hpp
     include/svm-pay/core/reference.hpp
+    include/svm-pay/core/exceptions.hpp
     include/svm-pay/network/adapter.hpp
     include/svm-pay/network/solana.hpp
     include/svm-pay/network/curl_initializer.hpp

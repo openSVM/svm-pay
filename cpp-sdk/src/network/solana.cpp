@@ -1,5 +1,6 @@
 #include "svm-pay/network/solana.hpp"
 #include "svm-pay/network/curl_initializer.hpp"
+#include "svm-pay/core/exceptions.hpp"
 #include <curl/curl.h>
 #include <stdexcept>
 #include <regex>
@@ -47,7 +48,7 @@ std::future<std::string> SolanaNetworkAdapter::make_rpc_call(const std::string& 
     return std::async(std::launch::async, [this, method, params]() -> std::string {
         CURL* curl = curl_easy_init();
         if (!curl) {
-            throw std::runtime_error("Failed to initialize curl");
+            throw NetworkException("Failed to initialize curl");
         }
         
         std::string response;
@@ -72,7 +73,7 @@ std::future<std::string> SolanaNetworkAdapter::make_rpc_call(const std::string& 
         curl_easy_cleanup(curl);
         
         if (res != CURLE_OK) {
-            throw std::runtime_error("curl_easy_perform() failed: " + std::string(curl_easy_strerror(res)));
+            throw NetworkException("curl_easy_perform() failed: " + std::string(curl_easy_strerror(res)));
         }
         
         return response;
@@ -82,7 +83,7 @@ std::future<std::string> SolanaNetworkAdapter::make_rpc_call(const std::string& 
 std::future<std::string> SolanaNetworkAdapter::create_transfer_transaction(const TransferRequest& request) {
     return std::async(std::launch::async, [this, request]() -> std::string {
         if (!validate_address(request.recipient)) {
-            throw std::invalid_argument("Invalid recipient address");
+            throw AddressValidationException("Invalid recipient address: " + request.recipient);
         }
         
         // For now, return a placeholder transaction
@@ -110,7 +111,7 @@ std::future<std::string> SolanaNetworkAdapter::create_transfer_transaction(const
 std::future<std::string> SolanaNetworkAdapter::fetch_transaction(const TransactionRequest& request) {
     return std::async(std::launch::async, [this, request]() -> std::string {
         if (!validate_address(request.recipient)) {
-            throw std::invalid_argument("Invalid recipient address");
+            throw AddressValidationException("Invalid recipient address: " + request.recipient);
         }
         
         // Make HTTP request to fetch transaction from the link

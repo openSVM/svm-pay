@@ -12,6 +12,7 @@
 #include "core/types.hpp"
 #include "core/url_scheme.hpp"
 #include "core/reference.hpp"
+#include "core/exceptions.hpp"
 #include "network/adapter.hpp"
 #include "network/solana.hpp"
 

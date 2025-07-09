@@ -1,4 +1,5 @@
 #include "svm-pay/core/reference.hpp"
+#include "svm-pay/core/exceptions.hpp"
 #include <openssl/rand.h>
 #include <openssl/evp.h>
 #include <stdexcept>
@@ -81,7 +82,7 @@ std::vector<unsigned char> decode_base58(const std::string& encoded) {
         
         // Check if character was found
         if (carry == -1) {
-            throw std::invalid_argument("Invalid base58 character: " + std::string(1, encoded[i]));
+            throw ReferenceException("Invalid base58 character: " + std::string(1, encoded[i]));
         }
         
         for (size_t j = 0; j < result.size(); j++) {
@@ -115,7 +116,7 @@ std::string generate_reference(size_t length) {
     std::vector<unsigned char> random_bytes(length);
     
     if (RAND_bytes(random_bytes.data(), static_cast<int>(length)) != 1) {
-        throw std::runtime_error("Failed to generate secure random bytes");
+        throw CryptographicException("Failed to generate secure random bytes");
     }
     
     return encode_base58(random_bytes.data(), length);
@@ -156,7 +157,7 @@ std::string generate_timestamped_reference(size_t length) {
     // Generate random bytes
     std::vector<unsigned char> random_bytes(length);
     if (RAND_bytes(random_bytes.data(), static_cast<int>(length)) != 1) {
-        throw std::runtime_error("Failed to generate secure random bytes");
+        throw CryptographicException("Failed to generate secure random bytes");
     }
     
     // Replace first 4 bytes with timestamp (big-endian)

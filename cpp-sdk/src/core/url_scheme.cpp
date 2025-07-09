@@ -1,4 +1,5 @@
 #include "svm-pay/core/url_scheme.hpp"
+#include "svm-pay/core/exceptions.hpp"
 #include <stdexcept>
 #include <sstream>
 #include <algorithm>
@@ -124,7 +125,7 @@ std::vector<std::string> get_all_params(const std::unordered_map<std::string, st
 
 std::unique_ptr<PaymentRequest> parse_url(const std::string& url) {
     if (url.empty()) {
-        throw std::invalid_argument("URL must be a non-empty string");
+        throw URLParseException("URL must be a non-empty string");
     }
     
     // Parse the URL using regex
@@ -132,7 +133,7 @@ std::unique_ptr<PaymentRequest> parse_url(const std::string& url) {
     std::smatch match;
     
     if (!std::regex_match(url, match, url_regex)) {
-        throw std::invalid_argument("Invalid URL format");
+        throw URLParseException("Invalid URL format");
     }
     
     std::string protocol = match[1].str();
@@ -150,13 +151,13 @@ std::unique_ptr<PaymentRequest> parse_url(const std::string& url) {
     } else if (protocol == "soon") {
         network = SVMNetwork::SOON;
     } else {
-        throw std::invalid_argument("Unsupported protocol: " + protocol);
+        throw URLParseException("Unsupported protocol: " + protocol);
     }
     
     // Extract recipient from path
     std::string recipient = path;
     if (recipient.empty()) {
-        throw std::invalid_argument("Missing recipient address");
+        throw URLParseException("Missing recipient address");
     }
     
     // Remove leading slash if present
@@ -165,7 +166,7 @@ std::unique_ptr<PaymentRequest> parse_url(const std::string& url) {
     }
     
     if (recipient.empty()) {
-        throw std::invalid_argument("Empty recipient address");
+        throw URLParseException("Empty recipient address");
     }
     
     // Parse query parameters
