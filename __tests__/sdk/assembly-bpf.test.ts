@@ -126,9 +126,10 @@ describe('Assembly-BPF SDK', () => {
 
       const result = await sdk.compile(instructions, metadata);
       
-      // The current implementation doesn't validate opcodes, so this passes
-      // In a real implementation, this would fail
-      expect(result.success).toBe(true);
+      // Should now properly fail with enhanced validation
+      expect(result.success).toBe(false);
+      expect(result.errors).toBeDefined();
+      expect(result.errors!.length).toBeGreaterThan(0);
     });
   });
 
@@ -209,14 +210,14 @@ describe('Assembly-BPF SDK', () => {
 
   describe('Program Validation', () => {
     it('should validate empty bytecode', async () => {
-      const result = await sdk.validateProgram(new Uint8Array(0));
+      const result = await sdk.validateBytecode(new Uint8Array(0));
       expect(result.valid).toBe(false);
       expect(result.issues).toContain('Empty bytecode');
     });
 
     it('should validate large bytecode', async () => {
       const largeBytecode = new Uint8Array(2 * 1024 * 1024); // 2MB
-      const result = await sdk.validateProgram(largeBytecode);
+      const result = await sdk.validateBytecode(largeBytecode);
       expect(result.valid).toBe(false);
       expect(result.issues).toContain('Program size exceeds maximum limit');
     });
@@ -228,7 +229,7 @@ describe('Assembly-BPF SDK', () => {
       normalBytecode[2] = 0x4c;
       normalBytecode[3] = 0x46;
       
-      const result = await sdk.validateProgram(normalBytecode);
+      const result = await sdk.validateBytecode(normalBytecode);
       expect(result.valid).toBe(true);
       expect(result.issues).toHaveLength(0);
     });
@@ -388,11 +389,11 @@ describe('BPF Memory Manager', () => {
     const memoryManager = sdk.getMemoryManager();
     
     const storeInstr = memoryManager.storeMemory(BPFRegister.R1, -8);
-    expect(storeInstr.opcode).toBe(BPFInstruction.STORE);
+    expect(storeInstr.opcode).toBe(BPFInstruction.STORE_MEM);
     expect(storeInstr.offset).toBe(-8);
 
     const loadInstr = memoryManager.loadMemory(BPFRegister.R2, -8);
-    expect(loadInstr.opcode).toBe(BPFInstruction.LOAD);
+    expect(loadInstr.opcode).toBe(BPFInstruction.LOAD_MEM);
     expect(loadInstr.offset).toBe(-8);
   });
 

@@ -144,6 +144,7 @@ export async function createCustomValidator() {
         opcode: BPFInstruction.JUMP_NE,
         dst: BPFRegister.R2,
         immediate: 0,
+        offset: 1, // Jump to next instruction
         comment: 'Reject if not multiple of 1000'
       }
     ])

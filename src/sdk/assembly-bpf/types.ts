@@ -22,35 +22,101 @@ export interface BPFProgramConfig {
 }
 
 /**
- * BPF instruction types
+ * BPF instruction classes
+ */
+export enum BPFInstructionClass {
+  LD = 0x00,    // Load
+  LDX = 0x01,   // Load, indexed
+  ST = 0x02,    // Store immediate
+  STX = 0x03,   // Store, indexed
+  ALU = 0x04,   // Arithmetic operations
+  JMP = 0x05,   // Jump operations
+  JMP32 = 0x06, // Jump operations on 32-bit
+  ALU64 = 0x07  // 64-bit arithmetic operations
+}
+
+/**
+ * BPF instruction types with full opcode semantics
  */
 export enum BPFInstruction {
-  // Arithmetic operations
+  // Load instructions (class 0x00-0x03)
+  LOAD_IMM = 0x18,      // lddw - Load 64-bit immediate
+  LOAD_ABS = 0x20,      // ldabs - Load absolute
+  LOAD_IND = 0x40,      // ldind - Load indirect
+  LOAD_MEM = 0x61,      // ldx - Load from memory
+  LOAD_MEMSX = 0x81,    // ldxs - Load sign-extended
+  
+  // Store instructions  
+  STORE_IMM = 0x62,     // st - Store immediate
+  STORE_MEM = 0x63,     // stx - Store to memory
+  
+  // 64-bit ALU operations (class 0x07)
+  ADD64 = 0x0f,         // add64
+  SUB64 = 0x1f,         // sub64  
+  MUL64 = 0x2f,         // mul64
+  DIV64 = 0x3f,         // div64
+  OR64 = 0x4f,          // or64
+  AND64 = 0x5f,         // and64
+  LSH64 = 0x6f,         // lsh64
+  RSH64 = 0x7f,         // rsh64
+  NEG64 = 0x87,         // neg64
+  MOD64 = 0x9f,         // mod64
+  XOR64 = 0xaf,         // xor64
+  ARSH64 = 0xcf,        // arsh64 - Arithmetic right shift
+  
+  // 32-bit ALU operations (class 0x04)
+  ADD32 = 0x04,         // add32
+  SUB32 = 0x14,         // sub32
+  MUL32 = 0x24,         // mul32
+  DIV32 = 0x34,         // div32
+  OR32 = 0x44,          // or32
+  AND32 = 0x54,         // and32
+  LSH32 = 0x64,         // lsh32
+  RSH32 = 0x74,         // rsh32
+  NEG32 = 0x84,         // neg32
+  MOD32 = 0x94,         // mod32
+  XOR32 = 0xa4,         // xor32
+  ARSH32 = 0xc4,        // arsh32
+  
+  // Jump operations (class 0x05)
+  JUMP = 0x05,          // ja - Jump always
+  JUMP_EQ = 0x15,       // jeq - Jump if equal
+  JUMP_GT = 0x25,       // jgt - Jump if greater than
+  JUMP_GE = 0x35,       // jge - Jump if greater or equal
+  JUMP_SET = 0x45,      // jset - Jump if bit set
+  JUMP_NE = 0x55,       // jne - Jump if not equal
+  JUMP_SGT = 0x65,      // jsgt - Jump if signed greater than
+  JUMP_SGE = 0x75,      // jsge - Jump if signed greater or equal
+  JUMP_LT = 0xa5,       // jlt - Jump if less than
+  JUMP_LE = 0xb5,       // jle - Jump if less or equal
+  JUMP_SLT = 0xc5,      // jslt - Jump if signed less than
+  JUMP_SLE = 0xd5,      // jsle - Jump if signed less or equal
+  
+  // 32-bit Jump operations (class 0x06)
+  JUMP32_EQ = 0x16,     // jeq32
+  JUMP32_GT = 0x26,     // jgt32
+  JUMP32_GE = 0x36,     // jge32
+  JUMP32_SET = 0x46,    // jset32
+  JUMP32_NE = 0x56,     // jne32
+  JUMP32_SGT = 0x66,    // jsgt32
+  JUMP32_SGE = 0x76,    // jsge32
+  JUMP32_LT = 0xa6,     // jlt32
+  JUMP32_LE = 0xb6,     // jle32
+  JUMP32_SLT = 0xc6,    // jslt32
+  JUMP32_SLE = 0xd6,    // jsle32
+  
+  // Function calls and returns
+  CALL = 0x85,          // call
+  EXIT = 0x95,          // exit
+  
+  // Legacy aliases for backward compatibility
   ADD = 0x0f,
   SUB = 0x1f,
   MUL = 0x2f,
   DIV = 0x3f,
   MOD = 0x9f,
-  
-  // Memory operations
   LOAD = 0x61,
   STORE = 0x62,
-  LOAD_IMM = 0x18,
-  
-  // Control flow
-  JUMP = 0x05,
-  JUMP_EQ = 0x15,
-  JUMP_NE = 0x55,
-  JUMP_GT = 0x25,
-  JUMP_GE = 0x35,
-  JUMP_LT = 0xa5,
-  JUMP_LE = 0xb5,
-  
-  // Function calls
-  CALL = 0x85,
-  EXIT = 0x95,
-  
-  // Bitwise operations
   AND = 0x5f,
   OR = 0x4f,
   XOR = 0xaf,
@@ -150,7 +216,7 @@ export interface BPFProgramMetadata {
 }
 
 /**
- * Assembly instruction representation
+ * Assembly instruction representation with enhanced 64-bit support
  */
 export interface AssemblyInstruction {
   /** Operation code */
@@ -159,12 +225,69 @@ export interface AssemblyInstruction {
   dst: BPFRegister;
   /** Source register */
   src?: BPFRegister;
-  /** Immediate value */
-  immediate?: number;
+  /** Immediate value (supports 64-bit) */
+  immediate?: number | bigint;
   /** Offset for memory operations */
   offset?: number;
   /** Comment for debugging */
   comment?: string;
+  /** Instruction size (8 or 16 bytes for wide instructions) */
+  size?: 8 | 16;
+}
+
+/**
+ * Enhanced BPF validation options
+ */
+export interface BPFValidationOptions {
+  /** Enable strict opcode validation */
+  strictOpcodes?: boolean;
+  /** Check for instruction class compliance */
+  validateInstructionClass?: boolean;
+  /** Validate 64-bit immediate encoding */
+  validate64BitImmediates?: boolean;
+  /** Check memory access bounds */
+  validateMemoryAccess?: boolean;
+  /** Maximum allowed stack depth */
+  maxStackDepth?: number;
+  /** Enable security pattern validation */
+  securityValidation?: boolean;
+}
+
+/**
+ * ELF parsing result for BPF programs
+ */
+export interface BPFELFParseResult {
+  /** Success status */
+  success: boolean;
+  /** Program header information */
+  programHeaders?: Array<{
+    type: number;
+    offset: number;
+    vaddr: number;
+    paddr: number;
+    filesz: number;
+    memsz: number;
+    flags: number;
+  }>;
+  /** Section header information */
+  sectionHeaders?: Array<{
+    name: string;
+    type: number;
+    flags: number;
+    addr: number;
+    offset: number;
+    size: number;
+  }>;
+  /** Symbol table */
+  symbols?: Array<{
+    name: string;
+    value: number;
+    size: number;
+    type: number;
+    binding: number;
+  }>;
+  /** Error message if parsing failed */
+  error?: string;
 }
 
 /**

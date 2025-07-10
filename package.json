@@ -60,6 +60,8 @@
     "commander": "^11.0.0",
     "crypto": "^1.0.1",
     "crypto-js": "^4.2.0",
+    "elf-parser": "^1.0.1",
+    "elf-tools": "^1.1.2",
     "ethers": "^6.15.0"
   },
   "peerDependencies": {

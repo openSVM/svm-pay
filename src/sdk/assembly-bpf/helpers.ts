@@ -50,12 +50,14 @@ export class BPFHelpers {
         opcode: BPFInstruction.JUMP_EQ,
         dst: BPFRegister.R1,
         immediate: 0,
+        offset: 3, // Jump forward 3 instructions to end
         comment: 'Check source account not null'
       },
       {
         opcode: BPFInstruction.JUMP_EQ,
         dst: BPFRegister.R2,
         immediate: 0,
+        offset: 2, // Jump forward 2 instructions to end
         comment: 'Check destination account not null'
       },
       
@@ -64,6 +66,7 @@ export class BPFHelpers {
         opcode: BPFInstruction.JUMP_EQ,
         dst: BPFRegister.R3,
         immediate: 0,
+        offset: 1, // Jump forward 1 instruction to end
         comment: 'Check amount is not zero'
       },
       
@@ -111,6 +114,7 @@ export class BPFHelpers {
         opcode: BPFInstruction.JUMP_NE,
         dst: BPFRegister.R0,
         immediate: 0,
+        offset: 1, // Jump to next instruction (effectively a no-op)
         comment: 'Check transfer success'
       }
     ];
@@ -206,6 +210,7 @@ export class BPFHelpers {
         opcode: BPFInstruction.JUMP_NE,
         dst: BPFRegister.R4,
         immediate: ownerHash,
+        offset: 1, // Jump to next instruction
         comment: 'Check account owner'
       }
     ];
@@ -230,6 +235,7 @@ export class BPFHelpers {
         opcode: BPFInstruction.JUMP_LT,
         dst: BPFRegister.R5,
         immediate: minBalance,
+        offset: 1, // Jump to next instruction
         comment: `Check minimum balance: ${minBalance}`
       }
     ];
@@ -303,6 +309,7 @@ export class BPFHelpers {
         opcode: BPFInstruction.JUMP_GT,
         dst: BPFRegister.R0,
         immediate: maxAge,
+        offset: 1, // Jump to error handler
         comment: `Check max age: ${maxAge}`
       }
     ];

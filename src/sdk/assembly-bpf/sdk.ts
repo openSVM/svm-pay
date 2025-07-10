@@ -1,5 +1,5 @@
 /**
- * Main Assembly-BPF SDK class
+ * Main Assembly-BPF SDK class with enhanced features
  */
 
 import { Connection, PublicKey } from '@solana/web3.js';
@@ -10,18 +10,22 @@ import {
   BPFCompilationResult, 
   BPFDeploymentResult,
   AssemblyInstruction,
-  SVMPayBPFProgramType
+  SVMPayBPFProgramType,
+  BPFValidationOptions
 } from './types';
 import { BPFSyscallHelper } from './syscalls';
 import { BPFMemoryManager } from './memory';
 import { BPFAssembler } from './core';
 import { BPFProgramLoader } from './loader';
+import { BPFValidator } from './validation';
+import { BPFELFParser } from './elf-parser';
 
 /**
- * Assembly-BPF SDK for SVM-Pay
+ * Enhanced Assembly-BPF SDK for SVM-Pay
  * 
  * Provides a complete toolkit for developing BPF programs in Assembly
- * that work with SVM-Pay across all supported SVM networks.
+ * that work with SVM-Pay across all supported SVM networks with
+ * comprehensive security validation and optimization.
  */
 export class AssemblyBPFSDK {
   private config: BPFProgramConfig;
@@ -30,8 +34,9 @@ export class AssemblyBPFSDK {
   private memoryManager: BPFMemoryManager;
   private assembler: BPFAssembler;
   private loader: BPFProgramLoader;
+  private validator: BPFValidator;
 
-  constructor(config: BPFProgramConfig) {
+  constructor(config: BPFProgramConfig, validationOptions?: BPFValidationOptions) {
     this.config = config;
     this.connection = new Connection(
       config.rpcEndpoint || this.getDefaultRpcEndpoint(config.network),
@@ -40,8 +45,9 @@ export class AssemblyBPFSDK {
     
     this.syscallHelper = new BPFSyscallHelper(config.network);
     this.memoryManager = new BPFMemoryManager();
-    this.assembler = new BPFAssembler(config);
+    this.assembler = new BPFAssembler(config, validationOptions);
     this.loader = new BPFProgramLoader(this.connection, config);
+    this.validator = new BPFValidator(validationOptions);
   }
 
   /**
@@ -52,7 +58,7 @@ export class AssemblyBPFSDK {
   }
 
   /**
-   * Compile assembly instructions to BPF bytecode
+   * Compile assembly instructions to BPF bytecode with enhanced validation
    */
   async compile(instructions: AssemblyInstruction[], metadata: BPFProgramMetadata): Promise<BPFCompilationResult> {
     try {
@@ -83,30 +89,30 @@ export class AssemblyBPFSDK {
   }
 
   /**
-   * Get syscall helper for the current network
+   * Parse ELF file and extract BPF program
    */
-  getSyscallHelper(): BPFSyscallHelper {
-    return this.syscallHelper;
+  parseELF(elfData: Uint8Array) {
+    const parser = new BPFELFParser(elfData);
+    return parser.parse();
   }
 
   /**
-   * Get memory manager
+   * Validate BPF program with enhanced security checks
    */
-  getMemoryManager(): BPFMemoryManager {
-    return this.memoryManager;
+  validateProgram(instructions: AssemblyInstruction[]): { valid: boolean; issues: string[] } {
+    const validationIssues = this.validator.validate(instructions);
+    const errors = validationIssues.filter(issue => issue.severity === 'error');
+    
+    return {
+      valid: errors.length === 0,
+      issues: validationIssues.map(issue => issue.message)
+    };
   }
 
   /**
-   * Get assembler
+   * Validate BPF bytecode (legacy method for backward compatibility)
    */
-  getAssembler(): BPFAssembler {
-    return this.assembler;
-  }
-
-  /**
-   * Validate BPF program for security and compliance
-   */
-  async validateProgram(bytecode: Uint8Array): Promise<{ valid: boolean; issues: string[] }> {
+  async validateBytecode(bytecode: Uint8Array): Promise<{ valid: boolean; issues: string[] }> {
     const issues: string[] = [];
     
     // Basic validation checks
@@ -133,6 +139,34 @@ export class AssemblyBPFSDK {
   }
 
   /**
+   * Get syscall helper for the current network
+   */
+  getSyscallHelper(): BPFSyscallHelper {
+    return this.syscallHelper;
+  }
+
+  /**
+   * Get memory manager
+   */
+  getMemoryManager(): BPFMemoryManager {
+    return this.memoryManager;
+  }
+
+  /**
+   * Get assembler
+   */
+  getAssembler(): BPFAssembler {
+    return this.assembler;
+  }
+
+  /**
+   * Get validator
+   */
+  getValidator(): BPFValidator {
+    return this.validator;
+  }
+
+  /**
    * Get default RPC endpoint for network
    */
   private getDefaultRpcEndpoint(network: SVMNetwork): string {
@@ -152,7 +186,7 @@ export class AssemblyBPFSDK {
 }
 
 /**
- * Builder class for BPF programs
+ * Enhanced builder class for BPF programs
  */
 export class BPFProgramBuilder {
   private sdk: AssemblyBPFSDK;
@@ -215,9 +249,33 @@ export class BPFProgramBuilder {
   }
 
   /**
-   * Compile the program
+   * Validate the current program
+   */
+  validate(): { valid: boolean; issues: string[] } {
+    return this.sdk.validateProgram(this.instructions);
+  }
+
+  /**
+   * Compile the program with validation
    */
   async compile(): Promise<BPFCompilationResult> {
+    // Run validation first
+    const validationResult = this.validate();
+    
+    if (!validationResult.valid) {
+      const errors = validationResult.issues.filter(issue => 
+        issue.includes('error') || issue.includes('Error') || issue.includes('missing') || issue.includes('required')
+      );
+      
+      if (errors.length > 0) {
+        return {
+          success: false,
+          errors,
+          metadata: this.metadata
+        };
+      }
+    }
+
     return this.sdk.compile(this.instructions, this.metadata);
   }
 
@@ -249,5 +307,20 @@ export class BPFProgramBuilder {
    */
   getMetadata(): BPFProgramMetadata {
     return this.metadata;
+  }
+
+  /**
+   * Get estimated compute units
+   */
+  getEstimatedComputeUnits(): number {
+    return this.sdk.getAssembler().estimateComputeUnitsEnhanced(this.instructions);
+  }
+
+  /**
+   * Optimize the program
+   */
+  optimize(): BPFProgramBuilder {
+    this.instructions = this.sdk.getAssembler().optimizeAdvanced(this.instructions);
+    return this;
   }
 }
