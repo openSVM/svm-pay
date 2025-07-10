@@ -341,6 +341,17 @@ describe('BPF Assembler', () => {
         dst: BPFRegister.R1,
         src: BPFRegister.R2,
         comment: 'Add registers'
+      },
+      {
+        opcode: BPFInstruction.LOAD_IMM,
+        dst: BPFRegister.R0,
+        immediate: 0,
+        comment: 'Return success'
+      },
+      {
+        opcode: BPFInstruction.EXIT,
+        dst: BPFRegister.R0,
+        comment: 'Exit program'
       }
     ];
 
@@ -351,8 +362,14 @@ describe('BPF Assembler', () => {
     );
 
     const result = await sdk.compile(instructions, metadata);
+    
+    if (!result.success) {
+      console.log('Compilation errors:', result.errors);
+    }
+    
+    expect(result.success).toBe(true);
     expect(result.assembly).toBeDefined();
-    expect(result.assembly).toContain('ldi');
+    expect(result.assembly).toContain('lddw');
     expect(result.assembly).toContain('add');
     expect(result.assembly).toContain('Load test value');
   });

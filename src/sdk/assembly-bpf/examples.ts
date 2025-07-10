@@ -44,7 +44,8 @@ export async function createSimplePaymentProcessor() {
   return {
     sdk,
     compilationResult,
-    metadata
+    metadata,
+    instructions
   };
 }
 
@@ -258,14 +259,14 @@ export async function deploymentWorkflow() {
   console.log('🚀 Starting complete deployment workflow...');
 
   // Create a simple payment processor
-  const { sdk, compilationResult, metadata } = await createSimplePaymentProcessor();
+  const { sdk, compilationResult, metadata, instructions } = await createSimplePaymentProcessor();
 
   if (!compilationResult.bytecode) {
     throw new Error('No bytecode generated');
   }
 
   // Validate the program
-  const validation = await sdk.validateProgram(compilationResult.bytecode);
+  const validation = sdk.validateProgram(instructions);
   
   if (!validation.valid) {
     console.log('❌ Program validation failed:');
