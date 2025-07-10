@@ -13,11 +13,12 @@ This documentation provides comprehensive information about SVM-Pay, including i
 3. [Core Protocol](#core-protocol)
 4. [Network Compatibility](#network-compatibility)
 5. [SDK Reference](#sdk-reference)
-6. [Integration Guide](#integration-guide)
-7. [Examples](#examples)
-8. [API Reference](#api-reference)
-9. [Network-Specific Features](#network-specific-features)
-10. [Troubleshooting](#troubleshooting)
+6. [Assembly-BPF SDK](#assembly-bpf-sdk)
+7. [Integration Guide](#integration-guide)
+8. [Examples](#examples)
+9. [API Reference](#api-reference)
+10. [Network-Specific Features](#network-specific-features)
+11. [Troubleshooting](#troubleshooting)
 
 ## Overview
 
@@ -239,6 +240,104 @@ const isValid = svmPayServer.verifyTransaction(transaction, request);
 // Handle a webhook
 const status = await svmPayServer.handleWebhook(signature, reference);
 ```
+
+## Assembly-BPF SDK
+
+For advanced use cases requiring low-level BPF program development, SVM-Pay includes a comprehensive Assembly-BPF SDK that provides Assembly and LLVM IR abstractions for developing efficient BPF programs.
+
+### Key Features
+
+- **Assembly abstractions** for BPF instruction generation
+- **Memory management utilities** for stack and heap operations
+- **Syscall helpers** for SVM network interactions
+- **Program templates** for common use cases (payment processor, cross-chain bridge, validator)
+- **Multi-network support** across all SVM chains (Solana, Sonic, Eclipse, s00n)
+- **Compilation and deployment tools**
+- **Security features** with program validation and memory safety
+
+### Quick Start
+
+```typescript
+import { AssemblyBPFSDK, BPFTemplates, SVMNetwork } from 'svm-pay/assembly-bpf';
+
+// Initialize SDK for BPF development
+const sdk = new AssemblyBPFSDK({ 
+  network: SVMNetwork.SOLANA,
+  debug: true 
+});
+
+// Create a payment processor using built-in template
+const { metadata, instructions } = BPFTemplates.createPaymentProcessor({
+  networks: [SVMNetwork.SOLANA, SVMNetwork.SONIC],
+  feeRate: 0.01,
+  maxAmount: 1000000
+});
+
+// Compile to BPF bytecode
+const result = await sdk.compile(instructions, metadata);
+
+if (result.success) {
+  console.log('✅ BPF Program compiled successfully');
+  console.log(`📊 Instructions: ${instructions.length}`);
+  console.log(`💾 Bytecode size: ${result.bytecode?.length} bytes`);
+  console.log(`⚡ Estimated compute units: ${result.computeUnits}`);
+}
+```
+
+### Program Builder Pattern
+
+```typescript
+// Build a custom program step-by-step
+const builder = sdk.createProgram(metadata);
+
+builder
+  .addInstructions(BPFHelpers.createDebugLog('Starting payment processing'))
+  .addPaymentProcessor()
+  .addCrossChainBridge()
+  .addValidator()
+  .addInstructions(BPFHelpers.createDebugLog('Payment processing completed'));
+
+const result = await builder.compile();
+```
+
+### Available Templates
+
+- **Payment Processor**: Basic payment processing with optional fees
+- **Cross-Chain Bridge**: Bridge assets between different chains
+- **Payment Validator**: Validate payment parameters and constraints
+- **Token Transfer**: Handle SPL token transfers with validation
+- **Middleware**: Custom middleware with pre/post hooks
+
+### Memory Management
+
+```typescript
+import { BPFMemoryManager } from 'svm-pay/assembly-bpf';
+
+// Allocate stack space for local variables
+const stackPointer = BPFMemoryManager.allocateStack(64);
+
+// Create memory structures
+const paymentData = BPFMemoryManager.createStruct([
+  { name: 'amount', type: 'u64', offset: 0 },
+  { name: 'recipient', type: 'pubkey', offset: 8 },
+  { name: 'fee', type: 'u64', offset: 40 }
+]);
+
+// Use syscall helpers for network operations
+const syscalls = new BPFSyscallHelper(SVMNetwork.SOLANA);
+const balance = syscalls.getAccountBalance(accountPublicKey);
+```
+
+### Security Features
+
+The Assembly-BPF SDK includes comprehensive security features:
+
+- **Program validation** with size limits and instruction validation
+- **Memory safety** with bounds checking and stack overflow protection
+- **Network compliance** with chain-specific validation requirements
+- **Sandboxed execution** for safe compilation and testing
+
+For complete documentation, examples, and advanced usage, see the [Assembly-BPF Documentation](assembly-bpf/README.md).
 
 ## Integration Guide
 

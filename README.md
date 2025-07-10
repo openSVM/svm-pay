@@ -14,6 +14,7 @@ SVM-Pay is a payment solution for SVM networks (Solana, Sonic SVM, Eclipse, s00n
 - **Cross-Network Compatibility**: Support for Solana, Sonic SVM, Eclipse, and s00n networks
 - **Simple Integration**: One-click integration for developers
 - **Comprehensive SDK**: JavaScript/TypeScript SDK with React, Vue, and Angular components
+- **Assembly-BPF SDK**: Low-level BPF program development with Assembly and LLVM IR abstractions
 - **Mobile Support**: iOS and Android SDK for mobile applications
 - **No Fees**: SVM-Pay itself charges no fees (only standard network transaction fees apply)
 - **Secure**: Built with security best practices for blockchain payments
@@ -23,6 +24,7 @@ SVM-Pay is a payment solution for SVM networks (Solana, Sonic SVM, Eclipse, s00n
 
 - [Documentation](docs/documentation.md)
 - [Developer Guide](docs/developer-guide.md)
+- [Assembly-BPF SDK](docs/assembly-bpf/README.md)
 - [Architecture](docs/architecture.md)
 - [Security Recommendations](docs/security-recommendations.md)
 - [Examples](examples/)
@@ -90,6 +92,42 @@ svm-pay history
 ```
 
 See [CLI Integration](CLI-INTEGRATION.md) for complete CLI documentation.
+
+## Assembly-BPF SDK
+
+For advanced use cases requiring low-level BPF program development, SVM-Pay includes an Assembly-BPF SDK:
+
+```typescript
+import { AssemblyBPFSDK, BPFTemplates, SVMNetwork } from 'svm-pay/assembly-bpf';
+
+// Initialize SDK for low-level BPF development
+const sdk = new AssemblyBPFSDK({ 
+  network: SVMNetwork.SOLANA,
+  debug: true 
+});
+
+// Create a payment processor using built-in template
+const { metadata, instructions } = BPFTemplates.createPaymentProcessor({
+  networks: [SVMNetwork.SOLANA, SVMNetwork.SONIC]
+});
+
+// Compile to BPF bytecode
+const result = await sdk.compile(instructions, metadata);
+
+console.log('✅ BPF Program compiled successfully');
+console.log(`📊 Instructions: ${instructions.length}`);
+console.log(`💾 Bytecode size: ${result.bytecode?.length} bytes`);
+```
+
+The Assembly-BPF SDK provides:
+- **BPF Assembly abstractions** for instruction generation
+- **Memory management utilities** for stack/heap operations  
+- **Syscall helpers** for SVM network interactions
+- **Program templates** (payment processor, cross-chain bridge, validator)
+- **Multi-network support** across all SVM chains
+- **Compilation and deployment tools**
+
+See the [Assembly-BPF Documentation](docs/assembly-bpf/README.md) for complete guides and examples.
 ```
 
 ## Framework Integration

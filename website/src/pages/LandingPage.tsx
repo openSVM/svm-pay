@@ -3,6 +3,7 @@ import { Features } from '../components/Features'
 import { TechStack } from '../components/TechStack'
 import { Documentation } from '../components/Documentation'
 import { Stats } from '../components/Stats'
+import { AssemblyBPFTutorials } from '../components/AssemblyBPFTutorials'
 
 export function LandingPage() {
   return (
@@ -11,6 +12,7 @@ export function LandingPage() {
       <Stats />
       <Features />
       <TechStack />
+      <AssemblyBPFTutorials />
       <Documentation />
     </>
   )

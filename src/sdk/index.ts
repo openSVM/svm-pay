@@ -4,6 +4,9 @@
  * This file implements the main SDK class for SVM-Pay.
  */
 
+// Export Assembly-BPF SDK
+export * from './assembly-bpf';
+
 import { 
   PaymentRequest, 
   PaymentStatus, 

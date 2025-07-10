@@ -106,6 +106,42 @@ console.log('Payment completed:', payment.hash)`}
             </div>
           </motion.div>
 
+          {/* Assembly-BPF SDK Demo */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="max-w-4xl mx-auto mb-12"
+          >
+            <div className="bg-slate-900 rounded-2xl p-8 shadow-2xl border border-slate-200">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="flex gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                  <div className="w-3 h-3 rounded-full bg-green-500" />
+                </div>
+                <span className="text-slate-400 font-mono text-sm ml-4">assembly-bpf-program.ts</span>
+              </div>
+              <pre className="text-left text-slate-100 font-mono text-sm sm:text-base leading-relaxed overflow-x-auto">
+                <code className="language-typescript">
+{`import { AssemblyBPFSDK, BPFTemplates, SVMNetwork } from 'svm-pay/assembly-bpf'
+
+// Low-level BPF program development
+const sdk = new AssemblyBPFSDK({ network: SVMNetwork.SOLANA })
+
+// Create payment processor using template
+const { metadata, instructions } = BPFTemplates.createPaymentProcessor({
+  networks: [SVMNetwork.SOLANA, SVMNetwork.SONIC]
+})
+
+// Compile to optimized BPF bytecode
+const result = await sdk.compile(instructions, metadata)
+console.log('✅ BPF Program compiled:', result.bytecode.length, 'bytes')`}
+                </code>
+              </pre>
+            </div>
+          </motion.div>
+
           {/* CTA buttons */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

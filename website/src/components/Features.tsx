@@ -7,7 +7,8 @@ import {
   Layers, 
   Coins, 
   Clock, 
-  ArrowRight
+  ArrowRight,
+  Terminal
 } from 'lucide-react'
 
 const features = [
@@ -58,6 +59,14 @@ const features = [
     color: 'text-orange-600',
     bgColor: 'bg-orange-100',
     borderColor: 'border-orange-200'
+  },
+  {
+    icon: Terminal,
+    title: 'Assembly-BPF SDK',
+    description: 'Low-level BPF program development with Assembly abstractions for advanced use cases.',
+    color: 'text-cyan-600',
+    bgColor: 'bg-cyan-100',
+    borderColor: 'border-cyan-200'
   }
 ]
 
