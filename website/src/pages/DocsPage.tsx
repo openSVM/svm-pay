@@ -84,6 +84,87 @@ const SecurityDoc = () => (
   </div>
 )
 
+const CppSDKDoc = () => (
+  <div className="pt-20 p-8">
+    <h1 className="text-4xl font-bold text-slate-900 mb-6">C++ SDK</h1>
+    <p className="text-xl text-slate-600 mb-8">
+      High-performance C++ SDK for SVM-Pay with comprehensive payment functionality.
+    </p>
+    <div className="prose max-w-none">
+      <h2>Overview</h2>
+      <p>The C++ SDK provides a high-performance, type-safe interface for integrating SVM-Pay into C++ applications. Built with modern C++17 features, it offers comprehensive payment processing capabilities across all SVM networks.</p>
+      
+      <h2>Core Features</h2>
+      <ul>
+        <li><strong>URL Scheme Support</strong> - Complete parsing and creation of payment URLs</li>
+        <li><strong>Multi-Network Support</strong> - Solana, Sonic, Eclipse, and s00n networks</li>
+        <li><strong>Secure Reference Generation</strong> - Cryptographically secure reference IDs using OpenSSL</li>
+        <li><strong>Type Safety</strong> - Modern C++17 implementation with strong typing</li>
+        <li><strong>Async Network Operations</strong> - Future-based asynchronous network adapter interface</li>
+        <li><strong>Cross-Platform</strong> - Works on Linux, Windows, and macOS</li>
+      </ul>
+      
+      <h2>Architecture</h2>
+      <ul>
+        <li><strong>Client Class</strong> - High-level interface for payment operations</li>
+        <li><strong>Network Adapters</strong> - Pluggable adapters for different blockchain networks</li>
+        <li><strong>URL Parser</strong> - Robust parsing of SVM-Pay protocol URLs</li>
+        <li><strong>Reference Generator</strong> - Secure random reference ID generation</li>
+        <li><strong>Exception System</strong> - Comprehensive error handling with custom exception types</li>
+      </ul>
+      
+      <h2>Getting Started</h2>
+      <div className="bg-slate-100 p-4 rounded-lg">
+        <pre><code>{`#include <svm-pay/svm_pay.hpp>
+
+// Initialize SDK
+svm_pay::initialize_sdk();
+
+// Create client
+svm_pay::Client client(svm_pay::SVMNetwork::SOLANA);
+
+// Create payment URL
+std::string url = client.create_transfer_url("recipient_address", "1.5", {
+    {"label", "Coffee Shop"},
+    {"message", "Payment for coffee"}
+});
+
+// Parse payment URL
+auto request = client.parse_url(url);
+
+// Generate reference ID
+std::string ref = client.generate_reference();`}</code></pre>
+      </div>
+      
+      <h2>Installation</h2>
+      <p>The C++ SDK can be integrated into your project using CMake:</p>
+      <div className="bg-slate-100 p-4 rounded-lg">
+        <pre><code>{`# Prerequisites
+sudo apt-get install build-essential cmake libcurl4-openssl-dev libssl-dev
+
+# Build and install
+git clone https://github.com/openSVM/svm-pay.git
+cd svm-pay/cpp-sdk
+mkdir build && cd build
+cmake ..
+make install
+
+# CMake integration
+find_package(svm-pay REQUIRED)
+target_link_libraries(your_target svm-pay)`}</code></pre>
+      </div>
+      
+      <h2>Examples</h2>
+      <p>The SDK includes comprehensive examples:</p>
+      <ul>
+        <li><strong>Basic Payment</strong> - Simple payment URL creation and processing</li>
+        <li><strong>URL Parsing</strong> - Parsing different types of payment URLs</li>
+        <li><strong>Network Adapter</strong> - Working with blockchain network adapters</li>
+      </ul>
+    </div>
+  </div>
+)
+
 const AssemblyBPFDoc = () => (
   <div className="pt-20 p-8">
     <h1 className="text-4xl font-bold text-slate-900 mb-6">Assembly-BPF SDK</h1>
@@ -196,6 +277,21 @@ const apiSections = [
       { name: 'Configuration', href: '/docs/cli/config', icon: FileText },
       { name: 'Solana Utils', href: '/docs/cli/solana', icon: FileText },
       { name: 'History Management', href: '/docs/cli/history', icon: Database },
+    ]
+  },
+  {
+    title: 'C++ SDK',
+    items: [
+      { name: 'C++ SDK Overview', href: '/docs/cpp-sdk', icon: Terminal },
+      { name: 'Getting Started', href: '/docs/cpp-sdk/getting-started', icon: Code },
+      { name: 'Installation Guide', href: '/docs/cpp-sdk/installation', icon: Settings },
+      { name: 'Basic Payment Example', href: '/docs/cpp-sdk/basic-payment', icon: Book },
+      { name: 'URL Parsing', href: '/docs/cpp-sdk/url-parsing', icon: Book },
+      { name: 'Network Adapters', href: '/docs/cpp-sdk/network-adapters', icon: Network },
+      { name: 'Client Class', href: '/docs/cpp-sdk/client', icon: Code },
+      { name: 'Exception Handling', href: '/docs/cpp-sdk/exceptions', icon: Shield },
+      { name: 'CMake Integration', href: '/docs/cpp-sdk/cmake', icon: Settings },
+      { name: 'API Reference', href: '/docs/cpp-sdk/api-reference', icon: FileText },
     ]
   },
   {
@@ -381,14 +477,25 @@ function getApiDescription(name: string): string {
     'History Management': 'Payment history storage and retrieval functionality.',
     'WalletConnect Integration': 'Integration with WalletConnect protocol for wallet connections.',
     'Connection Manager': 'Manager for handling wallet connection states and operations.',
+    // C++ SDK descriptions
+    'C++ SDK Overview': 'Comprehensive C++ SDK for high-performance payment processing.',
+    'C++ Getting Started': 'Quick start guide for C++ SDK with setup and basic examples.',
+    'Installation Guide': 'Complete installation instructions for all platforms.',
+    'Basic Payment Example': 'Simple payment URL creation and processing with C++ SDK.',
+    'URL Parsing': 'Parse and validate SVM-Pay protocol URLs in C++.',
+    'Network Adapters': 'Work with blockchain network adapters in C++.',
+    'Client Class': 'Main C++ SDK client class for payment operations.',
+    'Exception Handling': 'Comprehensive error handling with custom exception types.',
+    'CMake Integration': 'Integrate C++ SDK into your CMake projects.',
+    'C++ API Reference': 'Complete C++ API documentation with classes and methods.',
     // Assembly-BPF SDK descriptions
     'Assembly-BPF Overview': 'Introduction to low-level BPF program development with SVM-Pay.',
-    'Getting Started': 'Quick start guide for Assembly-BPF SDK with setup and basic examples.',
+    'Assembly-BPF Getting Started': 'Quick start guide for Assembly-BPF SDK with setup and basic examples.',
     'Hello World Program': 'Simple BPF program tutorial to understand the basic structure.',
     'Payment Processor': 'Build BPF programs for payment processing with Assembly-BPF SDK.',
     'Cross-Chain Bridge': 'Create cross-chain bridge programs using low-level BPF instructions.',
     'Memory Management': 'Stack and heap management utilities for BPF programs.',
-    'API Reference': 'Complete API documentation for Assembly-BPF SDK classes and methods.',
+    'Assembly-BPF API Reference': 'Complete API documentation for Assembly-BPF SDK classes and methods.',
     'Security Patterns': 'Security best practices and patterns for BPF program development.',
     'Advanced Usage': 'Advanced Assembly-BPF techniques including optimization and debugging.',
     // Architecture and Security
@@ -398,6 +505,17 @@ function getApiDescription(name: string): string {
   }
   return descriptions[name] || 'API documentation for SVM-Pay component.'
 }
+
+// C++ SDK placeholder documentation components
+function CppSDKGettingStartedDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">C++ SDK Getting Started</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function CppSDKInstallationDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">C++ SDK Installation</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function CppSDKBasicPaymentDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">C++ SDK Basic Payment</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function CppSDKUrlParsingDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">C++ SDK URL Parsing</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function CppSDKNetworkAdaptersDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">C++ SDK Network Adapters</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function CppSDKClientDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">C++ SDK Client Class</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function CppSDKExceptionsDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">C++ SDK Exception Handling</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function CppSDKCMakeDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">C++ SDK CMake Integration</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function CppSDKApiReferenceDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">C++ SDK API Reference</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
 
 // Placeholder documentation components
 function SVMPayClassDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">SVMPay Class</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
@@ -460,6 +578,18 @@ export function DocsPage() {
           <Route path="/cli/config" element={<CLIConfigDoc />} />
           <Route path="/cli/solana" element={<CLISolanaDoc />} />
           <Route path="/cli/history" element={<CLIHistoryDoc />} />
+          
+          {/* C++ SDK */}
+          <Route path="/cpp-sdk" element={<CppSDKDoc />} />
+          <Route path="/cpp-sdk/getting-started" element={<CppSDKGettingStartedDoc />} />
+          <Route path="/cpp-sdk/installation" element={<CppSDKInstallationDoc />} />
+          <Route path="/cpp-sdk/basic-payment" element={<CppSDKBasicPaymentDoc />} />
+          <Route path="/cpp-sdk/url-parsing" element={<CppSDKUrlParsingDoc />} />
+          <Route path="/cpp-sdk/network-adapters" element={<CppSDKNetworkAdaptersDoc />} />
+          <Route path="/cpp-sdk/client" element={<CppSDKClientDoc />} />
+          <Route path="/cpp-sdk/exceptions" element={<CppSDKExceptionsDoc />} />
+          <Route path="/cpp-sdk/cmake" element={<CppSDKCMakeDoc />} />
+          <Route path="/cpp-sdk/api-reference" element={<CppSDKApiReferenceDoc />} />
           
           {/* Assembly-BPF SDK */}
           <Route path="/assembly-bpf" element={<AssemblyBPFDoc />} />
