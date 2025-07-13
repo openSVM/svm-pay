@@ -14,9 +14,55 @@ import {
   Shield
 } from 'lucide-react'
 import { useState } from 'react'
+import { 
+  GamingTutorials, 
+  DeFiTutorials, 
+  SaaSTutorials, 
+  SocialTutorials 
+} from '../components/TutorialSections'
+import { 
+  EnterpriseTutorials, 
+  CrossChainTutorials, 
+  MobileTutorials 
+} from '../components/AdvancedTutorialSections'
 import { AssemblyBPFTutorials } from '../components/AssemblyBPFTutorials'
 
 // Import individual tutorial components
+import { 
+  OnlineStoreIntegrationTutorial, 
+  MarketplaceEscrowTutorial,
+  SubscriptionBoxTutorial,
+  DigitalProductStoreTutorial,
+  FlashSaleManagementTutorial
+} from './tutorials/EcommerceTutorials'
+import { 
+  InGameCurrencyTutorial, 
+  NFTMarketplaceTutorial,
+  TournamentPrizeDistributionTutorial,
+  PlayToEarnRewardsTutorial,
+  GameAssetRentalTutorial
+} from './tutorials/GamingTutorials'
+import { 
+  SaaSSubscriptionBillingTutorial, 
+  FreelancePaymentEscrowTutorial,
+  ConsultingTimeTrackingTutorial,
+  APIUsageBillingTutorial,
+  SoftwareLicenseManagementTutorial,
+  N8nIntegrationTutorial
+} from './tutorials/SaaSTutorials'
+import {
+  YieldFarmingRewardsTutorial,
+  CrossChainArbitrageBotTutorial,
+  LendingProtocolIntegrationTutorial,
+  DEXTradingFeeDistributionTutorial,
+  AutomatedMarketMakerTutorial
+} from './tutorials/DeFiTutorials'
+import {
+  CreatorTippingSystemTutorial,
+  ContentCreatorSubscriptionsTutorial,
+  NFTDropPlatformTutorial,
+  CommunityRewardSystemTutorial
+} from './tutorials/SocialTutorials'
 import {
   MultiChainArbitrageTutorial,
   CrossChainLiquidityPoolTutorial,
@@ -79,14 +125,60 @@ const apiSections = [
     ]
   },
   {
-    title: 'WalletConnect',
+    title: 'E-commerce Tutorials',
+    items: [
+      { name: 'Online Store Integration', href: '/docs/tutorials/ecommerce/online-store', icon: Book },
+      { name: 'Marketplace Escrow', href: '/docs/tutorials/ecommerce/marketplace-escrow', icon: Book },
+      { name: 'Subscription Box', href: '/docs/tutorials/ecommerce/subscription-box', icon: Book },
+      { name: 'Digital Product Store', href: '/docs/tutorials/ecommerce/digital-products', icon: Book },
+      { name: 'Flash Sale Management', href: '/docs/tutorials/ecommerce/flash-sales', icon: Book },
+    ]
+  },
+  {
+    title: 'Gaming Tutorials',
+    items: [
+      { name: 'In-Game Currency', href: '/docs/tutorials/gaming/in-game-currency', icon: Book },
+      { name: 'NFT Marketplace', href: '/docs/tutorials/gaming/nft-marketplace', icon: Book },
+      { name: 'Tournament Prize Distribution', href: '/docs/tutorials/gaming/tournament-prizes', icon: Book },
+      { name: 'Play-to-Earn Rewards', href: '/docs/tutorials/gaming/play-to-earn', icon: Book },
+      { name: 'Game Asset Rental', href: '/docs/tutorials/gaming/asset-rental', icon: Book },
+    ]
+  },
+  {
+    title: 'SaaS Tutorials',
+    items: [
+      { name: 'Subscription Billing', href: '/docs/tutorials/saas/subscription-billing', icon: Book },
+      { name: 'Freelance Payment Escrow', href: '/docs/tutorials/saas/freelance-escrow', icon: Book },
+      { name: 'Consulting Time Tracking', href: '/docs/tutorials/saas/time-tracking', icon: Book },
+      { name: 'API Usage Billing', href: '/docs/tutorials/saas/api-billing', icon: Book },
+      { name: 'Software License Management', href: '/docs/tutorials/saas/license-management', icon: Book },
+      { name: 'N8n Integration', href: '/docs/tutorials/saas/n8n-integration', icon: Book },
+    ]
+  },
+  {
+    title: 'DeFi Tutorials',
+    items: [
+      { name: 'Yield Farming Rewards', href: '/docs/tutorials/defi/yield-farming', icon: Book },
+      { name: 'Cross-Chain Arbitrage Bot', href: '/docs/tutorials/defi/arbitrage-bot', icon: Book },
+      { name: 'Lending Protocol Integration', href: '/docs/tutorials/defi/lending-protocol', icon: Book },
+      { name: 'DEX Trading Fee Distribution', href: '/docs/tutorials/defi/dex-fees', icon: Book },
+      { name: 'Automated Market Maker', href: '/docs/tutorials/defi/amm', icon: Book },
+    ]
+  },
+  {
+    title: 'Social Tutorials',
     items: [
       { name: 'Creator Tipping System', href: '/docs/tutorials/social/creator-tipping', icon: Book },
       { name: 'Content Creator Subscriptions', href: '/docs/tutorials/social/creator-subscriptions', icon: Book },
       { name: 'NFT Drop Platform', href: '/docs/tutorials/social/nft-drops', icon: Book },
-      { name: 'Social Media Monetization', href: '/docs/tutorials/social/social-monetization', icon: Book },
-      { name: 'Live Streaming Donations', href: '/docs/tutorials/social/live-streaming', icon: Book },
       { name: 'Community Reward System', href: '/docs/tutorials/social/community-rewards', icon: Book },
+    ]
+  },
+  {
+    title: 'WalletConnect',
+    items: [
+      { name: 'WalletConnect Integration', href: '/docs/walletconnect/integration', icon: Code },
+      { name: 'Connection Manager', href: '/docs/walletconnect/manager', icon: Code },
     ]
   },
   {
@@ -333,6 +425,41 @@ export function DocsPage() {
           <Route path="/cli/config" element={<CLIConfigDoc />} />
           <Route path="/cli/solana" element={<CLISolanaDoc />} />
           <Route path="/cli/history" element={<CLIHistoryDoc />} />
+          
+          {/* E-commerce Tutorial Routes */}
+          <Route path="/tutorials/ecommerce/online-store" element={<OnlineStoreIntegrationTutorial />} />
+          <Route path="/tutorials/ecommerce/marketplace-escrow" element={<MarketplaceEscrowTutorial />} />
+          <Route path="/tutorials/ecommerce/subscription-box" element={<SubscriptionBoxTutorial />} />
+          <Route path="/tutorials/ecommerce/digital-products" element={<DigitalProductStoreTutorial />} />
+          <Route path="/tutorials/ecommerce/flash-sales" element={<FlashSaleManagementTutorial />} />
+          
+          {/* Gaming Tutorial Routes */}
+          <Route path="/tutorials/gaming/in-game-currency" element={<InGameCurrencyTutorial />} />
+          <Route path="/tutorials/gaming/nft-marketplace" element={<NFTMarketplaceTutorial />} />
+          <Route path="/tutorials/gaming/tournament-prizes" element={<TournamentPrizeDistributionTutorial />} />
+          <Route path="/tutorials/gaming/play-to-earn" element={<PlayToEarnRewardsTutorial />} />
+          <Route path="/tutorials/gaming/asset-rental" element={<GameAssetRentalTutorial />} />
+          
+          {/* SaaS Tutorial Routes */}
+          <Route path="/tutorials/saas/subscription-billing" element={<SaaSSubscriptionBillingTutorial />} />
+          <Route path="/tutorials/saas/freelance-escrow" element={<FreelancePaymentEscrowTutorial />} />
+          <Route path="/tutorials/saas/time-tracking" element={<ConsultingTimeTrackingTutorial />} />
+          <Route path="/tutorials/saas/api-billing" element={<APIUsageBillingTutorial />} />
+          <Route path="/tutorials/saas/license-management" element={<SoftwareLicenseManagementTutorial />} />
+          <Route path="/tutorials/saas/n8n-integration" element={<N8nIntegrationTutorial />} />
+          
+          {/* DeFi Tutorial Routes */}
+          <Route path="/tutorials/defi/yield-farming" element={<YieldFarmingRewardsTutorial />} />
+          <Route path="/tutorials/defi/arbitrage-bot" element={<CrossChainArbitrageBotTutorial />} />
+          <Route path="/tutorials/defi/lending-protocol" element={<LendingProtocolIntegrationTutorial />} />
+          <Route path="/tutorials/defi/dex-fees" element={<DEXTradingFeeDistributionTutorial />} />
+          <Route path="/tutorials/defi/amm" element={<AutomatedMarketMakerTutorial />} />
+          
+          {/* Social Tutorial Routes */}
+          <Route path="/tutorials/social/creator-tipping" element={<CreatorTippingSystemTutorial />} />
+          <Route path="/tutorials/social/creator-subscriptions" element={<ContentCreatorSubscriptionsTutorial />} />
+          <Route path="/tutorials/social/nft-drops" element={<NFTDropPlatformTutorial />} />
+          <Route path="/tutorials/social/community-rewards" element={<CommunityRewardSystemTutorial />} />
           
           {/* Cross-Chain Advanced Tutorial Routes */}
           <Route path="/tutorials/cross-chain/arbitrage" element={<MultiChainArbitrageTutorial />} />
