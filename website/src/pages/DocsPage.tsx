@@ -2885,8 +2885,8 @@ FetchContent_Declare(
 )
 
 # Set options before making available
-set(BUILD_TESTS ${ENABLE_TESTING})
-set(BUILD_EXAMPLES ${BUILD_EXAMPLES})
+set(BUILD_TESTS \${ENABLE_TESTING})
+set(BUILD_EXAMPLES \${BUILD_EXAMPLES})
 
 FetchContent_MakeAvailable(svm-pay)`}</code></pre>
         </div>
@@ -2924,7 +2924,7 @@ find_package(PkgConfig REQUIRED)
 # Find cURL
 find_package(CURL REQUIRED)
 if(CURL_FOUND)
-    message(STATUS "Found cURL: ${CURL_VERSION_STRING}")
+    message(STATUS "Found cURL: \${CURL_VERSION_STRING}")
 else()
     message(FATAL_ERROR "cURL not found")
 endif()
@@ -2932,7 +2932,7 @@ endif()
 # Find OpenSSL
 find_package(OpenSSL REQUIRED)
 if(OPENSSL_FOUND)
-    message(STATUS "Found OpenSSL: ${OPENSSL_VERSION}")
+    message(STATUS "Found OpenSSL: \${OPENSSL_VERSION}")
 else()
     message(FATAL_ERROR "OpenSSL not found")
 endif()
@@ -3002,7 +3002,7 @@ if(GTest_FOUND)
     # Set test properties
     set_tests_properties(svm_pay_unit_tests PROPERTIES
         TIMEOUT 60
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        WORKING_DIRECTORY \${CMAKE_CURRENT_BINARY_DIR}
     )
 else()
     message(WARNING "Google Test not found, tests will not be built")
@@ -3016,14 +3016,14 @@ include(GNUInstallDirs)
 
 # Install your application
 install(TARGETS my_app
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION \${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION \${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION \${CMAKE_INSTALL_LIBDIR}
 )
 
 # Install configuration files
 install(FILES config/app.conf
-    DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/my_app
+    DESTINATION \${CMAKE_INSTALL_SYSCONFDIR}/my_app
 )
 
 # Create package
