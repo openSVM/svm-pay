@@ -3083,7 +3083,7 @@ endif()`}</code></pre>
 set -e
 
 # Configuration
-BUILD_TYPE=${1:-Release}
+BUILD_TYPE=\${1:-Release}
 BUILD_DIR="build"
 INSTALL_PREFIX="install"
 
@@ -3134,8 +3134,8 @@ echo "Build completed successfully!"`}</code></pre>
         "CMAKE_BUILD_TYPE": "Debug",
         "BUILD_TESTING": "ON"
     },
-    "cmake.buildDirectory": "${workspaceFolder}/build",
-    "cmake.installPrefix": "${workspaceFolder}/install"
+    "cmake.buildDirectory": "\${workspaceFolder}/build",
+    "cmake.installPrefix": "\${workspaceFolder}/install"
 }`}</code></pre>
         </div>
         
