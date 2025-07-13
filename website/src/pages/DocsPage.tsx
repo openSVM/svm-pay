@@ -7,58 +7,16 @@ import {
   Network,
   ChevronRight,
   Search,
-  ExternalLink
+  ExternalLink,
+  Book,
+  Terminal,
+  Zap,
+  Shield
 } from 'lucide-react'
 import { useState } from 'react'
-import { 
-  GamingTutorials, 
-  DeFiTutorials, 
-  SaaSTutorials, 
-  SocialTutorials 
-} from '../components/TutorialSections'
-import { 
-  EnterpriseTutorials, 
-  CrossChainTutorials, 
-  MobileTutorials 
-} from '../components/AdvancedTutorialSections'
 import { AssemblyBPFTutorials } from '../components/AssemblyBPFTutorials'
 
 // Import individual tutorial components
-import { 
-  OnlineStoreIntegrationTutorial, 
-  MarketplaceEscrowTutorial,
-  SubscriptionBoxTutorial,
-  DigitalProductStoreTutorial,
-  FlashSaleManagementTutorial
-} from './tutorials/EcommerceTutorials'
-import { 
-  InGameCurrencyTutorial, 
-  NFTMarketplaceTutorial,
-  TournamentPrizeDistributionTutorial,
-  PlayToEarnRewardsTutorial,
-  GameAssetRentalTutorial
-} from './tutorials/GamingTutorials'
-import { 
-  SaaSSubscriptionBillingTutorial, 
-  FreelancePaymentEscrowTutorial,
-  ConsultingTimeTrackingTutorial,
-  APIUsageBillingTutorial,
-  SoftwareLicenseManagementTutorial,
-  N8nIntegrationTutorial
-} from './tutorials/SaaSTutorials'
-import {
-  YieldFarmingRewardsTutorial,
-  CrossChainArbitrageBotTutorial,
-  LendingProtocolIntegrationTutorial,
-  DEXTradingFeeDistributionTutorial,
-  AutomatedMarketMakerTutorial
-} from './tutorials/DeFiTutorials'
-import {
-  CreatorTippingSystemTutorial,
-  ContentCreatorSubscriptionsTutorial,
-  NFTDropPlatformTutorial,
-  CommunityRewardSystemTutorial
-} from './tutorials/SocialTutorials'
 import {
   MultiChainArbitrageTutorial,
   CrossChainLiquidityPoolTutorial,
@@ -1234,3 +1192,8 @@ function CLISolanaDoc() { return <div className="pt-20 p-8"><h1 className="text-
 function CLIHistoryDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">CLI History Management</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
 function WalletConnectIntegrationDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">WalletConnect Integration</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
 function WalletConnectManagerDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">WalletConnect Manager</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+
+// Missing documentation components
+function CrossChainDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">Cross-Chain Payments</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function ArchitectureDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">Architecture</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
+function SecurityDoc() { return <div className="pt-20 p-8"><h1 className="text-4xl font-bold">Security</h1><p className="text-slate-600">Documentation coming soon...</p></div> }
