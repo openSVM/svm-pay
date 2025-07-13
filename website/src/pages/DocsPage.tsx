@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { 
+  EcommerceTutorials,
   GamingTutorials, 
   DeFiTutorials, 
   SaaSTutorials, 
@@ -75,6 +76,13 @@ import {
   SmartCityPaymentsTutorial,
   V2XPaymentsTutorial
 } from './tutorials/MobileTutorials'
+import {
+  B2BInvoiceProcessingTutorial,
+  EmployeePayrollSystemTutorial,
+  SupplyChainPaymentsTutorial,
+  TreasuryManagementTutorial,
+  VendorPaymentManagementTutorial
+} from './tutorials/EnterpriseTutorials'
 
 
 // API Documentation sections - focused on actual source files
@@ -127,6 +135,7 @@ const apiSections = [
   {
     title: 'E-commerce Tutorials',
     items: [
+      { name: 'E-commerce Overview', href: '/docs/tutorials/ecommerce', icon: Book },
       { name: 'Online Store Integration', href: '/docs/tutorials/ecommerce/online-store', icon: Book },
       { name: 'Marketplace Escrow', href: '/docs/tutorials/ecommerce/marketplace-escrow', icon: Book },
       { name: 'Subscription Box', href: '/docs/tutorials/ecommerce/subscription-box', icon: Book },
@@ -137,6 +146,7 @@ const apiSections = [
   {
     title: 'Gaming Tutorials',
     items: [
+      { name: 'Gaming Overview', href: '/docs/tutorials/gaming', icon: Book },
       { name: 'In-Game Currency', href: '/docs/tutorials/gaming/in-game-currency', icon: Book },
       { name: 'NFT Marketplace', href: '/docs/tutorials/gaming/nft-marketplace', icon: Book },
       { name: 'Tournament Prize Distribution', href: '/docs/tutorials/gaming/tournament-prizes', icon: Book },
@@ -147,6 +157,7 @@ const apiSections = [
   {
     title: 'SaaS Tutorials',
     items: [
+      { name: 'SaaS Overview', href: '/docs/tutorials/saas', icon: Book },
       { name: 'Subscription Billing', href: '/docs/tutorials/saas/subscription-billing', icon: Book },
       { name: 'Freelance Payment Escrow', href: '/docs/tutorials/saas/freelance-escrow', icon: Book },
       { name: 'Consulting Time Tracking', href: '/docs/tutorials/saas/time-tracking', icon: Book },
@@ -158,6 +169,7 @@ const apiSections = [
   {
     title: 'DeFi Tutorials',
     items: [
+      { name: 'DeFi Overview', href: '/docs/tutorials/defi', icon: Book },
       { name: 'Yield Farming Rewards', href: '/docs/tutorials/defi/yield-farming', icon: Book },
       { name: 'Cross-Chain Arbitrage Bot', href: '/docs/tutorials/defi/arbitrage-bot', icon: Book },
       { name: 'Lending Protocol Integration', href: '/docs/tutorials/defi/lending-protocol', icon: Book },
@@ -168,6 +180,7 @@ const apiSections = [
   {
     title: 'Social Tutorials',
     items: [
+      { name: 'Social Overview', href: '/docs/tutorials/social', icon: Book },
       { name: 'Creator Tipping System', href: '/docs/tutorials/social/creator-tipping', icon: Book },
       { name: 'Content Creator Subscriptions', href: '/docs/tutorials/social/creator-subscriptions', icon: Book },
       { name: 'NFT Drop Platform', href: '/docs/tutorials/social/nft-drops', icon: Book },
@@ -184,6 +197,7 @@ const apiSections = [
   {
     title: 'Enterprise Tutorials',
     items: [
+      { name: 'Enterprise Overview', href: '/docs/tutorials/enterprise', icon: Book },
       { name: 'B2B Invoice Processing', href: '/docs/tutorials/enterprise/b2b-invoicing', icon: Book },
       { name: 'Employee Payroll System', href: '/docs/tutorials/enterprise/payroll-system', icon: Book },
       { name: 'Supply Chain Payments', href: '/docs/tutorials/enterprise/supply-chain', icon: Book },
@@ -194,6 +208,7 @@ const apiSections = [
   {
     title: 'Cross-Chain Advanced Tutorials',
     items: [
+      { name: 'Cross-Chain Overview', href: '/docs/tutorials/cross-chain', icon: Book },
       { name: 'Multi-Chain Arbitrage', href: '/docs/tutorials/cross-chain/arbitrage', icon: Book },
       { name: 'Cross-Chain Liquidity Pools', href: '/docs/tutorials/cross-chain/liquidity-pools', icon: Book },
       { name: 'Payment Routing Optimization', href: '/docs/tutorials/cross-chain/payment-routing', icon: Book },
@@ -203,6 +218,7 @@ const apiSections = [
   {
     title: 'Mobile & IoT Tutorials',
     items: [
+      { name: 'Mobile & IoT Overview', href: '/docs/tutorials/mobile', icon: Book },
       { name: 'Mobile Wallet Integration', href: '/docs/tutorials/mobile/wallet-integration', icon: Book },
       { name: 'IoT Device Micropayments', href: '/docs/tutorials/mobile/iot-micropayments', icon: Book },
       { name: 'Smart City Payments', href: '/docs/tutorials/mobile/smart-city', icon: Book },
@@ -426,6 +442,16 @@ export function DocsPage() {
           <Route path="/cli/solana" element={<CLISolanaDoc />} />
           <Route path="/cli/history" element={<CLIHistoryDoc />} />
           
+          {/* Tutorial Section Overview Routes */}
+          <Route path="/tutorials/ecommerce" element={<EcommerceTutorials />} />
+          <Route path="/tutorials/gaming" element={<GamingTutorials />} />
+          <Route path="/tutorials/saas" element={<SaaSTutorials />} />
+          <Route path="/tutorials/defi" element={<DeFiTutorials />} />
+          <Route path="/tutorials/social" element={<SocialTutorials />} />
+          <Route path="/tutorials/enterprise" element={<EnterpriseTutorials />} />
+          <Route path="/tutorials/cross-chain" element={<CrossChainTutorials />} />
+          <Route path="/tutorials/mobile" element={<MobileTutorials />} />
+
           {/* E-commerce Tutorial Routes */}
           <Route path="/tutorials/ecommerce/online-store" element={<OnlineStoreIntegrationTutorial />} />
           <Route path="/tutorials/ecommerce/marketplace-escrow" element={<MarketplaceEscrowTutorial />} />
@@ -466,6 +492,13 @@ export function DocsPage() {
           <Route path="/tutorials/cross-chain/liquidity-pools" element={<CrossChainLiquidityPoolTutorial />} />
           <Route path="/tutorials/cross-chain/payment-routing" element={<PaymentRoutingOptimizationTutorial />} />
           <Route path="/tutorials/cross-chain/governance" element={<CrossChainGovernanceTutorial />} />
+          
+          {/* Enterprise Tutorial Routes */}
+          <Route path="/tutorials/enterprise/b2b-invoicing" element={<B2BInvoiceProcessingTutorial />} />
+          <Route path="/tutorials/enterprise/payroll-system" element={<EmployeePayrollSystemTutorial />} />
+          <Route path="/tutorials/enterprise/supply-chain" element={<SupplyChainPaymentsTutorial />} />
+          <Route path="/tutorials/enterprise/treasury-management" element={<TreasuryManagementTutorial />} />
+          <Route path="/tutorials/enterprise/vendor-management" element={<VendorPaymentManagementTutorial />} />
           
           {/* Mobile & IoT Tutorial Routes */}
           <Route path="/tutorials/mobile/wallet-integration" element={<MobileWalletIntegrationTutorial />} />
