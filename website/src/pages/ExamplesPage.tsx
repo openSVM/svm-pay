@@ -938,10 +938,135 @@ const totalSize = memoryManager.calculateStackSpace([
 console.log('Total structure size:', totalSize, 'bytes');`,
     demoUrl: 'https://github.com/openSVM/svm-pay/tree/main/examples/assembly-bpf',
     sourceUrl: 'https://github.com/openSVM/svm-pay/tree/main/examples/assembly-bpf'
+  },
+  // C++ SDK Examples
+  {
+    id: 'cpp-basic-payment',
+    title: 'C++ Basic Payment Integration',
+    description: 'Simple payment URL creation and processing using C++ SDK',
+    category: 'C++',
+    difficulty: 'Beginner',
+    tech: ['C++17', 'CMake', 'SVM-Pay C++ SDK'],
+    preview: `#include <iostream>
+#include <svm-pay/svm_pay.hpp>
+
+using namespace svm_pay;
+
+int main() {
+    // Initialize the SDK
+    initialize_sdk();
+    
+    // Create a client
+    Client client(SVMNetwork::SOLANA);
+    
+    // Create a simple transfer URL
+    std::string recipient = "7v91N7iZ9eyTktBwWC2ckrjdLhvmS4R1HqvYZzG5FGvn";
+    std::string amount = "1.5";
+    
+    std::unordered_map<std::string, std::string> options = {
+        {"label", "Coffee Shop"},
+        {"message", "Payment for coffee and pastry"},
+        {"memo", "Order #12345"}
+    };
+    
+    std::string payment_url = client.create_transfer_url(recipient, amount, options);
+    std::cout << "Payment URL: " << payment_url << std::endl;
+    
+    return 0;
+}`,
+    demoUrl: 'https://github.com/openSVM/svm-pay/tree/main/examples/cpp-examples/basic-payment',
+    sourceUrl: 'https://github.com/openSVM/svm-pay/tree/main/examples/cpp-examples/basic-payment'
+  },
+  {
+    id: 'cpp-url-parsing',
+    title: 'C++ URL Parsing and Validation',
+    description: 'Parse and validate different types of SVM-Pay URLs with C++',
+    category: 'C++',
+    difficulty: 'Intermediate',
+    tech: ['C++17', 'URL Parsing', 'SVM-Pay C++ SDK'],
+    preview: `#include <iostream>
+#include <vector>
+#include <svm-pay/svm_pay.hpp>
+
+using namespace svm_pay;
+
+int main() {
+    initialize_sdk();
+    Client client;
+    
+    // Test URLs for different networks and types
+    std::vector<std::string> test_urls = {
+        // Solana transfer
+        "solana:7v91N7iZ9eyTktBwWC2ckrjdLhvmS4R1HqvYZzG5FGvn?amount=1.5&label=Coffee%20Shop",
+        
+        // USDC transfer
+        "solana:7v91N7iZ9eyTktBwWC2ckrjdLhvmS4R1HqvYZzG5FGvn?amount=100&spl-token=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        
+        // Cross-chain transfer
+        "solana:7v91N7iZ9eyTktBwWC2ckrjdLhvmS4R1HqvYZzG5FGvn?amount=50&source-network=ethereum&bridge=wormhole",
+        
+        // Sonic network
+        "sonic:7v91N7iZ9eyTktBwWC2ckrjdLhvmS4R1HqvYZzG5FGvn?amount=2.0&memo=Sonic%20payment"
+    };
+    
+    for (const auto& url : test_urls) {
+        auto request = client.parse_url(url);
+        std::cout << "Network: " << network_to_string(request->network) << std::endl;
+    }
+    
+    return 0;
+}`,
+    demoUrl: 'https://github.com/openSVM/svm-pay/tree/main/examples/cpp-examples/url-parsing',
+    sourceUrl: 'https://github.com/openSVM/svm-pay/tree/main/examples/cpp-examples/url-parsing'
+  },
+  {
+    id: 'cpp-network-adapters',
+    title: 'C++ Network Adapters',
+    description: 'Working with different network adapters for multi-chain support',
+    category: 'C++',
+    difficulty: 'Advanced',
+    tech: ['C++17', 'Network Adapters', 'Async Operations', 'SVM-Pay C++ SDK'],
+    preview: `#include <iostream>
+#include <thread>
+#include <chrono>
+#include <svm-pay/svm_pay.hpp>
+
+using namespace svm_pay;
+
+int main() {
+    initialize_sdk();
+    Client client;
+    
+    // Check available network adapters
+    NetworkAdapter* solana_adapter = client.get_adapter(SVMNetwork::SOLANA);
+    if (solana_adapter) {
+        std::cout << "✓ Solana adapter available" << std::endl;
+        
+        // Create transfer transaction
+        TransferRequest transfer_request(
+            SVMNetwork::SOLANA,
+            "7v91N7iZ9eyTktBwWC2ckrjdLhvmS4R1HqvYZzG5FGvn",
+            "1.5"
+        );
+        transfer_request.label = "Test Payment";
+        transfer_request.memo = "SDK Example";
+        
+        // Submit transaction asynchronously
+        auto future = solana_adapter->submit_transaction(transfer_request);
+        
+        // Wait for result
+        auto result = future.get();
+        std::cout << "Transaction submitted: " << result.transaction_id << std::endl;
+    }
+    
+    return 0;
+}`,
+    demoUrl: 'https://github.com/openSVM/svm-pay/tree/main/examples/cpp-examples/network-adapters',
+    sourceUrl: 'https://github.com/openSVM/svm-pay/tree/main/examples/cpp-examples/network-adapters'
   }
 ]
 
-const categories = ['All', 'Getting Started', 'Cross-Chain', 'Advanced', 'E-commerce', 'Gaming', 'DeFi', 'SaaS', 'Social', 'Enterprise', 'Mobile', 'IoT', 'Assembly-BPF', 'Tools', 'NFT']
+const categories = ['All', 'Getting Started', 'Cross-Chain', 'Advanced', 'E-commerce', 'Gaming', 'DeFi', 'SaaS', 'Social', 'Enterprise', 'Mobile', 'IoT', 'Assembly-BPF', 'C++', 'Tools', 'NFT']
 const difficulties = ['All', 'Beginner', 'Intermediate', 'Advanced', 'Expert']
 
 export function ExamplesPage() {

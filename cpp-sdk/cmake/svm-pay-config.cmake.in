@@ -1,0 +1,9 @@
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/svm-pay-targets.cmake")
+
+# Find required dependencies
+find_dependency(CURL REQUIRED)
+find_dependency(OpenSSL REQUIRED)
+
+check_required_components(svm-pay)

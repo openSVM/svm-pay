@@ -68,9 +68,32 @@ import {
   SmartCityPaymentsTutorial,
   V2XPaymentsTutorial
 } from './tutorials/MobileTutorials'
+import {
+  CppSDKGettingStartedTutorial,
+  CppSDKBasicPaymentTutorial,
+  CppSDKUrlParsingTutorial,
+  CppSDKNetworkAdaptersTutorial,
+  CppSDKAsyncOperationsTutorial,
+  CppSDKCMakeIntegrationTutorial,
+  CppSDKCrossPlatformTutorial,
+  CppSDKPerformanceTutorial
+} from './tutorials/CppSDKTutorials'
 
 // Tutorial sections
 const tutorialSections = [
+  {
+    title: 'C++ SDK Tutorials',
+    items: [
+      { name: 'C++ Getting Started', href: '/tutorials/cpp-sdk/getting-started', icon: Book },
+      { name: 'Basic Payment Processing', href: '/tutorials/cpp-sdk/basic-payment', icon: Book },
+      { name: 'URL Parsing & Validation', href: '/tutorials/cpp-sdk/url-parsing', icon: Book },
+      { name: 'Network Adapter Usage', href: '/tutorials/cpp-sdk/network-adapters', icon: Book },
+      { name: 'Async Network Operations', href: '/tutorials/cpp-sdk/async-operations', icon: Book },
+      { name: 'CMake Integration', href: '/tutorials/cpp-sdk/cmake-integration', icon: Book },
+      { name: 'Cross-Platform Development', href: '/tutorials/cpp-sdk/cross-platform', icon: Book },
+      { name: 'Performance Optimization', href: '/tutorials/cpp-sdk/performance', icon: Book },
+    ]
+  },
   {
     title: 'E-commerce Tutorials',
     items: [
@@ -282,6 +305,16 @@ function TutorialsHome() {
 
 function getTutorialDescription(name: string): string {
   const descriptions: Record<string, string> = {
+    // C++ SDK tutorial descriptions
+    'C++ Getting Started': 'Learn to set up the C++ SDK and create your first payment application.',
+    'Basic Payment Processing': 'Build a complete payment processing system with C++.',
+    'URL Parsing & Validation': 'Parse and validate SVM-Pay protocol URLs in C++ applications.',
+    'Network Adapter Usage': 'Work with different blockchain network adapters in C++.',
+    'Async Network Operations': 'Implement asynchronous network operations for better performance.',
+    'CMake Integration': 'Integrate the C++ SDK into your CMake-based projects.',
+    'Cross-Platform Development': 'Build payment applications that work across Windows, macOS, and Linux.',
+    'Performance Optimization': 'Optimize your C++ payment applications for maximum performance.',
+    // Other tutorial descriptions
     'Online Store Integration': 'Build a complete e-commerce store with Solana payments and order management.',
     'Marketplace with Escrow': 'Create a multi-vendor marketplace with secure escrow payment system.',
     'Subscription Box Service': 'Implement recurring payments for subscription-based businesses.',
@@ -333,6 +366,16 @@ export function TutorialsPage() {
       <div className="flex-1">
         <Routes>
           <Route path="/" element={<TutorialsHome />} />
+          
+          {/* C++ SDK Tutorials */}
+          <Route path="/cpp-sdk/getting-started" element={<CppSDKGettingStartedTutorial />} />
+          <Route path="/cpp-sdk/basic-payment" element={<CppSDKBasicPaymentTutorial />} />
+          <Route path="/cpp-sdk/url-parsing" element={<CppSDKUrlParsingTutorial />} />
+          <Route path="/cpp-sdk/network-adapters" element={<CppSDKNetworkAdaptersTutorial />} />
+          <Route path="/cpp-sdk/async-operations" element={<CppSDKAsyncOperationsTutorial />} />
+          <Route path="/cpp-sdk/cmake-integration" element={<CppSDKCMakeIntegrationTutorial />} />
+          <Route path="/cpp-sdk/cross-platform" element={<CppSDKCrossPlatformTutorial />} />
+          <Route path="/cpp-sdk/performance" element={<CppSDKPerformanceTutorial />} />
           
           {/* E-commerce Tutorials */}
           <Route path="/ecommerce" element={<EcommerceTutorials />} />
