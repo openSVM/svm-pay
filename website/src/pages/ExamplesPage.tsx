@@ -804,10 +804,144 @@ const IoTMicropayments = ({ devices, services }) => {
 }`,
     demoUrl: 'https://github.com/openSVM/svm-pay/tree/main/examples/iot-micropayments',
     sourceUrl: 'https://github.com/openSVM/svm-pay/tree/main/examples/iot-micropayments'
+  },
+  {
+    id: 'assembly-bpf-hello-world',
+    title: 'Assembly-BPF Hello World',
+    description: 'Simple BPF program using Assembly-BPF SDK for debugging and basic operations',
+    category: 'Assembly-BPF',
+    difficulty: 'Beginner',
+    tech: ['Assembly-BPF SDK', 'BPF', 'TypeScript'],
+    preview: `import { examples } from 'svm-pay/assembly-bpf';
+
+// Create a simple hello world program
+const { sdk, compilationResult, metadata } = await examples.createHelloWorld();
+
+console.log('Program compiled:', compilationResult.success);
+console.log('Assembly listing:', compilationResult.assembly);`,
+    demoUrl: 'https://github.com/openSVM/svm-pay/tree/main/examples/assembly-bpf',
+    sourceUrl: 'https://github.com/openSVM/svm-pay/tree/main/examples/assembly-bpf'
+  },
+  {
+    id: 'assembly-bpf-payment-processor',
+    title: 'Assembly-BPF Payment Processor',
+    description: 'Low-level payment processing program built with Assembly-BPF SDK',
+    category: 'Assembly-BPF',
+    difficulty: 'Intermediate',
+    tech: ['Assembly-BPF SDK', 'BPF', 'Payment Processing'],
+    preview: `import { AssemblyBPFSDK, BPFTemplates, SVMNetwork } from 'svm-pay/assembly-bpf';
+
+const sdk = new AssemblyBPFSDK({ 
+  network: SVMNetwork.SOLANA,
+  debug: true 
+});
+
+const { metadata, instructions } = BPFTemplates.createPaymentProcessor({
+  networks: [SVMNetwork.SOLANA, SVMNetwork.SONIC]
+});
+
+const result = await sdk.compile(instructions, metadata);`,
+    demoUrl: 'https://github.com/openSVM/svm-pay/tree/main/examples/assembly-bpf',
+    sourceUrl: 'https://github.com/openSVM/svm-pay/tree/main/examples/assembly-bpf'
+  },
+  {
+    id: 'assembly-bpf-cross-chain-bridge',
+    title: 'Assembly-BPF Cross-Chain Bridge',
+    description: 'Cross-chain bridge implementation using low-level BPF instructions',
+    category: 'Assembly-BPF',
+    difficulty: 'Advanced',
+    tech: ['Assembly-BPF SDK', 'BPF', 'Cross-Chain', 'Bridge'],
+    preview: `import { 
+  AssemblyBPFSDK, 
+  BPFTemplates, 
+  BPFHelpers,
+  SVMNetwork,
+  SVMPayBPFProgramType 
+} from 'svm-pay/assembly-bpf';
+
+const { metadata, instructions } = BPFTemplates.createCrossChainBridge({
+  supportedChains: [1, 137, 42161], // Ethereum, Polygon, Arbitrum
+  bridgeAuthority: bridgeAuthorityKey,
+  networks: [SVMNetwork.SOLANA, SVMNetwork.ECLIPSE]
+});
+
+const result = await sdk.compile(instructions, metadata);`,
+    demoUrl: 'https://github.com/openSVM/svm-pay/tree/main/examples/assembly-bpf',
+    sourceUrl: 'https://github.com/openSVM/svm-pay/tree/main/examples/assembly-bpf'
+  },
+  {
+    id: 'assembly-bpf-custom-validator',
+    title: 'Assembly-BPF Custom Validator',
+    description: 'Custom payment validation logic using Assembly-BPF program builder',
+    category: 'Assembly-BPF',
+    difficulty: 'Advanced',
+    tech: ['Assembly-BPF SDK', 'BPF', 'Validation', 'Memory Management'],
+    preview: `import { 
+  AssemblyBPFSDK, 
+  BPFHelpers, 
+  BPFInstruction, 
+  BPFRegister,
+  SVMNetwork,
+  SVMPayBPFProgramType 
+} from 'svm-pay/assembly-bpf';
+
+const sdk = new AssemblyBPFSDK({ network: SVMNetwork.SONIC });
+const metadata = BPFHelpers.createProgramMetadata(
+  'Custom Validator',
+  SVMPayBPFProgramType.VALIDATOR,
+  [SVMNetwork.SONIC]
+);
+
+const builder = sdk.createProgram(metadata);
+builder.addInstructions([
+  {
+    opcode: BPFInstruction.LOAD,
+    dst: BPFRegister.R2,
+    src: BPFRegister.R1,
+    offset: 8,
+    comment: 'Load payment amount'
+  }
+]);
+
+const result = await builder.compile();`,
+    demoUrl: 'https://github.com/openSVM/svm-pay/tree/main/examples/assembly-bpf',
+    sourceUrl: 'https://github.com/openSVM/svm-pay/tree/main/examples/assembly-bpf'
+  },
+  {
+    id: 'assembly-bpf-memory-management',
+    title: 'Assembly-BPF Memory Management',
+    description: 'Demonstrate memory allocation and structure management in BPF programs',
+    category: 'Assembly-BPF',
+    difficulty: 'Intermediate',
+    tech: ['Assembly-BPF SDK', 'BPF', 'Memory Management', 'Data Structures'],
+    preview: `import { AssemblyBPFSDK, SVMNetwork } from 'svm-pay/assembly-bpf';
+
+const sdk = new AssemblyBPFSDK({ network: SVMNetwork.SOLANA });
+const memoryManager = sdk.getMemoryManager();
+
+// Create a payment data structure
+const structInstructions = memoryManager.createStructureLayout([
+  { name: 'header', size: 8, value: 0x1234 },
+  { name: 'amount', size: 8, value: 1000000 },
+  { name: 'recipient', size: 32 },
+  { name: 'memo', size: 64 }
+]);
+
+// Calculate total memory requirements
+const totalSize = memoryManager.calculateStackSpace([
+  { name: 'header', size: 8 },
+  { name: 'amount', size: 8 },
+  { name: 'recipient', size: 32 },
+  { name: 'memo', size: 64 }
+]);
+
+console.log('Total structure size:', totalSize, 'bytes');`,
+    demoUrl: 'https://github.com/openSVM/svm-pay/tree/main/examples/assembly-bpf',
+    sourceUrl: 'https://github.com/openSVM/svm-pay/tree/main/examples/assembly-bpf'
   }
 ]
 
-const categories = ['All', 'Getting Started', 'Cross-Chain', 'Advanced', 'E-commerce', 'Gaming', 'DeFi', 'SaaS', 'Social', 'Enterprise', 'Mobile', 'IoT', 'Tools', 'NFT']
+const categories = ['All', 'Getting Started', 'Cross-Chain', 'Advanced', 'E-commerce', 'Gaming', 'DeFi', 'SaaS', 'Social', 'Enterprise', 'Mobile', 'IoT', 'Assembly-BPF', 'Tools', 'NFT']
 const difficulties = ['All', 'Beginner', 'Intermediate', 'Advanced', 'Expert']
 
 export function ExamplesPage() {

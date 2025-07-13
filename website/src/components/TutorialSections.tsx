@@ -1,5 +1,85 @@
 import { motion } from 'framer-motion'
 
+// E-commerce Tutorials
+export function EcommerceTutorials() {
+  const tutorials = [
+    {
+      title: "Online Store Integration",
+      description: "Complete e-commerce store with Solana payments",
+      level: "Beginner",
+      time: "30 minutes",
+      code: `// E-commerce checkout with SVM-Pay
+import { SVMPay, PaymentForm } from '@svm-pay/sdk'
+
+const EcommerceCheckout = ({ cartItems, total }) => {
+  const handlePayment = async (paymentData) => {
+    const payment = SVMPay.createPayment({
+      recipient: process.env.STORE_WALLET,
+      amount: total,
+      token: 'USDC',
+      metadata: {
+        orderId: generateOrderId(),
+        items: cartItems,
+        customerEmail: paymentData.email
+      }
+    })
+
+    const result = await payment.execute()
+    
+    if (result.status === 'SUCCESS') {
+      // Update inventory
+      await updateInventory(cartItems)
+      // Send confirmation email
+      await sendOrderConfirmation(paymentData.email, result.transactionId)
+      // Redirect to success page
+      router.push('/order-success')
+    }
+  }
+
+  return <PaymentForm onSubmit={handlePayment} amount={total} />
+}`
+    }
+  ]
+
+  return (
+    <div className="pt-20 p-8 max-w-6xl">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-4xl font-bold text-slate-900 mb-6">E-commerce Tutorials</h1>
+        <p className="text-xl text-slate-600 mb-8">
+          Build sophisticated e-commerce solutions with Solana payments
+        </p>
+
+        <div className="space-y-8">
+          {tutorials.map((tutorial, index) => (
+            <div key={index} className="bg-white border border-slate-200 rounded-lg p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h3 className="text-xl font-semibold text-slate-900 mb-2">{tutorial.title}</h3>
+                  <p className="text-slate-600 mb-2">{tutorial.description}</p>
+                  <div className="flex space-x-4 text-sm text-slate-500">
+                    <span>Level: {tutorial.level}</span>
+                    <span>Time: {tutorial.time}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-slate-900 rounded-lg p-4">
+                <pre className="text-sm text-slate-100 overflow-x-auto">
+                  <code>{tutorial.code}</code>
+                </pre>
+              </div>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
 // Gaming & NFT Tutorials
 export function GamingTutorials() {
   const tutorials = [
