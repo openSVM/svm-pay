@@ -6,7 +6,9 @@ on:
       - 'v*'
 
 jobs:
-  publish:
+  # Pre-publish validation
+  validate:
+    name: Pre-publish Validation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -29,7 +31,51 @@ jobs:
           npm test -- --passWithNoTests
           npm run lint
 
+      # Validate Flutter SDK if it exists
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+        if: hashFiles('flutter_sdk/pubspec.yaml') != ''
+
+      - name: Validate Flutter test coverage
+        working-directory: flutter_sdk
+        run: |
+          chmod +x scripts/validate_tests.sh
+          ./scripts/validate_tests.sh
+
+  # Main publish job
+  publish:
+    name: Publish to NPM
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
       - name: Publish to NPM
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish Summary
+        run: |
+          echo "🎉 Package published successfully!"
+          echo "📦 NPM Package: svm-pay"
+          echo "🏷️  Version: $(node -p "require('./package.json').version")"
+          if [ -f "flutter_sdk/pubspec.yaml" ]; then
+            echo "📱 Flutter SDK included and validated"
+          fi

@@ -1,0 +1,149 @@
+name: Flutter SDK Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'flutter_sdk/**'
+      - '.github/workflows/flutter-tests.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'flutter_sdk/**'
+      - '.github/workflows/flutter-tests.yml'
+
+jobs:
+  test:
+    name: Run Flutter Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      - name: Verify Flutter installation
+        run: flutter --version
+
+      - name: Get Flutter dependencies
+        working-directory: flutter_sdk
+        run: flutter pub get
+
+      - name: Verify dependencies
+        working-directory: flutter_sdk
+        run: flutter pub deps
+
+      - name: Run Flutter analyzer
+        working-directory: flutter_sdk
+        run: flutter analyze --fatal-infos
+
+      - name: Run all Flutter tests
+        working-directory: flutter_sdk
+        run: flutter test --coverage --reporter expanded
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          file: flutter_sdk/coverage/lcov.info
+          flags: flutter-sdk
+          name: flutter-sdk-coverage
+          fail_ci_if_error: false
+
+  security-tests:
+    name: Security & Bug Fix Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      - name: Get Flutter dependencies
+        working-directory: flutter_sdk
+        run: flutter pub get
+
+      - name: Run security tests
+        working-directory: flutter_sdk
+        run: flutter test test/security_test.dart --reporter expanded
+
+      - name: Run bug fix tests
+        working-directory: flutter_sdk
+        run: flutter test test/bug_fixes_test.dart --reporter expanded
+
+      - name: Run integration tests
+        working-directory: flutter_sdk
+        run: flutter test test/integration_test.dart --reporter expanded
+
+  widget-tests:
+    name: Widget Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      - name: Get Flutter dependencies
+        working-directory: flutter_sdk
+        run: flutter pub get
+
+      - name: Run widget tests
+        working-directory: flutter_sdk
+        run: flutter test test/widget_test.dart --reporter expanded
+
+  comprehensive-validation:
+    name: Comprehensive Test Validation
+    runs-on: ubuntu-latest
+    needs: [test, security-tests, widget-tests]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      - name: Get Flutter dependencies
+        working-directory: flutter_sdk
+        run: flutter pub get
+
+      - name: Validate test completeness
+        working-directory: flutter_sdk
+        run: |
+          echo "Running comprehensive test validation..."
+          
+          # Count total tests
+          TOTAL_TESTS=$(flutter test --dry-run 2>/dev/null | grep -c "loading.*test" || echo "0")
+          echo "Total tests found: $TOTAL_TESTS"
+          
+          # Verify critical test files exist
+          echo "Verifying critical test files..."
+          test -f test/svm_pay_test.dart && echo "✓ Core SDK tests found"
+          test -f test/security_test.dart && echo "✓ Security tests found" 
+          test -f test/bug_fixes_test.dart && echo "✓ Bug fix tests found"
+          test -f test/integration_test.dart && echo "✓ Integration tests found"
+          test -f test/widget_test.dart && echo "✓ Widget tests found"
+          
+          # Run final comprehensive test suite
+          echo "Running final comprehensive test suite..."
+          flutter test --reporter expanded --coverage
+          
+          echo "✅ All Flutter SDK tests completed successfully!"

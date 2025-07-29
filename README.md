@@ -17,6 +17,7 @@ SVM-Pay is a payment solution for SVM networks (Solana, Sonic SVM, Eclipse, s00n
 - **C++ SDK**: Native C++ SDK for high-performance applications and system integration
 - **Assembly-BPF SDK**: Low-level BPF program development with Assembly and LLVM IR abstractions
 - **Mobile Support**: iOS and Android SDK for mobile applications
+- **Flutter SDK**: Cross-platform mobile development with Flutter
 - **No Fees**: SVM-Pay itself charges no fees (only standard network transaction fees apply)
 - **Secure**: Built with security best practices for blockchain payments
 - **Flexible**: Support for different payment scenarios (e-commerce, point-of-sale, subscriptions)
@@ -29,6 +30,7 @@ SVM-Pay is a payment solution for SVM networks (Solana, Sonic SVM, Eclipse, s00n
 - [Architecture](docs/architecture.md)
 - [Security Recommendations](docs/security-recommendations.md)
 - [C++ SDK](cpp-sdk/README.md)
+- [Flutter SDK](flutter_sdk/README.md)
 - [Examples](examples/)
 - [CLI Integration](CLI-INTEGRATION.md)
 
@@ -231,6 +233,52 @@ std::string ref = client.generate_reference();
 - Comprehensive test suite and examples
 
 See [C++ SDK Documentation](cpp-sdk/README.md) for detailed installation and usage instructions.
+
+## Flutter SDK
+
+SVM-Pay includes a comprehensive Flutter SDK for cross-platform mobile development:
+
+```dart
+import 'package:svm_pay/svm_pay.dart';
+
+// Initialize SDK
+final svmPay = SVMPay(
+  config: const SVMPayConfig(
+    defaultNetwork: SVMNetwork.solana,
+    debug: true,
+  ),
+);
+
+// Create payment URL
+final url = svmPay.createTransferUrl(
+  'recipient_address',
+  '1.5',
+  label: 'Coffee Shop',
+  message: 'Payment for coffee',
+);
+
+// Use payment widgets
+PaymentButton(
+  recipient: 'recipient_address',
+  amount: '1.0',
+  label: 'Pay 1.0 SOL',
+  onPayment: (result) async {
+    if (result.status == PaymentStatus.confirmed) {
+      print('Payment successful!');
+    }
+  },
+)
+```
+
+**Features:**
+- Cross-platform support (iOS & Android)
+- Pre-built payment widgets (buttons, forms, QR codes)
+- Type-safe Dart API with comprehensive error handling
+- Platform channels for native performance
+- Support for all SVM networks
+- Payment URL generation and parsing
+
+See [Flutter SDK Documentation](flutter_sdk/README.md) for detailed installation and usage instructions.
 
 ## Demo Applications
 

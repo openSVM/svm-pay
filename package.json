@@ -142,6 +142,10 @@
       "import": "./dist/sdk/assembly-bpf/index.js",
       "require": "./dist/sdk/assembly-bpf/index.js",
       "types": "./dist/sdk/assembly-bpf/index.d.ts"
+    },
+    "./flutter": {
+      "path": "./flutter_sdk",
+      "description": "Flutter SDK for SVM-Pay cross-platform mobile development"
     }
   }
 }

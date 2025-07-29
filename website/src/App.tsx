@@ -14,6 +14,7 @@ import { AboutPage } from './pages/AboutPage'
 import { CareersPage } from './pages/CareersPage'
 import { PrivacyPage } from './pages/PrivacyPage'
 import { TermsPage } from './pages/TermsPage'
+import { FlutterPage } from './pages/FlutterPage'
 import { Navigation } from './components/Navigation'
 import { Footer } from './components/Footer'
 
@@ -37,6 +38,7 @@ function App() {
           <Route path="/careers" element={<CareersPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
+          <Route path="/flutter" element={<FlutterPage />} />
         </Routes>
         <Footer />
       </div>
