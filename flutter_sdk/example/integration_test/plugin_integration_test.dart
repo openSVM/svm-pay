@@ -10,16 +10,31 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
-import 'package:flutter_sdk/flutter_sdk.dart';
+import 'package:svm_pay/svm_pay.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('getPlatformVersion test', (WidgetTester tester) async {
-    final FlutterSdk plugin = FlutterSdk();
-    final String? version = await plugin.getPlatformVersion();
-    // The version string depends on the host platform running the test, so
-    // just assert that some non-empty string is returned.
-    expect(version?.isNotEmpty, true);
+  testWidgets('SVMPay integration test', (WidgetTester tester) async {
+    final SVMPay svmPay = SVMPay();
+    
+    // Test basic SDK functionality
+    const testRecipient = '11111111111111111111111111111112';
+    const testAmount = '1.0';
+    
+    final url = svmPay.createTransferUrl(
+      testRecipient,
+      testAmount,
+      label: 'Test Payment',
+      message: 'Integration test payment',
+    );
+    
+    // Verify URL was generated successfully
+    expect(url.isNotEmpty, true);
+    expect(url.contains(testRecipient), true);
+    expect(url.contains(testAmount), true);
+    
+    // Clean up
+    svmPay.dispose();
   });
 }
