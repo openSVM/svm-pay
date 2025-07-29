@@ -428,7 +428,7 @@ void main() {
       test('should handle timeout scenarios gracefully', () async {
         const validAddress = '11111111111111111111111111111112';
         
-        final request = TransferRequest(
+        const request = TransferRequest(
           recipient: validAddress,
           amount: '1.0',
           network: SVMNetwork.solana,

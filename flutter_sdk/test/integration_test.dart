@@ -127,7 +127,7 @@ void main() {
 
     group('Network Integration Tests', () {
       testWidgets('should handle payment processing', (tester) async {
-        final request = TransferRequest(
+        const request = TransferRequest(
           recipient: testAddress,
           amount: '0.001',
           network: SVMNetwork.solana,
@@ -168,7 +168,7 @@ void main() {
       testWidgets('should handle network timeouts gracefully', (tester) async {
         // This test might be challenging in a real environment
         // We're testing that timeouts are handled properly
-        final request = TransferRequest(
+        const request = TransferRequest(
           recipient: testAddress,
           amount: '1000000.0', // Large amount to potentially trigger timeout
           network: SVMNetwork.solana,
@@ -296,7 +296,7 @@ void main() {
     group('Error Handling Tests', () {
       testWidgets('should handle platform exceptions gracefully', (tester) async {
         // Create a request that might trigger platform errors
-        final request = TransferRequest(
+        const request = TransferRequest(
           recipient: testAddress,
           amount: '999999999.0', // Very large amount
           network: SVMNetwork.solana,

@@ -53,7 +53,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: PaymentButton(
               recipient: testAddress,
@@ -72,7 +72,7 @@ void main() {
       const customLoadingWidget = Text('Processing...');
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: PaymentButton(
               recipient: testAddress,
@@ -329,7 +329,7 @@ void main() {
 
     testWidgets('PaymentButton should show error snackbar on failure', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: PaymentButton(
               recipient: '', // Empty address will cause validation failure
@@ -351,7 +351,7 @@ void main() {
 
     testWidgets('Widgets should handle loading states correctly', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: PaymentButton(
               recipient: testAddress,

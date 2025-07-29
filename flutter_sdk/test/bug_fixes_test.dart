@@ -186,7 +186,7 @@ void main() {
       test('payment processing logs fee warning', () {
         // This test would require a way to capture log output
         // For now, we just verify the method doesn't crash
-        final request = TransferRequest(
+        const request = TransferRequest(
           recipient: '11111111111111111111111111111112',
           amount: '1.0',
           network: SVMNetwork.solana,
