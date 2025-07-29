@@ -1,10 +1,12 @@
 /// SVM-Pay Flutter SDK
 /// 
 /// This file implements the main SDK class for SVM-Pay Flutter integration.
+library;
 
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' show Random;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:crypto/crypto.dart';
 
@@ -215,7 +217,7 @@ class SVMPay {
       if (_config.debug) {
         // Fix Bug #10: More thorough error sanitization
         final sanitizedError = _sanitizeErrorMessage(e.toString());
-        print('SVM-Pay: Error parsing URL: $sanitizedError');
+        _log('Error parsing URL: $sanitizedError');
       }
       return null;
     }
@@ -265,7 +267,7 @@ class SVMPay {
           .replaceAll(RegExp(r'\b[1-9A-HJ-NP-Za-km-z]{32,44}\b'), '[ADDRESS_REDACTED]')
           .replaceAll(RegExp(r'"signature":\s*"[^"]*"'), '"signature": "[SIGNATURE_REDACTED]"')
           .replaceAll(RegExp(r'"transaction":\s*"[^"]*"'), '"transaction": "[TRANSACTION_REDACTED]"');
-      print('SVM-Pay: $sanitized');
+      debugPrint('SVM-Pay: $sanitized');
     }
   }
 
@@ -409,7 +411,7 @@ class SVMPay {
     } on PlatformException catch (e) {
       _log('Platform error getting balance: ${e.code}');
       throw Exception('Failed to get wallet balance: ${_sanitizeErrorMessage(e.message ?? 'Unknown error')}');
-    } on TimeoutException catch (e) {
+    } on TimeoutException {
       _log('Timeout getting balance');
       throw Exception('Balance request timed out. Please try again.');
     } catch (e) {

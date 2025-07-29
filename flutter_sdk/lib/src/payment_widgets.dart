@@ -1,6 +1,7 @@
 /// Payment Widgets for SVM-Pay Flutter SDK
 /// 
 /// This file implements Flutter widgets for easy payment integration.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

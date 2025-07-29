@@ -1,4 +1,3 @@
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:svm_pay/svm_pay.dart';
@@ -352,9 +351,9 @@ void main() {
 
       testWidgets('should handle large data efficiently', (tester) async {
         // Test with maximum allowed string lengths
-        const maxLabel = 'a' * 200;
-        const maxMessage = 'b' * 500;
-        const maxMemo = 'c' * 100;
+        final maxLabel = 'a' * 200;
+        final maxMessage = 'b' * 500;
+        final maxMemo = 'c' * 100;
 
         final stopwatch = Stopwatch()..start();
         

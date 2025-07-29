@@ -1,6 +1,7 @@
 /// Network Adapters for SVM-Pay Flutter SDK
 /// 
 /// This file implements network-specific adapters for different SVM networks.
+library;
 
 import 'types.dart';
 

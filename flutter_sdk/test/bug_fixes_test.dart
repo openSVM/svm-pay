@@ -1,6 +1,7 @@
 /// Bug Fixes Test Suite
 /// 
 /// Comprehensive tests for critical bug fixes in the Flutter SDK.
+library;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:svm_pay/src/svm_pay_sdk.dart';
@@ -39,13 +40,13 @@ void main() {
 
     group('Bug #2: Race Condition Prevention', () {
       test('concurrent payment requests are handled safely', () async {
-        final request1 = TransferRequest(
+        const request1 = TransferRequest(
           recipient: '11111111111111111111111111111112',
           amount: '1.0',
           network: SVMNetwork.solana,
         );
         
-        final request2 = TransferRequest(
+        const request2 = TransferRequest(
           recipient: '11111111111111111111111111111112',
           amount: '2.0',
           network: SVMNetwork.solana,
@@ -141,7 +142,7 @@ void main() {
         expect(svmPay.parseUrl(longUrl), isNull);
         
         // Test URLs with path traversal attempts
-        final maliciousUrl = 'solana://address?amount=../../../etc/passwd';
+        const maliciousUrl = 'solana://address?amount=../../../etc/passwd';
         final result = svmPay.parseUrl(maliciousUrl);
         expect(result, isNull);
         
@@ -154,7 +155,7 @@ void main() {
         expect(svmPay.parseUrl(excessiveUrl), isNull);
         
         // Test valid URL still works
-        final validUrl = 'solana://11111111111111111111111111111112?amount=1.0';
+        const validUrl = 'solana://11111111111111111111111111111112?amount=1.0';
         expect(svmPay.parseUrl(validUrl), isNotNull);
       });
     });
@@ -215,7 +216,7 @@ void main() {
            'private: [REDACTED] and token: [REDACTED]'),
         ];
         
-        for (final (input, expected) in testCases) {
+        for (final (input, _) in testCases) {
           // We need to access the private method through a test-specific approach
           // This is a simplified test - in practice, we'd test through public methods
           expect(input.contains('11111111111111111111111111111112') ||

@@ -1,6 +1,7 @@
 /// SVM-Pay Flutter SDK Types
 /// 
 /// This file defines the core types used throughout the SVM-Pay Flutter SDK.
+library;
 
 /// Supported SVM networks
 enum SVMNetwork {
@@ -118,17 +119,14 @@ class TransferRequest extends PaymentRequest {
   const TransferRequest({
     required this.recipient,
     required this.amount,
-    required SVMNetwork network,
+    required super.network,
     this.splToken,
     this.label,
     this.message,
-    String? memo,
-    String? reference,
+    super.memo,
+    super.reference,
   }) : super(
           type: RequestType.transfer,
-          network: network,
-          memo: memo,
-          reference: reference,
         );
 
   @override
@@ -154,14 +152,11 @@ class TransactionRequest extends PaymentRequest {
 
   const TransactionRequest({
     required this.transaction,
-    required SVMNetwork network,
-    String? memo,
-    String? reference,
+    required super.network,
+    super.memo,
+    super.reference,
   }) : super(
           type: RequestType.transaction,
-          network: network,
-          memo: memo,
-          reference: reference,
         );
 
   @override
