@@ -83,7 +83,7 @@ void main() {
       });
 
       testWidgets('should validate string length limits', (tester) async {
-        final longString = 'a' * 500;
+        final longString = 'a' * 501; // 501 characters to exceed message limit
         
         // Long label should throw
         expect(
@@ -242,7 +242,7 @@ void main() {
         );
 
         expect(url, contains('solana://'));
-        expect(url, contains('transaction=$transaction'));
+        expect(url, contains('transaction=${Uri.encodeComponent(transaction)}'));
         expect(url, contains(Uri.encodeComponent(memo)));
 
         // Parse the URL back

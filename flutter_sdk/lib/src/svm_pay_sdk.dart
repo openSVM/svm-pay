@@ -246,7 +246,7 @@ class SVMPay {
     hash = sha256.convert(hash).bytes; // Double hash for additional security
     
     // Convert to base64 for better entropy preservation than hex
-    return base64.encode(hash).substring(0, 22).replaceAll('/', '_').replaceAll('+', '-');
+    return base64.encode(hash).substring(0, 16).replaceAll('/', '_').replaceAll('+', '-');
   }
 
   /// Convert integer to bytes
