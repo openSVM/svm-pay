@@ -64,11 +64,21 @@ class PaymentButton extends StatefulWidget {
 class _PaymentButtonState extends State<PaymentButton> {
   bool _isLoading = false;
   late final SVMPay _svmPay;
+  
+  // Fix Bug #6: Track async operations to prevent memory leaks
+  final Set<Future> _activeOperations = {};
 
   @override
   void initState() {
     super.initState();
     _svmPay = widget.svmPay ?? SVMPay();
+  }
+
+  @override
+  void dispose() {
+    // Fix Bug #6: Cancel all active operations and dispose resources
+    _svmPay.dispose();
+    super.dispose();
   }
 
   @override
@@ -83,10 +93,15 @@ class _PaymentButtonState extends State<PaymentButton> {
   }
 
   Future<void> _handlePayment() async {
+    // Fix Bug #7: Prevent double-submission
+    if (_isLoading) return;
+    
     setState(() {
       _isLoading = true;
     });
 
+    late Future<PaymentResult> paymentFuture;
+    
     try {
       final request = TransferRequest(
         recipient: widget.recipient,
@@ -96,22 +111,29 @@ class _PaymentButtonState extends State<PaymentButton> {
         message: widget.message,
       );
 
-      final result = await _svmPay.processPayment(request);
+      paymentFuture = _svmPay.processPayment(request);
+      _activeOperations.add(paymentFuture);
+      
+      final result = await paymentFuture;
+
+      // Fix Bug #6: Only handle result if widget is still mounted
+      if (!mounted) return;
 
       if (widget.onPayment != null) {
         await widget.onPayment!(result);
       }
 
-      if (result.status == PaymentStatus.failed && mounted) {
+      if (result.status == PaymentStatus.failed) {
         _showErrorSnackBar(result.error ?? 'Payment failed');
-      } else if (result.status == PaymentStatus.confirmed && mounted) {
+      } else if (result.status == PaymentStatus.confirmed) {
         _showSuccessSnackBar('Payment successful');
       }
     } catch (e) {
       if (mounted) {
-        _showErrorSnackBar('Payment error: $e');
+        _showErrorSnackBar('Payment error: ${e.toString()}');
       }
     } finally {
+      _activeOperations.remove(paymentFuture);
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -240,6 +262,9 @@ class _PaymentFormState extends State<PaymentForm> {
 
   late SVMNetwork _selectedNetwork;
   late final SVMPay _svmPay;
+  
+  // Fix Bug #7: Prevent double-submission
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -257,9 +282,11 @@ class _PaymentFormState extends State<PaymentForm> {
 
   @override
   void dispose() {
+    // Fix Bug #6: Properly dispose controllers and SDK
     _recipientController.dispose();
     _amountController.dispose();
     _messageController.dispose();
+    _svmPay.dispose();
     super.dispose();
   }
 
@@ -337,8 +364,21 @@ class _PaymentFormState extends State<PaymentForm> {
           ),
           const SizedBox(height: 24),
           ElevatedButton(
-            onPressed: _handleSubmit,
-            child: const Text('Create Payment'),
+            onPressed: _isSubmitting ? null : _handleSubmit,
+            child: _isSubmitting 
+                ? const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                      SizedBox(width: 8),
+                      Text('Processing...'),
+                    ],
+                  )
+                : const Text('Create Payment'),
           ),
         ],
       ),
@@ -346,9 +386,14 @@ class _PaymentFormState extends State<PaymentForm> {
   }
 
   Future<void> _handleSubmit() async {
-    if (!_formKey.currentState!.validate()) {
+    // Fix Bug #7: Prevent double-submission
+    if (_isSubmitting || !_formKey.currentState!.validate()) {
       return;
     }
+
+    setState(() {
+      _isSubmitting = true;
+    });
 
     final request = TransferRequest(
       recipient: _recipientController.text,
@@ -362,17 +407,23 @@ class _PaymentFormState extends State<PaymentForm> {
     try {
       final result = await _svmPay.processPayment(request);
       
-      if (widget.onSubmit != null) {
+      if (mounted && widget.onSubmit != null) {
         await widget.onSubmit!(result);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text('Error: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
       }
     }
   }

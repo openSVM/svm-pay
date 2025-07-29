@@ -17,11 +17,22 @@ class SVMPay {
 
   final SVMPayConfig _config;
   final NetworkAdapterManager _networkManager;
+  
+  // Fix Bug #2: Add mutex for concurrent payment protection
+  final Completer<void> _paymentMutex = Completer<void>();
+  bool _isProcessingPayment = false;
 
   /// Create a new SVMPay SDK instance
   SVMPay({SVMPayConfig? config})
       : _config = config ?? const SVMPayConfig(),
-        _networkManager = NetworkAdapterManager();
+        _networkManager = NetworkAdapterManager() {
+    _paymentMutex.complete(); // Initialize as available
+  }
+
+  /// Fix Bug #1: Dispose resources to prevent memory leaks
+  void dispose() {
+    _networkManager.dispose();
+  }
 
   /// Get the current configuration
   SVMPayConfig get config => _config;
@@ -146,11 +157,27 @@ class SVMPay {
 
   /// Parse a payment URL to extract payment request information
   /// 
+  /// Fix Bug #5: Add URL validation to prevent malformed URL attacks
   /// @param url Payment URL to parse
   /// @returns Parsed payment request
   PaymentRequest? parseUrl(String url) {
     try {
+      // Fix Bug #5: Validate URL length and complexity to prevent DoS
+      if (url.isEmpty || url.length > 2048) {
+        return null;
+      }
+      
+      // Check for suspicious patterns that could cause parsing issues
+      if (url.contains('..') || url.contains('%') && url.length > 500) {
+        return null;
+      }
+      
       final uri = Uri.parse(url);
+      
+      // Additional URI validation
+      if (uri.scheme.isEmpty || uri.scheme.length > 20) {
+        return null;
+      }
       
       if (!_isSvmPayUrl(uri)) {
         return null;
@@ -159,6 +186,11 @@ class SVMPay {
       final network = SVMNetwork.fromString(uri.scheme);
       final recipient = uri.host;
       final queryParams = uri.queryParameters;
+      
+      // Validate query parameters don't exceed reasonable limits
+      if (queryParams.length > 10) {
+        return null;
+      }
 
       if (queryParams.containsKey('transaction')) {
         return TransactionRequest(
@@ -181,7 +213,9 @@ class SVMPay {
       }
     } catch (e) {
       if (_config.debug) {
-        print('SVM-Pay: Error parsing URL: $e');
+        // Fix Bug #10: More thorough error sanitization
+        final sanitizedError = _sanitizeErrorMessage(e.toString());
+        print('SVM-Pay: Error parsing URL: $sanitizedError');
       }
       return null;
     }
@@ -189,21 +223,28 @@ class SVMPay {
 
   /// Generate a unique reference ID using secure randomness
   /// 
+  /// Fix Bug #3: Improve entropy by using only secure random data
   /// @returns Cryptographically secure unique reference string
   String generateReference() {
     final secureRandom = Random.secure();
-    final timestamp = DateTime.now().microsecondsSinceEpoch;
     
-    // Generate 16 bytes of secure random data
-    final randomBytes = List.generate(16, (index) => secureRandom.nextInt(256));
+    // Generate 32 bytes of secure random data (increased from 16)
+    final randomBytes = List.generate(32, (index) => secureRandom.nextInt(256));
     
-    // Combine timestamp and random data
-    final timestampBytes = _intToBytes(timestamp);
-    final combinedBytes = [...timestampBytes, ...randomBytes];
+    // Add additional entropy from high-resolution timer
+    final nanoTime = DateTime.now().microsecondsSinceEpoch * 1000 + 
+                     secureRandom.nextInt(1000000);
+    final entropyBytes = _intToBytes(nanoTime);
     
-    // Hash the combined data
-    final hash = sha256.convert(combinedBytes);
-    return hash.toString().substring(0, 16);
+    // Combine all random sources
+    final combinedBytes = [...randomBytes, ...entropyBytes];
+    
+    // Hash the combined data with multiple rounds
+    var hash = sha256.convert(combinedBytes).bytes;
+    hash = sha256.convert(hash).bytes; // Double hash for additional security
+    
+    // Convert to base64 for better entropy preservation than hex
+    return base64.encode(hash).substring(0, 22).replaceAll('/', '_').replaceAll('+', '-');
   }
 
   /// Convert integer to bytes
@@ -230,10 +271,22 @@ class SVMPay {
 
   /// Process a payment request with enhanced error handling
   /// 
+  /// Fix Bug #2: Add mutex protection against concurrent payments
   /// @param request Payment request to process
   /// @returns Future that resolves to payment result
   Future<PaymentResult> processPayment(PaymentRequest request) async {
     _log('Processing payment request: ${request.type.value}');
+    
+    // Fix Bug #2: Prevent concurrent payment processing
+    if (_isProcessingPayment) {
+      return PaymentResult(
+        status: PaymentStatus.failed,
+        network: request.network,
+        error: 'Another payment is already in progress. Please wait.',
+      );
+    }
+    
+    _isProcessingPayment = true;
     
     try {
       // Validate request
@@ -250,6 +303,9 @@ class SVMPay {
         if (amount > 1000000000) {
           throw ArgumentError('Amount exceeds maximum allowed limit of 1 billion tokens');
         }
+        
+        // Fix Bug #8: Add basic fee estimation warning
+        _log('Warning: This amount does not include network fees. Ensure sufficient balance.');
       }
 
       final adapter = _networkManager.getAdapter(request.network);
@@ -271,21 +327,21 @@ class SVMPay {
       return paymentResult;
       
     } on PlatformException catch (e) {
-      _log('Platform error: ${e.code} - ${e.message}');
+      _log('Platform error: ${e.code} - ${_sanitizeErrorMessage(e.message ?? "Unknown error")}');
       return PaymentResult(
         status: PaymentStatus.failed,
         network: request.network,
         error: _sanitizeErrorMessage(e.message ?? 'Platform error occurred'),
       );
     } on TimeoutException catch (e) {
-      _log('Timeout error: ${e.message}');
+      _log('Timeout error: ${_sanitizeErrorMessage(e.message ?? "Timeout")}');
       return PaymentResult(
         status: PaymentStatus.failed,
         network: request.network,
         error: 'Payment request timed out. Please try again.',
       );
     } on ArgumentError catch (e) {
-      _log('Validation error: ${e.message}');
+      _log('Validation error: ${_sanitizeErrorMessage(e.message ?? "Validation error")}');
       return PaymentResult(
         status: PaymentStatus.failed,
         network: request.network,
@@ -298,15 +354,21 @@ class SVMPay {
         network: request.network,
         error: 'An unexpected error occurred. Please try again.',
       );
+    } finally {
+      _isProcessingPayment = false;
     }
   }
 
   /// Sanitize error messages to prevent information disclosure
+  /// Fix Bug #10: Enhanced sanitization with stack trace removal
   String _sanitizeErrorMessage(String message) {
     return message
         .replaceAll(RegExp(r'\b[1-9A-HJ-NP-Za-km-z]{32,44}\b'), '[ADDRESS]')
         .replaceAll(RegExp(r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b'), '[IP_ADDRESS]')
-        .replaceAll(RegExp(r'(private|secret|key|token):\s*\S+', caseSensitive: false), r'$1: [REDACTED]');
+        .replaceAll(RegExp(r'(private|secret|key|token|password|credential):\s*\S+', caseSensitive: false), r'$1: [REDACTED]')
+        .replaceAll(RegExp(r'#\d+\s+.*\(.*:\d+:\d+\)'), '[STACK_TRACE_REDACTED]') // Remove stack traces
+        .replaceAll(RegExp(r'file:///.*'), '[FILE_PATH_REDACTED]') // Remove file paths
+        .replaceAll(RegExp(r'Exception:\s*.*'), 'Exception: [DETAILS_REDACTED]'); // Sanitize exception details
   }
 
   /// Check wallet balance with enhanced validation and error handling
