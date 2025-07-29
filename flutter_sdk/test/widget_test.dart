@@ -165,9 +165,13 @@ void main() {
       await tester.tap(networkDropdown);
       await tester.pumpAndSettle();
 
-      // Should show all network options
+      // Should show all network options in dropdown menu
       for (final network in SVMNetwork.values) {
-        expect(find.text(network.value.toUpperCase()), findsOneWidget);
+        // Look for dropdown menu items specifically, not the selected value
+        expect(find.descendant(
+          of: find.byType(DropdownMenuItem<SVMNetwork>),
+          matching: find.text(network.value.toUpperCase()),
+        ), findsOneWidget);
       }
 
       // Select a different network
@@ -324,18 +328,12 @@ void main() {
     });
 
     testWidgets('PaymentButton should show error snackbar on failure', (tester) async {
-      // Create a mock SVMPay that always fails
-      final mockSvmPay = SVMPay(
-        config: const SVMPayConfig(debug: false),
-      );
-
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: PaymentButton(
-              recipient: 'invalid-address', // This will cause failure
+              recipient: '', // Empty address will cause validation failure
               amount: '1.0',
-              svmPay: mockSvmPay,
             ),
           ),
         ),
@@ -343,11 +341,12 @@ void main() {
 
       // Tap the button
       await tester.tap(find.byType(PaymentButton));
-      await tester.pumpAndSettle(const Duration(seconds: 3));
-
+      await tester.pump(); // Initial pump to trigger the async operation
+      await tester.pump(const Duration(milliseconds: 100)); // Wait for setState
+      
       // Should show error snackbar
       expect(find.byType(SnackBar), findsOneWidget);
-      expect(find.textContaining('Payment error'), findsOneWidget);
+      expect(find.text('Payment error: Invalid recipient address'), findsOneWidget);
     });
 
     testWidgets('Widgets should handle loading states correctly', (tester) async {

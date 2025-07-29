@@ -78,6 +78,7 @@ class _PaymentButtonState extends State<PaymentButton> {
   @override
   void dispose() {
     // Fix Bug #6: Cancel all active operations and dispose resources
+    _activeOperations.clear();
     _svmPay.dispose();
     super.dispose();
   }
