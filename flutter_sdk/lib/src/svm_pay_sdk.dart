@@ -2,7 +2,9 @@
 /// 
 /// This file implements the main SDK class for SVM-Pay Flutter integration.
 
+import 'dart:async';
 import 'dart:convert';
+import 'dart:math' show Random;
 import 'package:flutter/services.dart';
 import 'package:crypto/crypto.dart';
 
@@ -40,7 +42,52 @@ class SVMPay {
     String? memo,
     String? reference,
   }) {
+    // Input validation
+    if (recipient.isEmpty) {
+      throw ArgumentError('Recipient address cannot be empty');
+    }
+    
+    if (amount.isEmpty) {
+      throw ArgumentError('Amount cannot be empty');
+    }
+    
+    // Validate amount is a positive number
+    final amountValue = double.tryParse(amount);
+    if (amountValue == null || amountValue <= 0) {
+      throw ArgumentError('Amount must be a positive number');
+    }
+    
+    // Check for reasonable upper bounds (1 billion tokens max)
+    if (amountValue > 1000000000) {
+      throw ArgumentError('Amount exceeds maximum allowed limit of 1 billion tokens');
+    }
+    
+    // Check for extremely precise decimal places (max 9 decimal places for SOL)
+    final parts = amount.split('.');
+    if (parts.length > 1 && parts[1].length > 9) {
+      throw ArgumentError('Amount has too many decimal places (maximum 9 allowed)');
+    }
+    
     final effectiveNetwork = network ?? _config.defaultNetwork;
+    
+    // Validate recipient address for the target network
+    if (!validateAddress(recipient, network: effectiveNetwork)) {
+      throw ArgumentError('Invalid recipient address for ${effectiveNetwork.value} network');
+    }
+    
+    // Validate optional parameters
+    if (label != null && label.length > 200) {
+      throw ArgumentError('Label cannot exceed 200 characters');
+    }
+    
+    if (message != null && message.length > 500) {
+      throw ArgumentError('Message cannot exceed 500 characters');
+    }
+    
+    if (memo != null && memo.length > 100) {
+      throw ArgumentError('Memo cannot exceed 100 characters');
+    }
+
     final effectiveReference = reference ?? generateReference();
 
     final request = TransferRequest(
@@ -68,6 +115,22 @@ class SVMPay {
     String? memo,
     String? reference,
   }) {
+    // Input validation
+    if (transaction.isEmpty) {
+      throw ArgumentError('Transaction cannot be empty');
+    }
+    
+    // Validate base64 encoding
+    try {
+      base64.decode(transaction);
+    } catch (e) {
+      throw ArgumentError('Transaction must be valid base64 encoded data');
+    }
+    
+    if (memo != null && memo.length > 100) {
+      throw ArgumentError('Memo cannot exceed 100 characters');
+    }
+
     final effectiveNetwork = network ?? _config.defaultNetwork;
     final effectiveReference = reference ?? generateReference();
 
@@ -124,51 +187,129 @@ class SVMPay {
     }
   }
 
-  /// Generate a unique reference ID
+  /// Generate a unique reference ID using secure randomness
   /// 
-  /// @returns Unique reference string
+  /// @returns Cryptographically secure unique reference string
   String generateReference() {
+    final secureRandom = Random.secure();
     final timestamp = DateTime.now().microsecondsSinceEpoch;
-    final random = timestamp.hashCode ^ Object.hash(timestamp, DateTime.now().millisecondsSinceEpoch);
-    final randomBytes = List.generate(8, (index) => random + index * 31);
-    final hash = sha256.convert(randomBytes);
+    
+    // Generate 16 bytes of secure random data
+    final randomBytes = List.generate(16, (index) => secureRandom.nextInt(256));
+    
+    // Combine timestamp and random data
+    final timestampBytes = _intToBytes(timestamp);
+    final combinedBytes = [...timestampBytes, ...randomBytes];
+    
+    // Hash the combined data
+    final hash = sha256.convert(combinedBytes);
     return hash.toString().substring(0, 16);
   }
 
-  /// Process a payment request
+  /// Convert integer to bytes
+  List<int> _intToBytes(int value) {
+    final bytes = <int>[];
+    while (value > 0) {
+      bytes.insert(0, value & 0xFF);
+      value >>= 8;
+    }
+    return bytes.isEmpty ? [0] : bytes;
+  }
+
+  /// Log message if debug is enabled with sensitive data sanitization
+  void _log(String message) {
+    if (_config.debug) {
+      // Sanitize sensitive information from logs
+      final sanitized = message
+          .replaceAll(RegExp(r'\b[1-9A-HJ-NP-Za-km-z]{32,44}\b'), '[ADDRESS_REDACTED]')
+          .replaceAll(RegExp(r'"signature":\s*"[^"]*"'), '"signature": "[SIGNATURE_REDACTED]"')
+          .replaceAll(RegExp(r'"transaction":\s*"[^"]*"'), '"transaction": "[TRANSACTION_REDACTED]"');
+      print('SVM-Pay: $sanitized');
+    }
+  }
+
+  /// Process a payment request with enhanced error handling
   /// 
   /// @param request Payment request to process
   /// @returns Future that resolves to payment result
   Future<PaymentResult> processPayment(PaymentRequest request) async {
+    _log('Processing payment request: ${request.type.value}');
+    
     try {
+      // Validate request
+      if (request is TransferRequest) {
+        if (!validateAddress(request.recipient, network: request.network)) {
+          throw ArgumentError('Invalid recipient address');
+        }
+        
+        final amount = double.tryParse(request.amount);
+        if (amount == null || amount <= 0) {
+          throw ArgumentError('Invalid amount: ${request.amount}');
+        }
+        
+        if (amount > 1000000000) {
+          throw ArgumentError('Amount exceeds maximum allowed limit of 1 billion tokens');
+        }
+      }
+
       final adapter = _networkManager.getAdapter(request.network);
       if (adapter == null) {
         throw Exception('Unsupported network: ${request.network.value}');
       }
 
-      // Use platform channel for native processing
+      // Use platform channel for native processing with timeout
       final result = await _channel.invokeMethod('processPayment', {
         'request': request.toJson(),
         'config': _config.toJson(),
-      });
+      }).timeout(
+        const Duration(seconds: 30),
+        onTimeout: () => throw TimeoutException('Payment request timed out', const Duration(seconds: 30)),
+      );
 
-      return PaymentResult.fromJson(Map<String, dynamic>.from(result));
+      final paymentResult = PaymentResult.fromJson(Map<String, dynamic>.from(result));
+      _log('Payment completed with status: ${paymentResult.status.value}');
+      return paymentResult;
+      
     } on PlatformException catch (e) {
+      _log('Platform error: ${e.code} - ${e.message}');
       return PaymentResult(
         status: PaymentStatus.failed,
         network: request.network,
-        error: e.message ?? 'Platform error occurred',
+        error: _sanitizeErrorMessage(e.message ?? 'Platform error occurred'),
+      );
+    } on TimeoutException catch (e) {
+      _log('Timeout error: ${e.message}');
+      return PaymentResult(
+        status: PaymentStatus.failed,
+        network: request.network,
+        error: 'Payment request timed out. Please try again.',
+      );
+    } on ArgumentError catch (e) {
+      _log('Validation error: ${e.message}');
+      return PaymentResult(
+        status: PaymentStatus.failed,
+        network: request.network,
+        error: e.message ?? 'Invalid payment request',
       );
     } catch (e) {
+      _log('Unexpected error: ${e.runtimeType}');
       return PaymentResult(
         status: PaymentStatus.failed,
         network: request.network,
-        error: e.toString(),
+        error: 'An unexpected error occurred. Please try again.',
       );
     }
   }
 
-  /// Check wallet balance
+  /// Sanitize error messages to prevent information disclosure
+  String _sanitizeErrorMessage(String message) {
+    return message
+        .replaceAll(RegExp(r'\b[1-9A-HJ-NP-Za-km-z]{32,44}\b'), '[ADDRESS]')
+        .replaceAll(RegExp(r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b'), '[IP_ADDRESS]')
+        .replaceAll(RegExp(r'(private|secret|key|token):\s*\S+', caseSensitive: false), r'$1: [REDACTED]');
+  }
+
+  /// Check wallet balance with enhanced validation and error handling
   /// 
   /// @param address Wallet address
   /// @param network Target network
@@ -178,18 +319,40 @@ class SVMPay {
     SVMNetwork? network,
     String? tokenMint,
   }) async {
+    // Input validation
+    if (address.isEmpty) {
+      throw ArgumentError('Address cannot be empty');
+    }
+    
+    final effectiveNetwork = network ?? _config.defaultNetwork;
+    
+    // Validate address format
+    if (!validateAddress(address, network: effectiveNetwork)) {
+      throw ArgumentError('Invalid address format for ${effectiveNetwork.value} network');
+    }
+    
     try {
-      final effectiveNetwork = network ?? _config.defaultNetwork;
+      _log('Getting wallet balance for address: [ADDRESS_REDACTED]');
       
       final result = await _channel.invokeMethod('getWalletBalance', {
         'address': address,
         'network': effectiveNetwork.value,
         if (tokenMint != null) 'tokenMint': tokenMint,
-      });
+      }).timeout(
+        const Duration(seconds: 15),
+        onTimeout: () => throw TimeoutException('Balance request timed out', const Duration(seconds: 15)),
+      );
 
       return result.toString();
     } on PlatformException catch (e) {
-      throw Exception('Failed to get wallet balance: ${e.message}');
+      _log('Platform error getting balance: ${e.code}');
+      throw Exception('Failed to get wallet balance: ${_sanitizeErrorMessage(e.message ?? 'Unknown error')}');
+    } on TimeoutException catch (e) {
+      _log('Timeout getting balance');
+      throw Exception('Balance request timed out. Please try again.');
+    } catch (e) {
+      _log('Unexpected error getting balance: ${e.runtimeType}');
+      throw Exception('Failed to get wallet balance: An unexpected error occurred');
     }
   }
 
@@ -199,18 +362,22 @@ class SVMPay {
   /// @param network Target network
   /// @returns True if address is valid
   bool validateAddress(String address, {SVMNetwork? network}) {
+    if (address.isEmpty) {
+      return false;
+    }
+    
     final effectiveNetwork = network ?? _config.defaultNetwork;
     final adapter = _networkManager.getAdapter(effectiveNetwork);
     return adapter?.validateAddress(address) ?? false;
   }
 
-  /// Build payment URL from request
+  /// Build payment URL from request with proper encoding
   String _buildPaymentUrl(PaymentRequest request) {
     final buffer = StringBuffer();
     buffer.write('${request.network.value}://');
 
     if (request is TransferRequest) {
-      buffer.write(request.recipient);
+      buffer.write(Uri.encodeComponent(request.recipient));
       
       final queryParams = <String, String>{};
       queryParams['amount'] = request.amount;
@@ -265,13 +432,6 @@ class SVMPay {
       return true;
     } catch (e) {
       return false;
-    }
-  }
-
-  /// Log message if debug is enabled
-  void _log(String message) {
-    if (_config.debug) {
-      print('SVM-Pay: $message');
     }
   }
 }

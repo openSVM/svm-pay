@@ -26,7 +26,7 @@ class SolanaNetworkAdapter extends NetworkAdapter {
 
   @override
   bool validateAddress(String address) {
-    // Basic validation for Solana addresses (base58, 32-44 characters)
+    // Enhanced validation for Solana addresses
     if (address.isEmpty || address.length < 32 || address.length > 44) {
       return false;
     }
@@ -39,7 +39,58 @@ class SolanaNetworkAdapter extends NetworkAdapter {
       }
     }
 
-    return true;
+    // Attempt to decode base58 to ensure it's a valid 32-byte public key
+    try {
+      final decoded = _decodeBase58(address);
+      return decoded.length == 32;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Decode base58 string to bytes with proper validation
+  List<int> _decodeBase58(String input) {
+    const alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+    final base = BigInt.from(58);
+    var result = BigInt.zero;
+    
+    // Handle empty input
+    if (input.isEmpty) {
+      throw ArgumentError('Cannot decode empty base58 string');
+    }
+    
+    for (int i = 0; i < input.length; i++) {
+      final charIndex = alphabet.indexOf(input[i]);
+      if (charIndex == -1) {
+        throw ArgumentError('Invalid base58 character: ${input[i]}');
+      }
+      result = result * base + BigInt.from(charIndex);
+    }
+    
+    // Check for overflow/underflow
+    if (result == BigInt.zero && input != '1' * input.length) {
+      throw ArgumentError('Invalid base58 encoding');
+    }
+    
+    // Convert to bytes
+    final bytes = <int>[];
+    var temp = result;
+    while (temp > BigInt.zero) {
+      bytes.insert(0, (temp % BigInt.from(256)).toInt());
+      temp = temp ~/ BigInt.from(256);
+    }
+    
+    // Handle leading zeros (represented as '1' in base58)
+    for (int i = 0; i < input.length && input[i] == '1'; i++) {
+      bytes.insert(0, 0);
+    }
+    
+    // Validate the byte length for Solana addresses (should be exactly 32 bytes)
+    if (bytes.length != 32) {
+      throw ArgumentError('Invalid address length: expected 32 bytes, got ${bytes.length}');
+    }
+    
+    return bytes;
   }
 
   @override
