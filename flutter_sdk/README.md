@@ -254,6 +254,84 @@ The example app showcases:
 - Network switching
 - Error handling
 
+## Testing
+
+The Flutter SDK includes comprehensive test coverage with 73+ tests covering all critical functionality.
+
+### Running Tests
+
+```bash
+# Run all tests
+flutter test
+
+# Run tests with coverage
+flutter test --coverage
+
+# Run specific test files
+flutter test test/svm_pay_test.dart        # Core SDK tests (12 tests)
+flutter test test/security_test.dart       # Security tests (19 tests)  
+flutter test test/bug_fixes_test.dart      # Bug fix tests (12 tests)
+flutter test test/integration_test.dart    # Integration tests (17 tests)
+flutter test test/widget_test.dart         # Widget tests (13 tests)
+```
+
+### Test Validation
+
+Use the built-in validation script to ensure test coverage meets requirements:
+
+```bash
+chmod +x scripts/validate_tests.sh
+./scripts/validate_tests.sh
+```
+
+### Test Categories
+
+**Core SDK Tests** - Basic functionality testing:
+- URL generation and parsing
+- Address validation 
+- Network adapter functionality
+- Configuration handling
+
+**Security Tests** - Security enhancement validation:
+- Enhanced address validation with edge cases
+- Secure random number generation
+- Input sanitization and validation
+- URL parsing security
+- Error message sanitization
+- DoS protection mechanisms
+
+**Bug Fix Tests** - Critical bug resolution validation:
+- Memory leak prevention
+- Race condition handling
+- Secure entropy generation
+- DoS attack protection
+- Malicious input handling
+
+**Integration Tests** - End-to-end functionality:
+- Payment flow testing
+- Network integration
+- Error handling scenarios
+- Widget lifecycle management
+
+**Widget Tests** - UI component testing:
+- PaymentButton functionality
+- PaymentForm validation
+- PaymentQRCode generation
+- State management
+- Event handling
+
+### GitHub Actions
+
+The Flutter SDK is automatically tested on every commit and pull request through GitHub Actions:
+
+- **Flutter SDK Tests**: Runs all tests with coverage reporting
+- **Security Validation**: Validates security test coverage  
+- **Bug Fix Validation**: Ensures critical bug fixes are tested
+- **Integration Testing**: E2E testing scenarios
+- **Test Coverage Validation**: Ensures minimum test coverage requirements
+
+All tests must pass before code can be merged or published.
+
 ## Contributing
 
 Contributions are welcome! Please see the main [SVM-Pay repository](https://github.com/openSVM/svm-pay) for contributing guidelines.

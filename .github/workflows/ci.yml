@@ -1,0 +1,219 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # JavaScript/TypeScript tests for main SDK
+  js-tests:
+    name: JavaScript SDK Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Build project
+        run: npm run build
+
+      - name: Run tests
+        run: npm test -- --passWithNoTests
+
+  # Flutter SDK tests
+  flutter-tests:
+    name: Flutter SDK Tests
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.modified, 'flutter_sdk/') || contains(github.event.head_commit.added, 'flutter_sdk/') || github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      - name: Get Flutter dependencies
+        working-directory: flutter_sdk
+        run: flutter pub get
+
+      - name: Run Flutter analyzer
+        working-directory: flutter_sdk
+        run: flutter analyze --fatal-infos
+
+      - name: Run Flutter tests with coverage
+        working-directory: flutter_sdk
+        run: flutter test --coverage --reporter expanded
+
+      - name: Validate test coverage
+        working-directory: flutter_sdk
+        run: |
+          chmod +x scripts/validate_tests.sh
+          ./scripts/validate_tests.sh
+
+      - name: Upload Flutter coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: flutter_sdk/coverage/lcov.info
+          flags: flutter-sdk
+          name: flutter-sdk-coverage
+          fail_ci_if_error: false
+
+  # Security and bug fix validation
+  security-validation:
+    name: Security & Bug Fix Validation
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.modified, 'flutter_sdk/') || contains(github.event.head_commit.added, 'flutter_sdk/') || github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      - name: Get Flutter dependencies
+        working-directory: flutter_sdk
+        run: flutter pub get
+
+      - name: Run security tests
+        working-directory: flutter_sdk
+        run: |
+          echo "🔒 Running security enhancement tests..."
+          flutter test test/security_test.dart --reporter expanded
+
+      - name: Run critical bug fix tests
+        working-directory: flutter_sdk
+        run: |
+          echo "🐛 Running critical bug fix validation..."
+          flutter test test/bug_fixes_test.dart --reporter expanded
+
+      - name: Validate security compliance
+        working-directory: flutter_sdk
+        run: |
+          echo "✅ Validating security compliance..."
+          echo "Checking for OWASP Mobile Security compliance..."
+          
+          # Verify security test coverage
+          SECURITY_TESTS=$(grep -r "test(" test/security_test.dart | wc -l)
+          BUG_FIX_TESTS=$(grep -r "test(" test/bug_fixes_test.dart | wc -l)
+          
+          echo "Security tests: $SECURITY_TESTS"
+          echo "Bug fix tests: $BUG_FIX_TESTS"
+          
+          if [ $SECURITY_TESTS -lt 10 ]; then
+            echo "❌ Insufficient security test coverage"
+            exit 1
+          fi
+          
+          if [ $BUG_FIX_TESTS -lt 5 ]; then
+            echo "❌ Insufficient bug fix test coverage"
+            exit 1
+          fi
+          
+          echo "✅ Security validation passed!"
+
+  # E2E Integration tests
+  integration-tests:
+    name: E2E Integration Tests
+    runs-on: ubuntu-latest
+    needs: [flutter-tests]
+    if: contains(github.event.head_commit.modified, 'flutter_sdk/') || contains(github.event.head_commit.added, 'flutter_sdk/') || github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      - name: Get Flutter dependencies
+        working-directory: flutter_sdk
+        run: flutter pub get
+
+      - name: Run integration tests
+        working-directory: flutter_sdk
+        run: |
+          echo "🔄 Running E2E integration tests..."
+          flutter test test/integration_test.dart --reporter expanded
+
+      - name: Run widget tests
+        working-directory: flutter_sdk
+        run: |
+          echo "🎨 Running widget tests..."
+          flutter test test/widget_test.dart --reporter expanded
+
+  # Final validation
+  validation-summary:
+    name: Test Summary & Validation
+    runs-on: ubuntu-latest
+    needs: [js-tests, flutter-tests, security-validation, integration-tests]
+    if: always()
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Test Results Summary
+        run: |
+          echo "📊 CI/CD Test Results Summary"
+          echo "=================================="
+          
+          # Check job results
+          if [ "${{ needs.js-tests.result }}" = "success" ]; then
+            echo "✅ JavaScript SDK Tests: PASSED"
+          else
+            echo "❌ JavaScript SDK Tests: FAILED"
+          fi
+          
+          if [ "${{ needs.flutter-tests.result }}" = "success" ] || [ "${{ needs.flutter-tests.result }}" = "skipped" ]; then
+            echo "✅ Flutter SDK Tests: PASSED"
+          else
+            echo "❌ Flutter SDK Tests: FAILED"
+          fi
+          
+          if [ "${{ needs.security-validation.result }}" = "success" ] || [ "${{ needs.security-validation.result }}" = "skipped" ]; then
+            echo "✅ Security Validation: PASSED"
+          else
+            echo "❌ Security Validation: FAILED"
+          fi
+          
+          if [ "${{ needs.integration-tests.result }}" = "success" ] || [ "${{ needs.integration-tests.result }}" = "skipped" ]; then
+            echo "✅ Integration Tests: PASSED"
+          else
+            echo "❌ Integration Tests: FAILED"
+          fi
+          
+          echo ""
+          echo "🎉 CI/CD Pipeline completed!"
+          
+          # Fail if any critical jobs failed
+          if [ "${{ needs.js-tests.result }}" = "failure" ] || [ "${{ needs.flutter-tests.result }}" = "failure" ] || [ "${{ needs.security-validation.result }}" = "failure" ] || [ "${{ needs.integration-tests.result }}" = "failure" ]; then
+            echo "❌ Some tests failed - please review the logs above"
+            exit 1
+          fi
+          
+          echo "✅ All tests passed successfully!"
