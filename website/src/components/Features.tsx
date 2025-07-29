@@ -8,7 +8,8 @@ import {
   Coins, 
   Clock, 
   ArrowRight,
-  Terminal
+  Terminal,
+  Smartphone
 } from 'lucide-react'
 
 const features = [
@@ -59,6 +60,14 @@ const features = [
     color: 'text-orange-600',
     bgColor: 'bg-orange-100',
     borderColor: 'border-orange-200'
+  },
+  {
+    icon: Smartphone,
+    title: 'Flutter SDK',
+    description: 'Cross-platform mobile apps with native performance, enterprise security, and ready-to-use widgets.',
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-100',
+    borderColor: 'border-blue-200'
   },
   {
     icon: Terminal,

@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Book, PlayCircle, Home, Menu, X, Code } from 'lucide-react'
+import { Book, PlayCircle, Home, Menu, X, Code, Smartphone } from 'lucide-react'
 import { useState } from 'react'
 
 export function Navigation() {
@@ -11,6 +11,7 @@ export function Navigation() {
     { name: 'Home', href: '/', icon: Home },
     { name: 'Documentation', href: '/docs', icon: Code },
     { name: 'Tutorials', href: '/tutorials', icon: Book },
+    { name: 'Flutter SDK', href: '/flutter', icon: Smartphone },
     { name: 'Demo', href: '/demo', icon: PlayCircle },
   ]
 
@@ -31,7 +32,8 @@ export function Navigation() {
             {navigation.map((item) => {
               const isActive = location.pathname === item.href || 
                 (item.href === '/docs' && location.pathname.startsWith('/docs')) ||
-                (item.href === '/tutorials' && location.pathname.startsWith('/tutorials'))
+                (item.href === '/tutorials' && location.pathname.startsWith('/tutorials')) ||
+                (item.href === '/flutter' && location.pathname.startsWith('/flutter'))
               return (
                 <Link
                   key={item.name}
@@ -79,7 +81,8 @@ export function Navigation() {
             {navigation.map((item) => {
               const isActive = location.pathname === item.href || 
                 (item.href === '/docs' && location.pathname.startsWith('/docs')) ||
-                (item.href === '/tutorials' && location.pathname.startsWith('/tutorials'))
+                (item.href === '/tutorials' && location.pathname.startsWith('/tutorials')) ||
+                (item.href === '/flutter' && location.pathname.startsWith('/flutter'))
               return (
                 <Link
                   key={item.name}
